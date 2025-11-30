@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/simon/Numera/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

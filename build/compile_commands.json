@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/simon/Numera/build",
+  "command": "/usr/bin/g++  -I/home/simon/Numera/numera -g -std=c++17 -o CMakeFiles/numera.dir/numera/Numera.cpp.o -c /home/simon/Numera/numera/Numera.cpp",
+  "file": "/home/simon/Numera/numera/Numera.cpp",
+  "output": "CMakeFiles/numera.dir/numera/Numera.cpp.o"
+},
+{
+  "directory": "/home/simon/Numera/build",
+  "command": "/usr/bin/g++  -I/home/simon/Numera/numera -g -std=c++17 -o CMakeFiles/numera_example.dir/examples/main.cpp.o -c /home/simon/Numera/examples/main.cpp",
+  "file": "/home/simon/Numera/examples/main.cpp",
+  "output": "CMakeFiles/numera_example.dir/examples/main.cpp.o"
+},
+{
+  "directory": "/home/simon/Numera/build",
+  "command": "/usr/bin/g++  -I/home/simon/Numera/numera -g -std=c++17 -o CMakeFiles/numera_tests.dir/tests/NumeraTests.cpp.o -c /home/simon/Numera/tests/NumeraTests.cpp",
+  "file": "/home/simon/Numera/tests/NumeraTests.cpp",
+  "output": "CMakeFiles/numera_tests.dir/tests/NumeraTests.cpp.o"
+}
+]
