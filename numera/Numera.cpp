@@ -25,7 +25,7 @@ void nr::Numera::add(double number)
 void nr::Numera::add(std::vector<double> nums)
 {
     numbers.insert(numbers.end(), nums.begin(), nums.end());
-}
+} 
 
 size_t nr::Numera::count() const
 {
