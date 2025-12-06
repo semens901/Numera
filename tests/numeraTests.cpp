@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
-#include "Numera.h"
+#include "numera.h"
+#include "sampling/sampling.h"
 
 // helper: comparison of doubles taking into account the error
 bool almostEqual(double a, double b, double eps = 1e-9)
@@ -67,6 +68,17 @@ int main()
         // variance = 2, stddev = sqrt(2)
         //assert(almostEqual(stats.variance(), 2.0));
         assert(almostEqual(stats.stddev(), std::sqrt(2.5)));
+    }
+
+    {
+        std::cout << "[TEST] Simple random sampling\n";
+
+        std::vector<double> stats({10, 20, 30, 40, 50});
+
+        size_t sampleSize = 3;
+        auto sample = nr::Sampling::simple_random(stats, sampleSize);
+
+        assert(sample.size() == sampleSize);
     }
 
     std::cout << "\nAll tests passed successfully!\n";

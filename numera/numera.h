@@ -4,7 +4,7 @@
 #include<vector>
 #include<string>
 #include<fstream>
-#include <algorithm>
+#include<algorithm>
 #include<numeric>
 #include<cmath>
 

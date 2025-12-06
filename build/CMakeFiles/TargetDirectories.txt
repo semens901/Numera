@@ -1,0 +1,15 @@
+/home/simon/Numera/build/CMakeFiles/test.dir
+/home/simon/Numera/build/CMakeFiles/edit_cache.dir
+/home/simon/Numera/build/CMakeFiles/rebuild_cache.dir
+/home/simon/Numera/build/numera/CMakeFiles/numera.dir
+/home/simon/Numera/build/numera/CMakeFiles/test.dir
+/home/simon/Numera/build/numera/CMakeFiles/edit_cache.dir
+/home/simon/Numera/build/numera/CMakeFiles/rebuild_cache.dir
+/home/simon/Numera/build/examples/CMakeFiles/numera_example.dir
+/home/simon/Numera/build/examples/CMakeFiles/test.dir
+/home/simon/Numera/build/examples/CMakeFiles/edit_cache.dir
+/home/simon/Numera/build/examples/CMakeFiles/rebuild_cache.dir
+/home/simon/Numera/build/tests/CMakeFiles/numera_tests.dir
+/home/simon/Numera/build/tests/CMakeFiles/test.dir
+/home/simon/Numera/build/tests/CMakeFiles/edit_cache.dir
+/home/simon/Numera/build/tests/CMakeFiles/rebuild_cache.dir

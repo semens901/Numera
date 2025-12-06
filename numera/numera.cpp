@@ -1,4 +1,4 @@
-#include "Numera.h"
+#include "numera.h"
 
 nr::Numera::Numera(std::string fileName) : fileName(fileName)
 {
