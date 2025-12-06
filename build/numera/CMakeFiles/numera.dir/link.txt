@@ -1,2 +1,0 @@
-/usr/bin/ar qc libnumera.a CMakeFiles/numera.dir/numera.cpp.o CMakeFiles/numera.dir/sampling/sampling.cpp.o
-/usr/bin/ranlib libnumera.a

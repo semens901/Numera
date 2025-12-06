@@ -1,1 +1,0 @@
-/usr/bin/g++ -g -Wl,--dependency-file=CMakeFiles/numera_example.dir/link.d CMakeFiles/numera_example.dir/main.cpp.o -o numera_example  ../numera/libnumera.a
