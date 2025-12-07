@@ -35,7 +35,7 @@ namespace nr
         void clear();
         bool empty() const;
 
-        void pop_back();
+        void pop_back(); 
         void remove_at(size_t);
 
         void load_data(const std::string&, IDataLoader&);
@@ -55,7 +55,7 @@ namespace nr
         std::vector<double>::const_iterator end () const; 
 
     private:
-        std::vector<double> numbers;
+        std::vector<double> numbers; // population
         std::string fileName;
     };
 }
