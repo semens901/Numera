@@ -17,13 +17,17 @@ namespace nr
         Numera& operator=(const Numera&) = delete;
 
         Numera(std::string);
+        Numera(std::vector<double> nums);
         Numera();
 
         ~Numera();
 
         void add(double); // add a number to a set
         void add(std::vector<double>); // add a numbers to a set
-        size_t count() const; // number of elements
+        void open_file(std::string);
+        void clear();
+
+        size_t size() const; // number of elements
         double min() const; // minimum
         double max() const; // maximum
         double mean() const; // arithmetic mean
@@ -31,7 +35,9 @@ namespace nr
         double stddev() const; // standard deviation
         double variance() const; // variance
         bool is_open() const;
-        void open_file(std::string);
+        
+        std::vector<double>::const_iterator begin () const; 
+        std::vector<double>::const_iterator end () const; 
 
     private:
         std::vector<double> numbers;

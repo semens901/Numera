@@ -9,6 +9,9 @@ nr::Numera::Numera(std::string fileName) : fileName(fileName)
     }
 }
 
+nr::Numera::Numera(std::vector<double> nums)  : numbers(nums) {}
+
+
 nr::Numera::Numera()
 {
 }
@@ -27,7 +30,7 @@ void nr::Numera::add(std::vector<double> nums)
     numbers.insert(numbers.end(), nums.begin(), nums.end());
 } 
 
-size_t nr::Numera::count() const
+size_t nr::Numera::size() const
 {
     return numbers.size();
 }
@@ -113,6 +116,16 @@ bool nr::Numera::is_open() const
     return file.is_open();
 }
 
+std::vector<double>::const_iterator nr::Numera::begin() const
+{
+    return numbers.begin();
+}
+
+std::vector<double>::const_iterator nr::Numera::end() const
+{
+    return numbers.end();
+}
+
 void nr::Numera::open_file(std::string)
 {
     file.open(fileName);
@@ -124,4 +137,9 @@ void nr::Numera::open_file(std::string)
             numbers.push_back(i);
         }
     }
+}
+
+void nr::Numera::clear()
+{
+    numbers.clear();
 }

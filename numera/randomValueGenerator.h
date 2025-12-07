@@ -8,6 +8,10 @@ namespace nr
     class RandomValueGenerator
     {
         public:
+            RandomValueGenerator() = delete;
+            RandomValueGenerator(const RandomValueGenerator&) = delete;
+            RandomValueGenerator& operator=(const RandomValueGenerator&) = delete;
+
             static std::mt19937_64& get_thread_local_generator();
     };
 }

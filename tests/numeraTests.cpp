@@ -19,7 +19,7 @@ int main()
         stats.add(20.0);
         stats.add(30.0);
 
-        assert(stats.count() == 3);
+        assert(stats.size() == 3);
     }
 
     {
