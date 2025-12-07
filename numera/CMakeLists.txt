@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 # Library: numera
 add_library(numera STATIC
     numera.cpp
+    randomValueGenerator.cpp
     sampling/sampling.cpp
 )
 

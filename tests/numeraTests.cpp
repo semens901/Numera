@@ -81,6 +81,42 @@ int main()
         assert(sample.size() == sampleSize);
     }
 
+    {
+        std::cout << "[TEST] Systematic sampling\n";
+        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+
+        size_t sample = 4;
+        auto sampleResult = nr::Sampling::systematic(stats, sample);
+
+        double statsSize = static_cast<double>(stats.size());
+        double step = statsSize / static_cast<double>(sample);
+        assert(sampleResult.size() == static_cast<double>(std::ceil(step)));
+    }
+
+    {
+        std::cout << "[TEST] Systematic sorted sampling\n";
+        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+
+        size_t sample = 4;
+        auto sampleResult = nr::Sampling::systematic_sorted(stats, sample);
+
+        double statsSize = static_cast<double>(stats.size());
+        double step = statsSize / static_cast<double>(sample);
+        assert(sampleResult.size() == static_cast<double>(std::ceil(step)));
+    }
+
+    {
+        std::cout << "[TEST] Stratified sampling (grouped by label)\n";
+        std::vector<double> stats({10,11,12,13, 20,21,22,23,24, 30,31,32, 40,41,42,43,44,45});
+        // labels: three strata (0,1,2) and one smaller stratum (3)
+        std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
+        size_t sampleSize = 8;
+
+        auto strat = nr::Sampling::stratified(stats, labels, sampleSize);
+
+        assert(strat.size() == sampleSize);
+    }
+
     std::cout << "\nAll tests passed successfully!\n";
     return 0;
 }

@@ -1,9 +1,14 @@
 #ifndef SAMPLING_H
 #define SAMPLING_H
-#include<vector>
 #include "numera.h"
+#include "randomValueGenerator.h"
+#include<vector>
 #include<random>
 #include<algorithm>
+#include <chrono>
+#include <unordered_map>
+#include<iostream>
+#include<cmath>
 
 namespace nr
 {
