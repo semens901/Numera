@@ -8,10 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTS "Build tests" ON)
 
 # Add subprojects
-add_subdirectory(numera)
-add_subdirectory(examples)
+add_subdirectory(Numera)
+add_subdirectory(Examples)
 
 if(BUILD_TESTS)
 	enable_testing()
-	add_subdirectory(tests)
+	add_subdirectory(Tests)
 endif()

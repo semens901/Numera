@@ -1,4 +1,4 @@
-#include "sampling.h"
+#include "Sampling.h"
 
 
 std::vector<double> nr::Sampling::simple_random(const std::vector<double> &data, size_t sampleSize)

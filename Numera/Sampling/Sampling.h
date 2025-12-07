@@ -1,7 +1,8 @@
 #ifndef SAMPLING_H
 #define SAMPLING_H
-#include "numera.h"
-#include "randomValueGenerator.h"
+#include "Numera.h"
+#include "RandomValueGenerator.h"
+
 #include<vector>
 #include<random>
 #include<algorithm>

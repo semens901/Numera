@@ -1,13 +1,15 @@
+#include "Numera.h"
+#include "Sampling/Sampling.h"
+#include "FileDataLoader.h"
+
 #include<iostream>
-#include "numera.h"
-#include "sampling/sampling.h"
 #include <cassert>
+#include<string>
 
 int main()
 {
-    nr::Numera nm("numbers.txt");
-    if(!nm.is_open())
-        return 1;
+    FileDataLoader file_loader;
+    nr::Numera nm("numbers.txt", file_loader);
     std::cout << "Count:\t" << nm.size() << std::endl;
     std:: cout << "Min:\t" << nm.min() << std::endl;
     std:: cout << "Max:\t" << nm.max() << std::endl;

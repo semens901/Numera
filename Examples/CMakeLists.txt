@@ -5,5 +5,5 @@ add_executable(numera_example
     main.cpp
 )
 
-target_link_libraries(numera_example PRIVATE numera)
+target_link_libraries(numera_example PRIVATE Numera)
 target_compile_features(numera_example PRIVATE cxx_std_17)

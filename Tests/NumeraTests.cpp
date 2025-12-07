@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
-#include "numera.h"
-#include "sampling/sampling.h"
+#include "Numera.h"
+#include "Sampling/Sampling.h"
 
 // helper: comparison of doubles taking into account the error
 bool almostEqual(double a, double b, double eps = 1e-9)

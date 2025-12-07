@@ -1,16 +1,29 @@
-#include "numera.h"
+#include "Numera.h"
 
-nr::Numera::Numera(std::string fileName) : fileName(fileName)
+nr::Numera::Numera(std::string filename, IDataLoader& loader)
 {
-    open_file(this->fileName);
-    if(!is_open())
-    {
-        std::cerr << "Failed to open file!\n";
-    }
+    this->fileName = filename;
+    load_data(fileName, loader);
+    numbers = loader.load(fileName);
 }
 
 nr::Numera::Numera(std::vector<double> nums)  : numbers(nums) {}
 
+nr::Numera::Numera(const Numera& other)
+{
+    this->numbers = other.numbers;
+    this->fileName = other.fileName;
+}
+
+nr::Numera& nr::Numera::operator=(const Numera& other)
+{
+    if (this != &other)
+    {
+        this->numbers = other.numbers;
+        this->fileName = other.fileName;
+    }
+    return *this;
+}
 
 nr::Numera::Numera()
 {
@@ -89,10 +102,18 @@ double nr::Numera::stddev() const
     long double variance = sumSquaredDiffs / (long double)(n - 1);
     return std::sqrt((double)variance);
 }
+void nr::Numera::load_data(const std::string& fileName, IDataLoader& loader)
+{
+    numbers = loader.load(fileName);
+}
+void nr::Numera::save_data(const std::string& fileName, IDataLoader& loader) const
+{
+    loader.save(fileName, numbers);
+}
 /*
 double nr::Numera::variance() const
 {
-    
+
     if (numbers.empty()) return 0.0;
     const std::size_t n = numbers.size();
     if (n == 1) return 0.0;
@@ -108,13 +129,9 @@ double nr::Numera::variance() const
     // Use sample variance (Bessel's correction): divide by (n - 1)
     long double variance = sumSquaredDiffs / (long double)(n - 1);
     return (double)variance;
-    
+
 }
 */
-bool nr::Numera::is_open() const
-{
-    return file.is_open();
-}
 
 std::vector<double>::const_iterator nr::Numera::begin() const
 {
@@ -126,20 +143,35 @@ std::vector<double>::const_iterator nr::Numera::end() const
     return numbers.end();
 }
 
-void nr::Numera::open_file(std::string)
+double nr::Numera::at(size_t index) const
 {
-    file.open(fileName);
-    if(is_open())
-    {
-        double i;
-        while(file >> i)
-        {
-            numbers.push_back(i);
-        }
-    }
+    return 0.0;
+}
+
+double nr::Numera::front() const
+{
+    return 0.0;
+}
+
+double nr::Numera::back() const
+{
+    return 0.0;
 }
 
 void nr::Numera::clear()
 {
     numbers.clear();
+}
+
+bool nr::Numera::empty() const
+{
+    return false;
+}
+
+void nr::Numera::pop_back()
+{
+}
+
+void nr::Numera::remove_at(size_t index)
+{
 }
