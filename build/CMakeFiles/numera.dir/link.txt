@@ -1,2 +1,0 @@
-/usr/bin/ar qc libnumera.a CMakeFiles/numera.dir/numera/Numera.cpp.o
-/usr/bin/ranlib libnumera.a
