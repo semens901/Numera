@@ -1,22 +1,35 @@
-#include "Numera.h"
-#include "Sampling/Sampling.h"
-#include "FileDataLoader.h"
+#include "Core/VectorData.h"
+#include "io/CsvDataLoader.h"
+#include "stats/Sampling.h"
+#include "stats/BasicStats.h"
+#include "io/FileDataLoader.h"
 
 #include<iostream>
-#include <cassert>
+#include<cassert>
 #include<string>
 
 int main()
-{
-    FileDataLoader file_loader;
-    nr::Numera nm("numbers.txt", file_loader);
-    std::cout << "Count:\t" << nm.size() << std::endl;
-    std:: cout << "Min:\t" << nm.min() << std::endl;
-    std:: cout << "Max:\t" << nm.max() << std::endl;
-    std:: cout << "Arithmetic mean:\t" << nm.mean() << std::endl;
-    std:: cout << "Median:\t" << nm.median() << std::endl;
-    std:: cout << "Standard deviation:\t" << nm.stddev() << std::endl;
+{    
+    CSVDataStore store("example.csv");
     
+    if (store.read()) {
+        std::cout << "CSV-файл успешно прочитан!" << std::endl;
+        store.print();
+
+        // Пример: получить все значения колонки "Name"
+        auto names = store.get("Name");
+        std::cout << "Name column: ";
+        for (const auto& n : names) std::cout << n << " ";
+        std::cout << std::endl;
+    } else {
+        std::cout << "Ошибка при чтении CSV-файла." << std::endl;
+    }
+
+    FileDataLoader file_loader;
+    nr::VectorData dt(file_loader.load("numbers.txt"));
+    std::cout << "Count:\t" << dt.size() << std::endl;
+    std::cout << "Min:\t" << nr::min(dt) << std::endl;
+   
     {
         std::cout << "[TEST] Simple random sampling\n";
 

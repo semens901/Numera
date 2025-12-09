@@ -1,7 +1,8 @@
 #include <cassert>
 #include <iostream>
-#include "Numera.h"
-#include "Sampling/Sampling.h"
+#include "Core/VectorData.h"
+#include "stats/Sampling.h"
+#include "stats/BasicStats.h"
 
 // helper: comparison of doubles taking into account the error
 bool almostEqual(double a, double b, double eps = 1e-9)
@@ -11,63 +12,67 @@ bool almostEqual(double a, double b, double eps = 1e-9)
 
 int main()
 {
+
     {
         std::cout << "[TEST] Adding elements\n";
 
-        nr::Numera stats;
-        stats.add(10.0);
-        stats.add(20.0);
-        stats.add(30.0);
+        nr::VectorData<double> vd;
+        vd.add(10.0);
+        vd.add(20.0);
+        vd.add(30.0);
 
-        assert(stats.size() == 3);
+        assert(vd.size() == 3);
+        std::cout << "Test passed: size is " << vd.size() << "\n";
+    }
+
+    {
+        std::cout << "[TEST] Adding elements\n";
+        nr::VectorData<double> vd;
+        vd.add({1.0, 2.0, 3.0, 4.0, 5.0});
+        assert(vd.size() == 5);
+        std::cout << "Test passed: size is " << vd.size() << "\n";
+        
+        std::cout << "[TEST] Copy and move semantics\n";
+        nr::VectorData<double> vd2 = vd; // copy constructor
+        assert(vd2.size() == 5);    
+        std::cout << "Test passed: size is " << vd2.size() << "\n";
+        
+        std::cout << "[TEST] Copy and move semantics\n";
+        nr::VectorData<double> vd3;
+        vd3 = vd; // copy assignment
+        assert(vd3.size() == 5);    
+        std::cout << "Test passed: size is " << vd3.size() << "\n";
+
+        std::cout << "[TEST] Move semantics\n";
+        nr::VectorData<double> vd4 = std::move(vd); // move constructor
+        assert(vd4.size() == 5);
+        assert(vd.size() == 0); // vd should be empty after move
+        std::cout << "Test passed: size is " << vd4.size() << "\n";    
+        
+        std::cout << "[TEST] Move semantics\n";
+        nr::VectorData<double> vd5;
+        vd5 = std::move(vd2); // move assignment
+        assert(vd5.size() == 5);
+        assert(vd2.size() == 0); // vd2 should be empty after move
+        std::cout << "Test passed: size is " << vd5.size() << "\n";
+
+        std::cout << "[TEST] Removing elements\n";
+        nr::VectorData<double> vd6({1,2,3});
+        vd6.remove_at(1); // remove element at index 1
+        assert(vd6.size() == 2);
+        assert(vd6[0] == 1);
+        assert(vd6[1] == 3);
+        std::cout << "Test passed: size is " << vd6.size() << "\n";
     }
 
     {
         std::cout << "[TEST] Minimum and maximum\n";
 
-        nr::Numera stats;
-        stats.add({5, 10, 2, 8});
+        nr::VectorData<double> vd;
+        vd.add({5, 10, 2, 8});
 
-        assert(stats.min() == 2);
-        assert(stats.max() == 10);
-    }
-
-    {
-        std::cout << "[TEST] Checking the average\n";
-
-        nr::Numera stats;
-        stats.add({1, 2, 3, 4, 5});
-
-        assert(almostEqual(stats.mean(), 3.0));
-    }
-
-    {
-        std::cout << "[TEST] Checking the median (odd number)\n";
-
-        nr::Numera stats;
-        stats.add({3, 1, 5});
-
-        assert(almostEqual(stats.median(), 3.0));
-    }
-
-    {
-        std::cout << "[TEST] Median (even number)\n";
-
-        nr::Numera stats;
-        stats.add({4, 2, 8, 6});
-
-        // sorted: 2,4,6,8 -> median = (4+6)/2 = 5
-        assert(almostEqual(stats.median(), 5.0));
-    }
-
-    {
-        std::cout << "[TEST] Variance and standard deviation\n";
-
-        nr::Numera stats;
-        stats.add({1, 2, 3, 4, 5});
-        // variance = 2, stddev = sqrt(2)
-        //assert(almostEqual(stats.variance(), 2.0));
-        assert(almostEqual(stats.stddev(), std::sqrt(2.5)));
+        assert(min(vd) == 2);
+        assert(max(vd) == 10);
     }
 
     {

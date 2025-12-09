@@ -74,7 +74,7 @@ std::vector<double> nr::Sampling::systematic_sorted(const std::vector<double> &d
 
     return out;
 }
-    std::vector<double> nr::Sampling::stratified(const std::vector<double> &data, const std::vector<size_t> &strataLabels, size_t sampleSize)
+std::vector<double> nr::Sampling::stratified(const std::vector<double> &data, const std::vector<size_t> &strataLabels, size_t sampleSize)
 {
     if (data.empty() || strataLabels.size() != data.size() || sampleSize == 0) return {};
 
@@ -155,21 +155,4 @@ std::vector<double> nr::Sampling::systematic_sorted(const std::vector<double> &d
     // Mixing
     std::shuffle(out.begin(), out.end(), gen);
     return out;
-}
-
-///////////////////////////////////////////////
-
-std::vector<double> nr::Sampling::simple_random(const Numera &data, size_t sampleSize)
-{
-    return std::vector<double>();
-}
-
-std::vector<double> nr::Sampling::systematic(const Numera &data, size_t step)
-{
-    return std::vector<double>();
-}
-
-std::vector<double> nr::Sampling::stratified(const Numera &data, const std::vector<size_t> &strataLabels, size_t samplePerStratum)
-{
-    return std::vector<double>();
 }

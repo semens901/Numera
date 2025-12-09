@@ -6,7 +6,7 @@
 #include<vector>
 #include<string>
 
-class FileDataLoader : public IDataLoader 
+class FileDataLoader : public IDataLoader<std::vector<double>>
 {
 public:
     std::vector<double> load(const std::string& filename) override;
