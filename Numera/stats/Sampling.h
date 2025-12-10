@@ -22,12 +22,12 @@ namespace nr
 
         static std::vector<double> systematic(
             const std::vector<double>& data,
-            size_t step
+            size_t sample
         );
 
         static std::vector<double> systematic_sorted(
             const std::vector<double>& data,
-            size_t step
+            size_t sample
         );
 
         static std::vector<double> stratified(
@@ -35,7 +35,29 @@ namespace nr
             const std::vector<size_t>& strataLabels,
             size_t samplePerStratum
         );
+////////////////////////////////////////////////////
 
+        static std::vector<double> simple_random(
+            const nr::DataSet<std::vector<double>>& data,
+            size_t sampleSize
+        );
+
+        static std::vector<double> systematic(
+            const nr::DataSet<std::vector<double>>& data,
+            size_t sample
+        );
+
+        static std::vector<double> systematic_sorted(
+            const nr::DataSet<std::vector<double>>& data,
+            size_t sample
+        );
+        /*
+        static std::vector<double> stratified(
+            const std::vector<double>& data,
+            const std::vector<size_t>& strataLabels,
+            size_t samplePerStratum
+        );
+        */
     };
 }
 

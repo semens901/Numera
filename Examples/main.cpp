@@ -12,7 +12,7 @@ int main()
 {    
     CSVDataStore store("example.csv");
     
-    if (store.read()) {
+    if (store.load().size() > 0) {
         std::cout << "CSV-файл успешно прочитан!" << std::endl;
         store.print();
 
@@ -26,14 +26,14 @@ int main()
     }
 
     FileDataLoader file_loader;
-    nr::VectorData dt(file_loader.load("numbers.txt"));
+    nr::VectorData<double> dt(file_loader.load("numbers.txt"));
     std::cout << "Count:\t" << dt.size() << std::endl;
     std::cout << "Min:\t" << nr::min(dt) << std::endl;
    
     {
         std::cout << "[TEST] Simple random sampling\n";
 
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sampleSize = 5;
         auto sample = nr::Sampling::simple_random(stats, sampleSize);
@@ -47,7 +47,7 @@ int main()
 
     {
         std::cout << "[TEST] Systematic sampling\n";
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
         auto sampleResult = nr::Sampling::systematic(stats, sample);
@@ -55,13 +55,11 @@ int main()
         std::cout << "Systematic sample (" << sampleResult.size() << "):";
         for (double v : sampleResult) std::cout << ' ' << v;
         std::cout << '\n';
-        double statsSize = static_cast<double>(stats.size());
-        double step = statsSize / static_cast<double>(sample);
     }
 
     {
         std::cout << "[TEST] Systematic sorted sampling\n";
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
         auto sampleResult = nr::Sampling::systematic_sorted(stats, sample);

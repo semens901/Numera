@@ -156,3 +156,54 @@ std::vector<double> nr::Sampling::stratified(const std::vector<double> &data, co
     std::shuffle(out.begin(), out.end(), gen);
     return out;
 }
+
+std::vector<double> nr::Sampling::simple_random(const nr::DataSet<std::vector<double>>& data, size_t sampleSize)
+{
+    if (sampleSize == 0 || data.empty()) return {};
+
+    // Use a thread-local generator seeded once per thread with mixed entropy.
+    auto &gen = nr::RandomValueGenerator::get_thread_local_generator();
+
+    size_t size = std::min(sampleSize, data.size());
+
+    std::vector<double> out;
+    out.reserve(size);
+
+    std::sample(data.cbegin(), data.cend(), std::back_inserter(out),
+                size, gen);
+    
+    std::shuffle(out.begin(), out.end(), gen);
+
+    return out;
+}
+
+std::vector<double> nr::Sampling::systematic(const nr::DataSet<std::vector<double>>& data, size_t sample)
+{
+    if (data.empty() || sample == 0) return {};
+     auto population = std::vector<double>(data.cbegin(), data.cend());
+    std::sort(population.begin(), population.end());
+
+    size_t n = population.size();
+    size_t start = 0;
+    size_t step = n / sample;
+    if (step > 1) {
+        std::random_device rd;
+        std::mt19937_64 gen(rd());
+        std::uniform_int_distribution<size_t> dist(0, std::min(step, n) - 1);
+        start = dist(gen);
+    }
+
+    std::vector<double> out;
+    out.reserve((n + step - 1) / step);
+
+    for (size_t i = start; i < n; i += step) {
+        out.push_back(population[i++]);
+    }
+
+    return out;
+}
+
+std::vector<double> nr::Sampling::systematic_sorted(const nr::DataSet<std::vector<double>>& data, size_t sample)
+{
+    return std::vector<double>();
+}

@@ -16,13 +16,12 @@ namespace nr
 
         VectorData() = default;
         ~VectorData() override = default;
+        VectorData(const VectorData& other);
+        VectorData(container_type vec) { this->container = std::move(vec); }
 
-        VectorData(const VectorData& other) : vec(other.vec) {};
-        VectorData(container_type vec)  : vec(vec) {}
-
-        VectorData<T>& operator=(const VectorData& other);
-        VectorData(VectorData&& other) noexcept : vec(std::move(other.vec)){};
-        VectorData<value_type>& operator=(VectorData&& other) noexcept;
+        VectorData<T>& operator=(const VectorData<T>& other);
+        VectorData(VectorData&& other) noexcept;
+        VectorData<value_type>& operator=(VectorData<T>&& other) noexcept;
 
         value_type& operator[](size_t index);
         const value_type& operator[](size_t index) const;
@@ -35,32 +34,41 @@ namespace nr
         void clear() override;
         bool empty() const override;
 
-        typename container_type::iterator begin ();
-        typename container_type::iterator end ();
-        typename container_type::const_iterator cbegin () const noexcept; 
-        typename container_type::const_iterator cend () const noexcept; 
+        typename container_type::iterator begin () override;
+        typename container_type::iterator end () override;
+        typename container_type::const_iterator cbegin () const noexcept override; 
+        typename container_type::const_iterator cend () const noexcept override; 
 
-
-    private:
-        container_type vec;
     };
 
     template <typename T>
-    inline VectorData<T> &VectorData<T>::operator=(const VectorData &other)
+    inline VectorData<T>::VectorData(const VectorData<T> &other)
+    {
+        this->container = other.container; 
+    }
+
+    template <typename T>
+    inline VectorData<T> &VectorData<T>::operator=(const VectorData<T> &other)
     {
         if(this != &other) 
         {
-            this->vec = other.vec;     
+            this->container = other.container;     
         }
         return *this; 
     }
 
     template <typename T>
-    inline VectorData<T> &VectorData<T>::operator=(VectorData &&other) noexcept
+    inline VectorData<T>::VectorData(VectorData<T> &&other) noexcept
+    {
+        this->container = std::move(other.container);
+    }
+
+    template <typename T>
+    inline VectorData<T> &VectorData<T>::operator=(VectorData<T> &&other) noexcept
     {
         if (this != &other) 
         {
-            this->vec = std::move(other.vec);
+            this->container = std::move(other.container);
         }
         return *this;
     }
@@ -68,79 +76,79 @@ namespace nr
     template <typename T>
     inline T &VectorData<T>::operator[](size_t index)
     {
-        return vec[index];
+        return this->container[index];
     }
 
     template <typename T>
     inline const T &VectorData<T>::operator[](size_t index) const
     {
-        return vec[index];
+        return this->container[index];
     }
 
     template <typename T>
     inline void VectorData<T>::add(value_type element)
     {
-        vec.push_back(element);
+        this->container.push_back(element);
     }
 
     template <typename T>
     inline void VectorData<T>::add(container_type elements) 
     {
-        vec.insert(vec.end(), elements.begin(), elements.end());
+        this->container.insert(this->container.end(), elements.begin(), elements.end());
     }
 
     template <typename T>
     inline void VectorData<T>::remove_at(size_t index)
     {
-        vec.erase(vec.begin() + index);
+        this->container.erase(this->container.begin() + index);
     }
 
     template <typename T>
     inline const T& VectorData<T>::at(size_t index) const
     {
-        return vec.at(index);
+        return this->container.at(index);
     }
 
     template <typename T>
     inline size_t VectorData<T>::size() const
     {
-        return vec.size();
+        return this->container.size();
     }
 
     template <typename T>
     inline void VectorData<T>::clear()
     {
-        vec.clear();
+        this->container.clear();
     }
 
     template <typename T>
     inline bool VectorData<T>::empty() const
     {
-        return vec.empty();
+        return this->container.empty();
     }
 
     template <typename T>
     inline typename std::vector<T>::iterator VectorData<T>::begin()
     {
-        return vec.begin();
+        return this->container.begin();
     }
 
     template <typename T>
     inline typename std::vector<T>::iterator VectorData<T>::end()
     {
-        return vec.end();
+        return this->container.end();
     }
 
     template <typename T>
     inline typename std::vector<T>::const_iterator VectorData<T>::cbegin() const noexcept
     {
-        return vec.cbegin();
+        return this->container.cbegin();
     }
 
     template <typename T>
     inline typename std::vector<T>::const_iterator VectorData<T>::cend() const noexcept
     {
-        return vec.cend();
+        return this->container.cend();
     }
 }
 

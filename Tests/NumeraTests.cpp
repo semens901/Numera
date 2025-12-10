@@ -1,8 +1,12 @@
-#include <cassert>
-#include <iostream>
 #include "Core/VectorData.h"
+#include "io/CsvDataLoader.h"
 #include "stats/Sampling.h"
 #include "stats/BasicStats.h"
+#include "io/FileDataLoader.h"
+
+#include<iostream>
+#include<cassert>
+#include<string>
 
 // helper: comparison of doubles taking into account the error
 bool almostEqual(double a, double b, double eps = 1e-9)
@@ -12,7 +16,6 @@ bool almostEqual(double a, double b, double eps = 1e-9)
 
 int main()
 {
-
     {
         std::cout << "[TEST] Adding elements\n";
 
@@ -78,7 +81,7 @@ int main()
     {
         std::cout << "[TEST] Simple random sampling\n";
 
-        std::vector<double> stats({10, 20, 30, 40, 50});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50});
 
         size_t sampleSize = 3;
         auto sample = nr::Sampling::simple_random(stats, sampleSize);
@@ -88,7 +91,7 @@ int main()
 
     {
         std::cout << "[TEST] Systematic sampling\n";
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
         auto sampleResult = nr::Sampling::systematic(stats, sample);

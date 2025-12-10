@@ -1,17 +1,17 @@
 #include "CsvDataLoader.h"
 
-bool CSVDataStore::read()
+std::map<std::string, std::vector<std::string>> CSVDataStore::load(const std::string& filename)
 {
-    std::ifstream file(m_filename);
+    std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Не удалось открыть файл: " << m_filename << std::endl;
-        return false;
+        std::cerr << "Не удалось открыть файл: " << filename << std::endl;
+        return {};
     }
 
     std::string line;
     
     // Считать заголовки (имена колонок)
-    if (!std::getline(file, line)) return false;
+    if (!std::getline(file, line)) return {};
     std::vector<std::string> headers = split(line, m_delimiter);
 
     // Инициализируем мапу пустыми векторами
@@ -32,7 +32,46 @@ bool CSVDataStore::read()
     }
 
     file.close();
-    return true;
+    return m_data;
+}
+
+std::map<std::string, std::vector<std::string>> CSVDataStore::load()
+{
+    std::ifstream file(m_filename);
+    if (!file.is_open()) {
+        std::cerr << "Не удалось открыть файл: " << m_filename << std::endl;
+        return {};
+    }
+
+    std::string line;
+    
+    // Считать заголовки (имена колонок)
+    if (!std::getline(file, line)) return {};
+    std::vector<std::string> headers = split(line, m_delimiter);
+
+    // Инициализируем мапу пустыми векторами
+    for (const auto& header : headers) {
+        m_data[header] = {};
+    }
+
+    // Чтение данных
+    while (std::getline(file, line)) {
+        std::vector<std::string> row = split(line, m_delimiter);
+        for (size_t i = 0; i < headers.size(); ++i) {
+            if (i < row.size()) {
+                m_data[headers[i]].push_back(row[i]);
+            } else {
+                m_data[headers[i]].push_back(""); // если данных меньше, чем колонок
+            }
+        }
+    }
+
+    file.close();
+    return m_data;
+}
+
+void CSVDataStore::save(const std::string &filename, const std::map<std::string, std::vector<std::string>> &data) const
+{
 }
 
 const std::vector<std::string> &CSVDataStore::get(const std::string &key) const
