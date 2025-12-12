@@ -7,24 +7,27 @@
 #include <string>
 #include <map>
 
-class CSVDataStore : public IDataLoader<std::map<std::string, std::vector<std::string>>>{
+class CSVDataLoader : public IDataLoader<std::map<std::string, std::vector<std::string>>>{
 public:
-    CSVDataStore(const std::string& filename, char delimiter = ',')
+    CSVDataLoader(const std::string& filename, char delimiter = ',')
         : m_filename(filename), m_delimiter(delimiter) {}
-
+    /*
+        This class can work with CSV files.
+    */
     using value_type = std::string;
     using container_type = std::map<std::string, std::vector<std::string>>;
     using size_type = std::size_t;
 
-    // Чтение CSV-файла
+    // Reading a CSV file
     container_type load(const std::string& filename) override;
     container_type load();
 
+    // Write to file
     void save(const std::string& filename, const std::map<std::string, std::vector<std::string>>& data) const override;
-    // Получить все значения по ключу (колонке)
+    // Get all values ​​by key (column)
     const std::vector<std::string>& get(const std::string& key) const;
 
-    // Вывести всё содержимое
+    // Output all contents
     void print() const;
 
 private:

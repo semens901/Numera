@@ -1,23 +1,32 @@
 #ifndef NUMERA_CORE_VECTORDATA_H
 #define NUMERA_CORE_VECTORDATA_H
+#include "stats/BasicStats.h"
 
-#include "DataSet.h"
+#include<iostream>
+#include<vector>
+#include<string>
+#include<fstream>
+#include<algorithm>
+#include<numeric>
+#include<cmath>
 
 namespace nr
 {   
     template <typename T>
-    class VectorData : public DataSet<std::vector<T>>
+    class VectorData
     {
     public:
-
+        //Stores data in std::vector
         using value_type = T;
         using container_type = std::vector<T>;
         using size_type = std::size_t;
+        using iterator = typename container_type::iterator;
+        using const_iterator =  typename container_type::const_iterator;
 
         VectorData() = default;
-        ~VectorData() override = default;
+        ~VectorData() = default;
         VectorData(const VectorData& other);
-        VectorData(container_type vec) { this->container = std::move(vec); }
+        VectorData(container_type vec) { this->container = vec; }
 
         VectorData<T>& operator=(const VectorData<T>& other);
         VectorData(VectorData&& other) noexcept;
@@ -26,19 +35,26 @@ namespace nr
         value_type& operator[](size_t index);
         const value_type& operator[](size_t index) const;
 
-        void add(value_type element) override;
+        void add(value_type element);
         void add(container_type elements);
-        void remove_at(size_t index) override;
-        const value_type& at(size_type index) const override;
-        size_type size() const override;
-        void clear() override;
-        bool empty() const override;
+        void remove_at(size_t index);
+        const value_type& at(size_type index) const;
+        size_type size() const;
+        void clear();
+        bool empty() const;
 
-        typename container_type::iterator begin () override;
-        typename container_type::iterator end () override;
-        typename container_type::const_iterator cbegin () const noexcept override; 
-        typename container_type::const_iterator cend () const noexcept override; 
+        value_type min() const;
+        value_type max() const;
+        value_type mean() const;
+        value_type median() const;
 
+        iterator begin ();
+        iterator end ();
+        const_iterator cbegin () const noexcept; 
+        const_iterator cend () const noexcept; 
+
+    private:
+        container_type container;
     };
 
     template <typename T>
@@ -149,6 +165,28 @@ namespace nr
     inline typename std::vector<T>::const_iterator VectorData<T>::cend() const noexcept
     {
         return this->container.cend();
+    }
+
+    template <typename T>
+    inline T VectorData<T>::min() const
+    {
+        return nr::min(this->container);
+    }
+
+    template <typename T>
+    inline T VectorData<T>::max() const
+    {
+        return nr::max(this->container);
+    }
+    template <typename T>
+    inline T VectorData<T>::mean() const
+    {
+        return nr::mean(this->container);
+    }
+    template <typename T>
+    inline T VectorData<T>::median() const
+    {
+        return nr::median(this->container);
     }
 }
 

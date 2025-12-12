@@ -1,6 +1,6 @@
 #include "CsvDataLoader.h"
 
-std::map<std::string, std::vector<std::string>> CSVDataStore::load(const std::string& filename)
+std::map<std::string, std::vector<std::string>> CSVDataLoader::load(const std::string& filename)
 {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -35,7 +35,7 @@ std::map<std::string, std::vector<std::string>> CSVDataStore::load(const std::st
     return m_data;
 }
 
-std::map<std::string, std::vector<std::string>> CSVDataStore::load()
+std::map<std::string, std::vector<std::string>> CSVDataLoader::load()
 {
     std::ifstream file(m_filename);
     if (!file.is_open()) {
@@ -70,18 +70,18 @@ std::map<std::string, std::vector<std::string>> CSVDataStore::load()
     return m_data;
 }
 
-void CSVDataStore::save(const std::string &filename, const std::map<std::string, std::vector<std::string>> &data) const
+void CSVDataLoader::save(const std::string &filename, const std::map<std::string, std::vector<std::string>> &data) const
 {
 }
 
-const std::vector<std::string> &CSVDataStore::get(const std::string &key) const
+const std::vector<std::string> &CSVDataLoader::get(const std::string &key) const
 {
     static const std::vector<std::string> empty;
     auto it = m_data.find(key);
     return it != m_data.end() ? it->second : empty;
 }
 
-void CSVDataStore::print() const
+void CSVDataLoader::print() const
 {
     for (const auto& [key, values] : m_data) {
         std::cout << key << " -> ";
@@ -93,7 +93,7 @@ void CSVDataStore::print() const
     }
 }
 
-std::vector<std::string> CSVDataStore::split(const std::string &s, char delimiter) const
+std::vector<std::string> CSVDataLoader::split(const std::string &s, char delimiter) const
 {
     std::vector<std::string> result;
     std::stringstream ss(s);
