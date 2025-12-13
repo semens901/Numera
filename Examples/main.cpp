@@ -47,7 +47,7 @@ int main()
         nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sampleSize = 5;
-        auto sample = nr::Sampling::simple_random(stats, sampleSize);
+        auto sample = nr::Sampling::simple_random<double>(stats, sampleSize);
 
         assert(sample.size() == sampleSize);
 
@@ -62,7 +62,7 @@ int main()
             {"Test3", {15, 90, 84, 15}}
         }};
 
-        std::vector<double> res = nr::Sampling::simple_random(cd, sampleSize);
+        std::vector<double> res = nr::Sampling::simple_random<std::string, double>(cd, sampleSize);
         std::cout << "SAMPLE SIZE\t" << res.size();
         assert(res.size() == sampleSize);
     }
@@ -72,7 +72,7 @@ int main()
         nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
-        auto sampleResult = nr::Sampling::systematic(stats, sample);
+        auto sampleResult = nr::Sampling::systematic<double>(stats, sample);
 
         std::cout << "Systematic sample (" << sampleResult.size() << "):";
         for (double v : sampleResult) std::cout << ' ' << v;
@@ -86,7 +86,7 @@ int main()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        auto strat = nr::Sampling::stratified(stats, labels, sampleSize);
+        auto strat = nr::Sampling::stratified<double>(stats, labels, sampleSize);
 
         std::cout << "Stratified sample (" << strat.size() << "):";
         for (double v : strat) std::cout << ' ' << v;

@@ -317,12 +317,12 @@ int main()
         nr::VectorData<double> stats({10, 20, 30, 40, 50});
 
         size_t sampleSize = 3;
-        auto sample = nr::Sampling::simple_random(stats, sampleSize);
+        auto sample = nr::Sampling::simple_random<double>(stats, sampleSize);
 
         assert(sample.size() == sampleSize);
 
         nr::VectorData<double> emptyStats;
-        auto emptySample = nr::Sampling::simple_random(emptyStats, sampleSize);
+        auto emptySample = nr::Sampling::simple_random<double>(emptyStats, sampleSize);
         assert(emptySample.size() == 0);
 
         nr::CSVDataStore<std::string, double> cd{std::map<std::string, std::vector<double>>
@@ -332,7 +332,7 @@ int main()
             {"Test3", {15, 90, 84, 15}}
         }};
 
-        std::vector<double> res = nr::Sampling::simple_random(cd, sampleSize);
+        std::vector<double> res = nr::Sampling::simple_random<std::string, double>(cd, sampleSize);
         std::cout << "SAMPLE SIZE\t" << res.size();
         assert(res.size() == sampleSize);
 
@@ -344,14 +344,14 @@ int main()
         nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
-        auto sampleResult = nr::Sampling::systematic(stats, sample);
+        auto sampleResult = nr::Sampling::systematic<double>(stats, sample);
 
         double statsSize = static_cast<double>(stats.size());
         double step = statsSize / static_cast<double>(sample);
         assert(sampleResult.size() == static_cast<double>(std::ceil(step)));
 
         nr::VectorData<double> emptyStats;
-        auto emptySample = nr::Sampling::systematic(emptyStats, sample);
+        auto emptySample = nr::Sampling::systematic<double>(emptyStats, sample);
         assert(emptySample.size() == 0);
         std::cout << "[TEST] successfully!\n";
     }
@@ -363,7 +363,7 @@ int main()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        auto strat = nr::Sampling::stratified(stats, labels, sampleSize);
+        auto strat = nr::Sampling::stratified<double>(stats, labels, sampleSize);
 
         assert(strat.size() == sampleSize);
 
@@ -373,7 +373,7 @@ int main()
         cv["2"] = {2, 2, 2};
         cv["3"] = {40, 41, 42, 43, 44, 45};
 
-        auto strat1 = nr::Sampling::stratified(cv, 5);
+        auto strat1 = nr::Sampling::stratified<std::string, double>(cv, 5);
 
         assert(strat1.size() == 5);
 
@@ -381,7 +381,7 @@ int main()
         size_t sampleSize1 = 8;
         std::vector<double> emptyStats1;
         std::vector<size_t> emptyLabels1;
-        auto emptySample1 = nr::Sampling::stratified(emptyStats1, emptyLabels1, sampleSize);
+        auto emptySample1 = nr::Sampling::stratified<double>(emptyStats1, emptyLabels1, sampleSize);
         assert(emptySample1.size() == 0);
         std::cout << "[TEST] successfully!\n";
     }
