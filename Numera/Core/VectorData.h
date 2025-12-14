@@ -1,6 +1,7 @@
 #ifndef NUMERA_CORE_VECTORDATA_H
 #define NUMERA_CORE_VECTORDATA_H
 #include "stats/BasicStats.h"
+#include "io/IDataLoader.h"
 
 #include<iostream>
 #include<vector>
@@ -27,6 +28,7 @@ namespace nr
         ~VectorData() = default;
         VectorData(const VectorData& other);
         VectorData(container_type vec) { this->container = vec; }
+        VectorData(IDataLoader<std::vector<T>> loader, std::string filename);
 
         VectorData<T>& operator=(const VectorData<T>& other);
         VectorData(VectorData&& other) noexcept;
@@ -35,6 +37,7 @@ namespace nr
         value_type& operator[](size_t index);
         const value_type& operator[](size_t index) const;
 
+        void push_back(value_type value);
         void add(value_type element);
         void add(container_type elements);
         void remove_at(size_t index);
@@ -61,6 +64,12 @@ namespace nr
     inline VectorData<T>::VectorData(const VectorData<T> &other)
     {
         this->container = other.container; 
+    }
+
+    template <typename T>
+    inline VectorData<T>::VectorData(IDataLoader<std::vector<T>> loader, std::string filename)
+    {
+        container = loader.load(filename);
     }
 
     template <typename T>
@@ -99,6 +108,12 @@ namespace nr
     inline const T &VectorData<T>::operator[](size_t index) const
     {
         return this->container[index];
+    }
+
+    template <typename T>
+    inline void VectorData<T>::push_back(value_type value)
+    {
+        container.push_back(value);
     }
 
     template <typename T>

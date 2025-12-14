@@ -17,6 +17,8 @@ public:
     virtual Container load(const std::string& filename) = 0;
     
     virtual void save(const std::string& filename, const Container& data) const = 0;
+private:
+
 };
 
 #endif // IDATALOADER_H

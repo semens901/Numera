@@ -1,5 +1,5 @@
-#ifndef SAMPLING_H
-#define SAMPLING_H
+#ifndef PROBABILITY_SAMPLING_H
+#define PROBABILITY_SAMPLING_H
 #include "RandomGenerator/RandomValueGenerator.h"
 
 #include<vector>
@@ -14,69 +14,60 @@
 
 namespace nr
 {
-    class Sampling {
+    class ProbabilitySampling {
     public:
         template<typename T>
         static std::vector<T> simple_random(
             const std::vector<T>& data,
-            size_t sampleSize
-        );
+            size_t sampleSize);
 
         template<typename T>
         static std::vector<T> systematic(
             const std::vector<T>& data,
-            size_t sample
-        );
+            size_t sample);
 
         template<typename T>
         static std::vector<T> stratified(
             const std::vector<T>& data,
             const std::vector<size_t>& strataLabels,
-            size_t sampleSize
-        );
+            size_t sampleSize);
 
 ////////////////////////////////////////////////////
         template<typename T>
         static std::vector<T> simple_random(
             const nr::VectorData<T>& data,
-            size_t sampleSize
-        );
+            size_t sampleSize);
 
         template<typename T>
         static std::vector<T> systematic(
             const nr::VectorData<T>& data,
-            size_t sample
-        );
+            size_t sample);
 
         template<typename T>
         static std::vector<T> stratified(
             const nr::VectorData<T>& data,
             const std::vector<size_t>& strataLabels,
-            size_t sampleSize
-        );
+            size_t sampleSize);
 
 ////////////////////////////////////////////////////
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> simple_random(
             const nr::CSVDataStore<KEY_T, Value_T>& data,
-            size_t sampleSize
-        );
+            size_t sampleSize);
 
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> systematic(
             const nr::CSVDataStore<KEY_T, Value_T>& data,
-            size_t sample
-        );
+            size_t sample);
         
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> stratified(
             const nr::CSVDataStore<KEY_T, Value_T>& data,
-            size_t sampleSize
-        );
+            size_t sampleSize);
     };
 
     template<typename T>
-    std::vector<T> Sampling::simple_random(
+    std::vector<T> ProbabilitySampling::simple_random(
         const std::vector<T>& data,
         size_t sampleSize)
     {
@@ -99,7 +90,7 @@ namespace nr
     }
 
     template<typename T>
-    std::vector<T> Sampling::systematic(
+    std::vector<T> ProbabilitySampling::systematic(
         const std::vector<T>& data,
         size_t sample)
     {
@@ -130,7 +121,7 @@ namespace nr
     }
 
     template<typename T>
-    std::vector<T> Sampling::stratified(
+    std::vector<T> ProbabilitySampling::stratified(
         const std::vector<T>& data,
         const std::vector<size_t>& strataLabels,
         size_t sampleSize)
@@ -223,7 +214,7 @@ namespace nr
     }
 
     template<typename T>
-    std::vector<T> Sampling::simple_random(
+    std::vector<T> ProbabilitySampling::simple_random(
         const nr::VectorData<T>& data,
         size_t sampleSize)
     {
@@ -246,7 +237,7 @@ namespace nr
     }
 
     template<typename T>
-    std::vector<T> Sampling::systematic(
+    std::vector<T> ProbabilitySampling::systematic(
         const nr::VectorData<T>& data,
         size_t sample)
     {
@@ -277,7 +268,7 @@ namespace nr
     }
 
     template<typename T>
-    std::vector<T> Sampling::stratified(
+    std::vector<T> ProbabilitySampling::stratified(
         const nr::VectorData<T>& data,
         const std::vector<size_t>& strataLabels,
         size_t sampleSize)
@@ -370,7 +361,7 @@ namespace nr
     }
 
     template<typename KEY_T, typename Value_T>
-    std::vector<Value_T> Sampling::simple_random(
+    std::vector<Value_T> ProbabilitySampling::simple_random(
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
@@ -398,7 +389,7 @@ namespace nr
     }
 
     template<typename KEY_T, typename Value_T>
-    std::vector<Value_T> Sampling::systematic(
+    std::vector<Value_T> ProbabilitySampling::systematic(
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sample)
     {
@@ -435,7 +426,7 @@ namespace nr
     }
     
     template<typename KEY_T, typename Value_T>
-    std::vector<Value_T> Sampling::stratified(
+    std::vector<Value_T> ProbabilitySampling::stratified(
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
@@ -527,4 +518,4 @@ namespace nr
     }
 }
 
-#endif // SAMPLING_H
+#endif // PROBABILITY_SAMPLING_H

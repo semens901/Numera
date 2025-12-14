@@ -20,7 +20,8 @@ add_library(Numera STATIC
     
     stats/BasicStats.h
     stats/Distributions.h
-    stats/Sampling.h
+    stats/ProbabilitySampling.h
+    stats/NonProbabilitySampling.h
 )
 
 target_include_directories(Numera
