@@ -1,59 +1,66 @@
-#include "Numera.h"
-#include "Sampling/Sampling.h"
-#include "FileDataLoader.h"
+#include "Core/VectorData.h"
+#include "io/CsvDataLoader.h"
+#include "stats/ProbabilitySampling.h"
+#include "io/FileDataLoader.h"
+#include "Core/CsvData.h"
+#include "stats/NonProbabilitySampling.h"
 
 #include<iostream>
-#include <cassert>
+#include<cassert>
 #include<string>
 
 int main()
-{
-    FileDataLoader file_loader;
-    nr::Numera nm("numbers.txt", file_loader);
-    std::cout << "Count:\t" << nm.size() << std::endl;
-    std:: cout << "Min:\t" << nm.min() << std::endl;
-    std:: cout << "Max:\t" << nm.max() << std::endl;
-    std:: cout << "Arithmetic mean:\t" << nm.mean() << std::endl;
-    std:: cout << "Median:\t" << nm.median() << std::endl;
-    std:: cout << "Standard deviation:\t" << nm.stddev() << std::endl;
-    
+{    
+    CSVDataLoader store("example.csv");
+
+    {
+        nr::CSVDataStore<std::string, double> csv;
+        FileDataLoader file_loader;
+        nr::VectorData<double> dt(file_loader.load("numbers.txt"));
+        std::cout << "Count:\t" << dt.size() << std::endl;
+        std::cout << "Min:\t" << nr::min(dt) << std::endl;
+    }
+
+    {
+        nr::CSVDataStore<std::string, double> csv(std::map<std::string, std::vector<double>>{{"hello", {1,2,3}},{"hi", {0,4,5}}});
+        std::cout << "Min:\t" << "(" << csv.min() << ")" << std::endl; 
+        std::cout << "Max:\t" << "(" << csv.max() << ")" << std::endl;
+    }
+
     {
         std::cout << "[TEST] Simple random sampling\n";
 
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sampleSize = 5;
-        auto sample = nr::Sampling::simple_random(stats, sampleSize);
+        auto sample = nr::ProbabilitySampling::simple_random<double>(stats, sampleSize);
 
         assert(sample.size() == sampleSize);
 
         std::cout << "Simple random sample (" << sample.size() << "):";
         for (double v : sample) std::cout << ' ' << v;
         std::cout << '\n';
+
+        nr::CSVDataStore<std::string, double> cd{std::map<std::string, std::vector<double>>
+        {
+            {"Test1", {1, 2, 5,3}},
+            {"Test2", {0, 12, 14}},
+            {"Test3", {15, 90, 84, 15}}
+        }};
+
+        std::vector<double> res = nr::ProbabilitySampling::simple_random<std::string, double>(cd, sampleSize);
+        std::cout << "SAMPLE SIZE\t" << res.size() << "\n";
+        assert(res.size() == sampleSize);
     }
 
     {
         std::cout << "[TEST] Systematic sampling\n";
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
+        nr::VectorData<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
-        auto sampleResult = nr::Sampling::systematic(stats, sample);
+        auto sampleResult = nr::ProbabilitySampling::systematic<double>(stats, sample);
 
         std::cout << "Systematic sample (" << sampleResult.size() << "):";
-        for (double v : sampleResult) std::cout << ' ' << v;
-        std::cout << '\n';
-        double statsSize = static_cast<double>(stats.size());
-        double step = statsSize / static_cast<double>(sample);
-    }
-
-    {
-        std::cout << "[TEST] Systematic sorted sampling\n";
-        std::vector<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
-
-        size_t sample = 4;
-        auto sampleResult = nr::Sampling::systematic_sorted(stats, sample);
-
-        std::cout << "Systematic sorted sample (" << sampleResult.size() << "):";
         for (double v : sampleResult) std::cout << ' ' << v;
         std::cout << '\n';
     }
@@ -65,11 +72,69 @@ int main()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        auto strat = nr::Sampling::stratified(stats, labels, sampleSize);
+        auto strat = nr::ProbabilitySampling::stratified<double>(stats, labels, sampleSize);
 
         std::cout << "Stratified sample (" << strat.size() << "):";
         for (double v : strat) std::cout << ' ' << v;
         std::cout << '\n';
+    }
+
+    {
+        std::cout << "[TEST] Quota sampling (CSVDataStore with quotas)\n";
+
+        nr::CSVDataStore<std::string, double> cv;
+        cv["A"] = {1, 2, 3};
+        cv["B"] = {10, 20, 30, 40};
+        cv["C"] = {100, 200};
+
+        std::unordered_map<std::string, size_t> quotas = {
+            {"A", 2},
+            {"B", 3},
+            {"C", 1}
+        };
+
+        auto quotaSample = nr::NonProbabilitySampling::quotaSample(cv, quotas);
+
+        // Checking the total sample size
+        assert(quotaSample.size() == 6); // 2+3+1=6
+
+        // We check that the elements are actually taken from the original groups
+        for (auto v : quotaSample) {
+            bool inA = std::find(cv["A"].begin(), cv["A"].end(), v) != cv["A"].end();
+            bool inB = std::find(cv["B"].begin(), cv["B"].end(), v) != cv["B"].end();
+            bool inC = std::find(cv["C"].begin(), cv["C"].end(), v) != cv["C"].end();
+            assert(inA || inB || inC);
+        }
+
+        // Test: Empty CSVDataStore
+        nr::CSVDataStore<std::string, double> emptyCv;
+        std::unordered_map<std::string, size_t> quotasEmpty = { {"A", 1} };
+        auto emptySample = nr::NonProbabilitySampling::quotaSample(emptyCv, quotasEmpty);
+        assert(emptySample.size() == 0);
+
+        // Test: Quota exceeds the number of elements in the group
+        nr::CSVDataStore<std::string, double> smallCv;
+        smallCv["X"] = {5, 6};
+        std::unordered_map<std::string, size_t> quotasExceed = { {"X", 5} };
+        auto exceedSample = nr::NonProbabilitySampling::quotaSample(smallCv, quotasExceed);
+        assert(exceedSample.size() == 2);
+        for (auto v : exceedSample)
+            assert(v == 5 || v == 6);
+    }
+
+    {
+         std::cout << "[TEST] Haphazard sampling (CSVDataStore)\n";
+
+        nr::CSVDataStore<std::string, double> cv;
+        cv["A"] = {1, 2, 3};
+        cv["B"] = {10, 20, 30, 40};
+        cv["C"] = {100, 200};
+
+        // --- Тест 1: обычная выборка ---
+        size_t sampleSize = 5;
+        auto haphazard = nr::NonProbabilitySampling::haphazardSample(cv, sampleSize);
+
+        assert(haphazard.size() == sampleSize);
     }
 
     return 0;
