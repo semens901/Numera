@@ -3,7 +3,7 @@
 #include "io/CsvDataLoader.h"
 #include "stats/ProbabilitySampling.h"
 #include "stats/NonProbabilitySampling.h"
-//#include "stats/BasicStats.h"
+#include "stats/BasicStats.h"
 #include "io/FileDataLoader.h"
 
 #include<iostream>
@@ -618,6 +618,52 @@ int main()
         assert(emptySample.size() == 0);
 
         std::cout << "[TEST] successfully!\n";
+    }
+
+    {
+        std::vector<double> v{1.0, 2.0, 3.0};
+        std::vector<double> w{1.0, 1.0, 1.0};
+
+        double result = nr::weighted_mean(v, w);
+        assert(std::abs(result - 2.0) < 1e-9);
+    }
+
+    {
+        std::vector<double> v{42.0};
+        std::vector<double> w{10.0};
+
+        double result = nr::weighted_mean(v, w);
+        assert(result == 42.0);
+    }
+
+    {
+        std::vector<double> v{15, 10, 5, 90};
+        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
+
+        double result = nr::weighted_mean(v, w);
+        assert(result == 51.0);
+    }
+    {
+        std::vector<double> population{
+            54, 63, 48, 29, 27, 32, 41
+        };
+
+        double result = nr::geometric_mean(population);
+        const double expected = 40.135109214786738;
+        const double eps = 1e-6;
+
+        assert(std::abs(result - expected) < eps);
+    }
+    
+    {
+        std::vector<double> population{54, 63, 48, 29, 27, 32, 41};
+
+        double expected = 38.380368771744429; // рассчитанное гармоническое среднее вручную или в калькуляторе
+        double result = nr::harmonic_mean(population);
+        std::cout << result << std::endl;
+        // Используем assert с допуском для вещественных чисел
+        double eps = 1e-4; 
+        assert(std::abs(result - expected) < eps);
     }
 
     std::cout << "\nAll tests passed successfully!\n";

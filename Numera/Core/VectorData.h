@@ -196,7 +196,7 @@ namespace nr
     template <typename T>
     inline T VectorData<T>::mean() const
     {
-        return nr::mean(this->container);
+        return nr::arithmetic_mean(this->container);
     }
     template <typename T>
     inline T VectorData<T>::median() const
