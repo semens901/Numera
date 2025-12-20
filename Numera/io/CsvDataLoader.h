@@ -28,7 +28,7 @@ private:
     value_type m_filename;    
     container_type m_data;
 
-    // Вспомогательная функция для разделения строки по разделителю
+    // Helper function for splitting a string by a delimiter
     std::vector<std::string> split(const std::string& s, char delimiter) const;
 };
 

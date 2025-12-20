@@ -11,6 +11,24 @@
 #include<numeric>
 #include<cmath>
 
+/**
+ * @brief A lightweight container for column-oriented CSV-like data.
+ *
+ * CSVDataStore stores data as a mapping from keys (e.g. column names)
+ * to vectors of values. Each key represents a logical group or column,
+ * and the associated vector holds all values belonging to that group.
+ *
+ * The class provides basic container semantics (iteration, access,
+ * insertion, removal) as well as simple descriptive statistics
+ * computed over all stored values.
+ *
+ * This container does not perform any I/O and is intended to be used
+ * as an in-memory data representation layer.
+ *
+ * @tparam key_type   Type used as a key (e.g. std::string for column names)
+ * @tparam data_type  Type of stored values (e.g. int, double)
+ */
+
 namespace nr
 {
     template<typename key_type, typename data_type>

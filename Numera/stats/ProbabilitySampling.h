@@ -14,6 +14,9 @@
 
 namespace nr
 {
+    /*
+        Functions for finding probability samples are declared here.
+    */
     class ProbabilitySampling {
     public:
         template<typename T>
@@ -71,6 +74,7 @@ namespace nr
         const std::vector<T>& data,
         size_t sampleSize)
     {
+        // Simple random sampling
         if (sampleSize == 0 || data.empty()) return {};
 
         // Use a thread-local generator seeded once per thread with mixed entropy.
@@ -94,6 +98,8 @@ namespace nr
         const std::vector<T>& data,
         size_t sample)
     {
+        //Systematic sampling
+
         // requires a sorted population
         if (data.empty() || sample == 0) return {};
 
@@ -126,6 +132,8 @@ namespace nr
         const std::vector<size_t>& strataLabels,
         size_t sampleSize)
     {
+        // Stratified sampling
+
         if (data.empty() || strataLabels.size() != data.size() || sampleSize == 0) return {};
 
         size_t dataSize = data.size();
@@ -218,6 +226,8 @@ namespace nr
         const nr::VectorData<T>& data,
         size_t sampleSize)
     {
+        // Simple random sampling
+
         if (sampleSize == 0 || data.empty()) return {};
 
         // Use a thread-local generator seeded once per thread with mixed entropy.
@@ -241,6 +251,7 @@ namespace nr
         const nr::VectorData<T>& data,
         size_t sample)
     {
+        //Systematic sampling
         if (data.empty() || sample == 0) return {};
         auto population = std::vector<double>(data.cbegin(), data.cend());
         std::sort(population.begin(), population.end());
@@ -273,6 +284,8 @@ namespace nr
         const std::vector<size_t>& strataLabels,
         size_t sampleSize)
     {
+        // Stratified sampling
+
         if (data.empty() || strataLabels.size() != data.size() || sampleSize == 0) return {};
 
         size_t dataSize = data.size();
@@ -365,6 +378,8 @@ namespace nr
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
+        // Simple random sampling
+
         if (sampleSize == 0 || data.empty()) return {};
 
         std::vector<double> out;
@@ -393,6 +408,8 @@ namespace nr
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sample)
     {
+        //Systematic sampling
+
         if (data.empty() || sample == 0) return {};
         std::vector<double> population;
         
@@ -430,6 +447,8 @@ namespace nr
         const nr::CSVDataStore<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
+        // Stratified sampling
+
         if (data.empty() || sampleSize == 0)
         return {};
 

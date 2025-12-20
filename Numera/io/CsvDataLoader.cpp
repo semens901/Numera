@@ -6,22 +6,22 @@ std::map<std::string, std::vector<std::string>> CSVDataLoader::load(const std::s
 
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Не удалось открыть файл: " << filename << std::endl;
+        std::cerr << "Failed to open file: " << filename << std::endl;
         return {};
     }
 
     std::string line;
     
-    // Считать заголовки (имена колонок)
+    // Count headers (column names)
     if (!std::getline(file, line)) return {};
     std::vector<std::string> headers = split(line, delimiter);
 
-    // Инициализируем мапу пустыми векторами
+    // Initialize the map with empty vectors
     for (const auto& header : headers) {
         m_data[header] = {};
     }
 
-    // Чтение данных
+    // Reading data
     while (std::getline(file, line)) {
         std::vector<std::string> row = split(line, delimiter);
         for (size_t i = 0; i < headers.size(); ++i) {
@@ -47,10 +47,10 @@ void CSVDataLoader::save(const std::string &filename, const std::map<std::string
     }
 
     if (data.empty()) {
-        return; // пустой CSV
+        return; // empty csv
     }
 
-    // --- 1. Записываем заголовок ---
+    // --- 1. Write down the title ---
     {
         bool first = true;
         for (const auto& [column, _] : data) {
@@ -63,7 +63,7 @@ void CSVDataLoader::save(const std::string &filename, const std::map<std::string
         file << '\n';
     }
 
-    // --- 2. Проверяем одинаковую длину столбцов ---
+    // --- 2. Checking if columns are the same length ---
     const std::size_t row_count = data.begin()->second.size();
 
     for (const auto& [_, column_data] : data) {
@@ -72,7 +72,7 @@ void CSVDataLoader::save(const std::string &filename, const std::map<std::string
         }
     }
 
-    // --- 3. Записываем строки ---
+    // --- 3. Write down the lines ---
     for (std::size_t row = 0; row < row_count; ++row) {
         bool first = true;
 

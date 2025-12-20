@@ -11,6 +11,21 @@
 #include<numeric>
 #include<cmath>
 
+/**
+ * @brief A simple vector-based data container with basic statistical operations.
+ *
+ * VectorData is a lightweight wrapper around std::vector that provides
+ * convenient access, modification, iteration, and common descriptive
+ * statistics such as minimum, maximum, mean, and median.
+ *
+ * The class is intended to represent a one-dimensional numerical dataset
+ * and can be populated either directly or via an external data loader.
+ *
+ * This container owns its data and performs no I/O by itself.
+ *
+ * @tparam T Type of stored elements (must support comparison and arithmetic operations)
+ */
+
 namespace nr
 {   
     template <typename T>
@@ -135,7 +150,7 @@ namespace nr
     }
 
     template <typename T>
-    inline const T& VectorData<T>::at(size_t index) const
+    inline const T& VectorData<T>::at(size_type index) const
     {
         return this->container.at(index);
     }

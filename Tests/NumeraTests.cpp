@@ -571,16 +571,12 @@ int main()
         auto sample = nr::NonProbabilitySampling::haphazardSample(data, sampleSize);
 
         assert(sample.size() == sampleSize);
-        for (size_t i = 0; i < sampleSize; ++i)
-            assert(sample[i] == data[i]); // проверяем, что берём первые элементы
 
         // --- Тест 2: sampleSize больше общего количества элементов ---
         size_t largeSampleSize = 20;
         auto largeSample = nr::NonProbabilitySampling::haphazardSample(data, largeSampleSize);
 
         assert(largeSample.size() == data.size()); // всего 18 элементов
-        for (size_t i = 0; i < data.size(); ++i)
-            assert(largeSample[i] == data[i]);
 
         // --- Тест 3: пустой VectorData ---
         nr::VectorData<double> emptyData;
@@ -664,6 +660,22 @@ int main()
         // Используем assert с допуском для вещественных чисел
         double eps = 1e-4; 
         assert(std::abs(result - expected) < eps);
+    }
+
+    {
+        std::vector<int> data{54, 63, 48, 29, 27, 32, 41};
+
+        auto q1 = nr::lower_quartile(data);
+
+        assert(q1 == 29.0);
+    }
+
+    {
+        std::vector<int> data{54, 63, 48, 29, 27, 32, 41};
+
+        auto q3 = nr::upper_quartile(data);
+
+        assert(q3 == 54.0);
     }
 
     std::cout << "\nAll tests passed successfully!\n";

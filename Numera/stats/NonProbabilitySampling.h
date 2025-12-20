@@ -13,6 +13,9 @@
 
 namespace nr
 {
+    /*
+        Functions for finding non-probability samples are declared here.
+    */
     class NonProbabilitySampling
     {
     public:
@@ -67,24 +70,23 @@ namespace nr
 template <typename T>
 inline std::vector<T> nr::NonProbabilitySampling::quotaSample(const std::vector<T> &data, const std::vector<size_t> &labels, const std::unordered_map<size_t, size_t> &quotas)
 {
+    // Quota sampling
     if (data.empty() || labels.size() != data.size() || quotas.empty())
         return {};
 
     std::vector<T> out;
 
-    // Сначала собираем элементы по группам
     std::unordered_map<size_t, std::vector<T>> groups;
     for (size_t i = 0; i < data.size(); ++i) {
         groups[labels[i]].push_back(data[i]);
     }
 
-    // Для каждой группы берём элементы по квоте
     for (const auto& [label, vec] : groups) {
         auto it = quotas.find(label);
         if (it == quotas.end() || vec.empty())
             continue;
 
-        size_t k = std::min(it->second, vec.size()); // квота не больше доступных элементов
+        size_t k = std::min(it->second, vec.size()); // quota no more than available items
 
         for (size_t i = 0; i < k; ++i)
             out.push_back(vec[i]);
@@ -96,60 +98,70 @@ inline std::vector<T> nr::NonProbabilitySampling::quotaSample(const std::vector<
 template <typename T>
 inline std::vector<T> nr::NonProbabilitySampling::haphazardSample(const std::vector<T> &data, size_t sampleSize)
 {
-    if (data.empty() || sampleSize == 0)
-        return {};
-
-    std::vector<T> out;
-    out.reserve(sampleSize);
-
-    // Берём элементы по порядку до sampleSize
-    for (size_t i = 0; i < data.size() && out.size() < sampleSize; ++i)
+    // Spontaneous sampling
+    if (data.empty() || sampleSize == 0) 
     {
-        out.push_back(data[i]);
+        return {};
     }
 
-    return out; // если sampleSize больше, чем элементов — возвращаем все
+    std::vector<T> shuffled = data;
+
+    // Non-deterministic source
+    std::mt19937 gen(std::random_device{}());
+    std::shuffle(shuffled.begin(), shuffled.end(), gen);
+
+    if (sampleSize >= shuffled.size()) 
+    {
+        return shuffled;
+    }
+
+    return std::vector<T>(
+        shuffled.begin(),
+        shuffled.begin() + sampleSize
+    );
 }
 
 template <typename T>
 inline std::vector<T> nr::NonProbabilitySampling::convenienceSample(const std::vector<T> &data, size_t sampleSize)
 {
+    // Convenient selection
     if (data.empty() || sampleSize == 0)
         return {};
 
     std::vector<T> out;
     out.reserve(sampleSize);
 
-    // Берём элементы по доступности (первые sampleSize элементов)
+    // We take elements based on availability (the first sampleSize of elements)
     for (size_t i = 0; i < data.size() && out.size() < sampleSize; ++i)
     {
         out.push_back(data[i]);
     }
 
-    return out; // если sampleSize больше количества элементов — возвращаем все
+    return out;
 }
 
 template <typename T>
 inline nr::VectorData<T> nr::NonProbabilitySampling::quotaSample(const nr::VectorData<T> &data, const std::vector<size_t> &labels, const std::unordered_map<size_t, size_t> &quotas)
 {
+    // Quota sampling
     if (data.empty() || labels.size() != data.size() || quotas.empty())
         return {};
 
     nr::VectorData<T> out;
 
-    // Сначала собираем элементы по группам
+    // First, we collect the elements into groups
     std::unordered_map<size_t, std::vector<T>> groups;
     for (size_t i = 0; i < data.size(); ++i) {
         groups[labels[i]].push_back(data[i]);
     }
 
-    // Для каждой группы берём элементы по квоте
+    // For each group we take elements according to the quota
     for (const auto& [label, vec] : groups) {
         auto it = quotas.find(label);
         if (it == quotas.end() || vec.empty())
             continue;
 
-        size_t k = std::min(it->second, vec.size()); // квота не больше доступных элементов
+        size_t k = std::min(it->second, vec.size()); // quota no more than available items
 
         for (size_t i = 0; i < k; ++i)
             out.push_back(vec[i]);
@@ -161,37 +173,46 @@ inline nr::VectorData<T> nr::NonProbabilitySampling::quotaSample(const nr::Vecto
 template <typename T>
 inline nr::VectorData<T> nr::NonProbabilitySampling::haphazardSample(const nr::VectorData<T> &data, size_t sampleSize)
 {
-    if (data.empty() || sampleSize == 0)
-        return {};
-
-    nr::VectorData<T> out;
-    //out.reserve(sampleSize);
-
-    // Берём элементы по порядку до sampleSize
-    for (size_t i = 0; i < data.size() && out.size() < sampleSize; ++i)
+    // Spontaneous sampling
+    if (data.empty() || sampleSize == 0) 
     {
-        out.push_back(data[i]);
+        return {};
     }
 
-    return out; // если sampleSize больше, чем элементов — возвращаем все
+    nr::VectorData<T> shuffled = data;
+
+    // Non-deterministic source
+    std::mt19937 gen(std::random_device{}());
+    std::shuffle(shuffled.begin(), shuffled.end(), gen);
+
+    if (sampleSize >= shuffled.size()) 
+    {
+        return shuffled;
+    }
+
+    return std::vector<T>(
+        shuffled.begin(),
+        shuffled.begin() + sampleSize
+    );
 }
 
 template <typename T>
 inline nr::VectorData<T> nr::NonProbabilitySampling::convenienceSample(const nr::VectorData<T> &data, size_t sampleSize)
 {
+    // Convenient selection
     if (data.empty() || sampleSize == 0)
         return {};
 
     std::vector<T> out;
     out.reserve(sampleSize);
 
-    // Берём элементы по доступности (первые sampleSize элементов)
+    // We take elements based on availability (the first sampleSize of elements)
     for (size_t i = 0; i < data.size() && out.size() < sampleSize; ++i)
     {
         out.push_back(data[i]);
     }
 
-    return out; // если sampleSize больше количества элементов — возвращаем все
+    return out;
 }
 
 template <typename KEY_T, typename Value_T>
@@ -199,6 +220,7 @@ inline nr::VectorData<Value_T> nr::NonProbabilitySampling::quotaSample(
     const nr::CSVDataStore<KEY_T, Value_T> &data,
     const std::unordered_map<KEY_T, size_t> &quotas)
 {
+    // Quota sampling
     if (data.empty() || quotas.empty())
         return {};
 
@@ -225,24 +247,35 @@ inline nr::VectorData<Value_T> nr::NonProbabilitySampling::quotaSample(
 template <typename KEY_T, typename Value_T>
 inline nr::VectorData<Value_T> nr::NonProbabilitySampling::haphazardSample(const nr::CSVDataStore<KEY_T, Value_T> &data, size_t sampleSize)
 {
-    if (data.empty() || sampleSize == 0)
+    // Spontaneous sampling
+    if (data.empty() || sampleSize == 0) {
         return {};
-
-    nr::VectorData<Value_T> out;
-    //out.reserve(sampleSize);
-
-    // Просто перебираем все группы и добавляем элементы по порядку
-    for (const auto& [label, values] : data)
-    {
-        for (const auto& v : values)
-        {
-            if (out.size() >= sampleSize)
-                return out;  // досчитали до sampleSize
-            out.push_back(v);
-        }
     }
 
-    return out; // если sampleSize больше, чем элементов — возвращаем всё
+    std::vector<Value_T> allValues;
+
+    // 1. Collecting all the values
+    for (const auto& [_, values] : data) {
+        allValues.insert(allValues.end(), values.begin(), values.end());
+    }
+
+    if (allValues.empty()) {
+        return {};
+    }
+
+    // 2. Mixing without determinism
+    std::mt19937 gen(std::random_device{}());
+    std::shuffle(allValues.begin(), allValues.end(), gen);
+
+    // 3. Forming the result
+    const std::size_t n = std::min(sampleSize, allValues.size());
+
+    nr::VectorData<Value_T> out;
+    for (std::size_t i = 0; i < n; ++i) {
+        out.add(allValues[i]);
+    }
+
+    return out;
 }
 
 template <typename KEY_T, typename Value_T>
@@ -265,7 +298,7 @@ inline nr::VectorData<Value_T> nr::NonProbabilitySampling::convenienceSample(con
         }
     }
 
-    return out; // If sampleSize is greater than the number of elements, we return everything.
+    return out;
 }
 
 

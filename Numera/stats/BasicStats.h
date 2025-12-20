@@ -15,6 +15,13 @@ namespace nr
     template <typename T>
     typename T::value_type min(T& data)
     {
+        // Finds the minimum element
+     
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("min: empty container");
+        }
+
         auto it = std::min_element(data.begin(), data.end());
         return (*it);
     }
@@ -22,6 +29,11 @@ namespace nr
     template<typename key_type, typename data_type>
     data_type min(const std::map<key_type, std::vector<data_type>>& data)
     {
+        // Finds the minimum element among all values ​​(not counting keys)
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("min: empty container");
+        }
         std::vector<data_type> out;
         for(const auto& [key, vec] : data)
         {
@@ -39,6 +51,12 @@ namespace nr
     template <typename T>
     typename T::value_type max(T& data)
     {
+        // Finds the maximum element
+
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("max: empty container");
+        }
         auto it = std::max_element(data.begin(), data.end());
         return *it;
     }
@@ -46,6 +64,13 @@ namespace nr
     template<typename key_type, typename data_type>
     data_type max(const std::map<key_type, std::vector<data_type>>& data)
     {
+        // Finds the maximum element among all values ​​(not counting keys)
+
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("max: empty container");
+        }
+
         std::vector<data_type> out;
         for(const auto& [key, vec] : data)
         {
@@ -63,8 +88,14 @@ namespace nr
     template <typename Container>
     auto arithmetic_mean(const Container& data) -> typename std::decay_t<Container>::value_type
     {
-        using T = typename std::decay_t<Container>::value_type;
         // Calculates the arithmetic mean
+
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("arithmetic_mean: empty container");
+        }
+
+        using T = typename std::decay_t<Container>::value_type;
         if (data.empty()) return 0.0;
         T sum = std::accumulate(data.cbegin(), data.cend(), 0.0);
         return sum/data.size();
@@ -73,6 +104,7 @@ namespace nr
     template <typename Container>
     auto median(const Container& data) -> typename std::decay_t<Container>::value_type
     {
+        // Finds the median
         using mut_container = std::decay_t<Container>;
         using value_type = typename mut_container::value_type;
 
@@ -92,12 +124,11 @@ namespace nr
     }
     
     template <typename T, typename W>
-auto weighted_mean(
-    const std::vector<T>& values,
-    const std::vector<W>& weights
-) -> std::decay_t<decltype(
-        std::declval<T>() * std::declval<W>()
-    )>
+    auto weighted_mean(
+        const std::vector<T>& values,
+        const std::vector<W>& weights
+    ) -> std::decay_t<decltype(
+            std::declval<T>() * std::declval<W>())>
     {
         /*
             The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
@@ -130,6 +161,7 @@ auto weighted_mean(
     template <typename Container>
     auto geometric_mean(const Container& data) -> typename std::decay_t<Container>::value_type
     {
+        // finds the geometric mean
         using T = typename std::decay_t<Container>::value_type;
         static_assert(
             std::is_arithmetic_v<typename Container::value_type>,
@@ -159,6 +191,7 @@ auto weighted_mean(
     template <typename Container>
     auto harmonic_mean(const Container& data) -> typename std::decay_t<Container>::value_type
     {
+        // finds the harmonic mean
         using T = typename std::decay_t<Container>::value_type;
         static_assert(
             std::is_arithmetic_v<T>,
@@ -183,6 +216,66 @@ auto weighted_mean(
         );
 
         return static_cast<double>(data.size()) / reciprocal_sum;
+    }
+
+    template <typename Container>
+    auto lower_quartile(const Container& data)
+        -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    {
+        // Finds the lower quartile
+        using mut_container = std::decay_t<Container>;
+        using value_type = typename mut_container::value_type;
+
+        if (data.empty()) {
+            throw std::invalid_argument("lower_quartile: empty data");
+        }
+
+        mut_container dataCopy(data.begin(), data.end());
+        std::sort(dataCopy.begin(), dataCopy.end());
+
+        const std::size_t size_ = dataCopy.size();
+        const std::size_t mid = size_ / 2;
+
+        if (mid == 0) {
+            throw std::logic_error("lower_quartile: not enough data");
+        }
+
+        mut_container dataLower(dataCopy.begin(), dataCopy.begin() + mid);
+
+        return median(dataLower);
+    }
+
+    template <typename Container>
+    auto upper_quartile(const Container& data)
+    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    {
+        // Finds the upper quartile
+        using mut_container = std::decay_t<Container>;
+
+        if (data.empty()) {
+            throw std::invalid_argument("upper_quartile: empty data");
+        }
+
+        mut_container dataCopy(data.begin(), data.end());
+        std::sort(dataCopy.begin(), dataCopy.end());
+
+        const std::size_t n = dataCopy.size();
+        const std::size_t mid = n / 2;
+
+        if (mid == 0) {
+            throw std::logic_error("upper_quartile: not enough data");
+        }
+
+        // для нечётного n пропускаем медиану
+        const std::size_t start =
+            (n % 2 == 0) ? mid : mid + 1;
+
+        mut_container dataUpper(
+            dataCopy.begin() + start,
+            dataCopy.end()
+        );
+
+        return median(dataUpper);
     }
 
 }
