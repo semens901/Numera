@@ -1,3 +1,5 @@
+#ifndef CSVDATALOADER_H
+#define CSVDATALOADER_H
 #include "IDataLoader.h"
 
 #include <iostream>
@@ -32,3 +34,4 @@ private:
     std::vector<std::string> split(const std::string& s, char delimiter) const;
 };
 
+#endif //CSVDATALOADER_H

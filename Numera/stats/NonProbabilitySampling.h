@@ -53,17 +53,17 @@ namespace nr
 ///////////////////////////////////////////////////////
         template<typename KEY_T, typename Value_T>
         static nr::VectorData<Value_T> quotaSample(
-        const nr::CSVDataStore<KEY_T, Value_T>& data, 
+        const nr::CSVData<KEY_T, Value_T>& data, 
         const std::unordered_map<KEY_T, size_t>& quotas);
         
         template<typename KEY_T, typename Value_T>
         static nr::VectorData<Value_T> haphazardSample(
-            const nr::CSVDataStore<KEY_T, Value_T>& data, 
+            const nr::CSVData<KEY_T, Value_T>& data, 
             size_t sampleSize);
 
         template<typename KEY_T, typename Value_T>
         static nr::VectorData<Value_T> convenienceSample(
-            const nr::CSVDataStore<KEY_T, Value_T>& data, 
+            const nr::CSVData<KEY_T, Value_T>& data, 
             size_t sampleSize);
     };
 }
@@ -217,7 +217,7 @@ inline nr::VectorData<T> nr::NonProbabilitySampling::convenienceSample(const nr:
 
 template <typename KEY_T, typename Value_T>
 inline nr::VectorData<Value_T> nr::NonProbabilitySampling::quotaSample(
-    const nr::CSVDataStore<KEY_T, Value_T> &data,
+    const nr::CSVData<KEY_T, Value_T> &data,
     const std::unordered_map<KEY_T, size_t> &quotas)
 {
     // Quota sampling
@@ -245,7 +245,7 @@ inline nr::VectorData<Value_T> nr::NonProbabilitySampling::quotaSample(
 }
 
 template <typename KEY_T, typename Value_T>
-inline nr::VectorData<Value_T> nr::NonProbabilitySampling::haphazardSample(const nr::CSVDataStore<KEY_T, Value_T> &data, size_t sampleSize)
+inline nr::VectorData<Value_T> nr::NonProbabilitySampling::haphazardSample(const nr::CSVData<KEY_T, Value_T> &data, size_t sampleSize)
 {
     // Spontaneous sampling
     if (data.empty() || sampleSize == 0) {
@@ -279,7 +279,7 @@ inline nr::VectorData<Value_T> nr::NonProbabilitySampling::haphazardSample(const
 }
 
 template <typename KEY_T, typename Value_T>
-inline nr::VectorData<Value_T> nr::NonProbabilitySampling::convenienceSample(const nr::CSVDataStore<KEY_T, Value_T> &data, size_t sampleSize)
+inline nr::VectorData<Value_T> nr::NonProbabilitySampling::convenienceSample(const nr::CSVData<KEY_T, Value_T> &data, size_t sampleSize)
 {
     if (data.empty() || sampleSize == 0)
         return {};

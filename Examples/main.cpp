@@ -14,7 +14,7 @@ int main()
     CSVDataLoader store("example.csv");
 
     {
-        nr::CSVDataStore<std::string, double> csv;
+        nr::CSVData<std::string, double> csv;
         FileDataLoader file_loader;
         nr::VectorData<double> dt(file_loader.load("numbers.txt"));
         std::cout << "Count:\t" << dt.size() << std::endl;
@@ -22,7 +22,7 @@ int main()
     }
 
     {
-        nr::CSVDataStore<std::string, double> csv(std::map<std::string, std::vector<double>>{{"hello", {1,2,3}},{"hi", {0,4,5}}});
+        nr::CSVData<std::string, double> csv(std::map<std::string, std::vector<double>>{{"hello", {1,2,3}},{"hi", {0,4,5}}});
         std::cout << "Min:\t" << "(" << csv.min() << ")" << std::endl; 
         std::cout << "Max:\t" << "(" << csv.max() << ")" << std::endl;
     }
@@ -41,7 +41,7 @@ int main()
         for (double v : sample) std::cout << ' ' << v;
         std::cout << '\n';
 
-        nr::CSVDataStore<std::string, double> cd{std::map<std::string, std::vector<double>>
+        nr::CSVData<std::string, double> cd{std::map<std::string, std::vector<double>>
         {
             {"Test1", {1, 2, 5,3}},
             {"Test2", {0, 12, 14}},
@@ -80,9 +80,9 @@ int main()
     }
 
     {
-        std::cout << "[TEST] Quota sampling (CSVDataStore with quotas)\n";
+        std::cout << "[TEST] Quota sampling (CSVData with quotas)\n";
 
-        nr::CSVDataStore<std::string, double> cv;
+        nr::CSVData<std::string, double> cv;
         cv["A"] = {1, 2, 3};
         cv["B"] = {10, 20, 30, 40};
         cv["C"] = {100, 200};
@@ -106,14 +106,14 @@ int main()
             assert(inA || inB || inC);
         }
 
-        // Test: Empty CSVDataStore
-        nr::CSVDataStore<std::string, double> emptyCv;
+        // Test: Empty CSVData
+        nr::CSVData<std::string, double> emptyCv;
         std::unordered_map<std::string, size_t> quotasEmpty = { {"A", 1} };
         auto emptySample = nr::NonProbabilitySampling::quotaSample(emptyCv, quotasEmpty);
         assert(emptySample.size() == 0);
 
         // Test: Quota exceeds the number of elements in the group
-        nr::CSVDataStore<std::string, double> smallCv;
+        nr::CSVData<std::string, double> smallCv;
         smallCv["X"] = {5, 6};
         std::unordered_map<std::string, size_t> quotasExceed = { {"X", 5} };
         auto exceedSample = nr::NonProbabilitySampling::quotaSample(smallCv, quotasExceed);
@@ -123,9 +123,9 @@ int main()
     }
 
     {
-         std::cout << "[TEST] Haphazard sampling (CSVDataStore)\n";
+         std::cout << "[TEST] Haphazard sampling (CSVData)\n";
 
-        nr::CSVDataStore<std::string, double> cv;
+        nr::CSVData<std::string, double> cv;
         cv["A"] = {1, 2, 3};
         cv["B"] = {10, 20, 30, 40};
         cv["C"] = {100, 200};

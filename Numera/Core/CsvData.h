@@ -14,7 +14,7 @@
 /**
  * @brief A lightweight container for column-oriented CSV-like data.
  *
- * CSVDataStore stores data as a mapping from keys (e.g. column names)
+ * CSVData stores data as a mapping from keys (e.g. column names)
  * to vectors of values. Each key represents a logical group or column,
  * and the associated vector holds all values belonging to that group.
  *
@@ -32,7 +32,7 @@
 namespace nr
 {
     template<typename key_type, typename data_type>
-    class CSVDataStore
+    class CSVData
     {
     public:
         using container_type = std::map<key_type, std::vector<data_type>>;
@@ -41,20 +41,20 @@ namespace nr
         using iterator = typename container_type::iterator;
         using const_iterator =  typename container_type::const_iterator;
 
-        CSVDataStore() = default;
-        CSVDataStore(const CSVDataStore& other) = default;
-        CSVDataStore& operator=(const CSVDataStore& other) = default;
-        CSVDataStore(CSVDataStore&& other) noexcept = default;
-        CSVDataStore& operator=(CSVDataStore&& other) noexcept = default;
-        ~CSVDataStore() = default;
+        CSVData() = default;
+        CSVData(const CSVData& other) = default;
+        CSVData& operator=(const CSVData& other) = default;
+        CSVData(CSVData&& other) noexcept = default;
+        CSVData& operator=(CSVData&& other) noexcept = default;
+        ~CSVData() = default;
 
-        CSVDataStore(std::initializer_list<
+        CSVData(std::initializer_list<
     std::pair<const key_type, std::vector<data_type>>> init);
 
-        CSVDataStore& operator=(std::initializer_list<
+        CSVData& operator=(std::initializer_list<
     std::pair<const key_type, std::vector<data_type>>> init);
 
-        CSVDataStore(std::map<key_type, std::vector<data_type>> data);
+        CSVData(std::map<key_type, std::vector<data_type>> data);
 
         vector_type& operator[](const key_type& key);
         const vector_type& operator[](const key_type& key) const;
@@ -86,14 +86,14 @@ namespace nr
     };
 
     template <typename key_type, typename data_type>
-    inline CSVDataStore<key_type, data_type>::CSVDataStore(std::initializer_list<std::pair<const key_type, std::vector<data_type>>> init)
+    inline CSVData<key_type, data_type>::CSVData(std::initializer_list<std::pair<const key_type, std::vector<data_type>>> init)
     {
         for (const auto& [key, vec] : init)
         this->container[key] = vec;
     }
 
     template <typename key_type, typename data_type>
-    inline CSVDataStore<key_type, data_type> &CSVDataStore<key_type, data_type>::operator=(std::initializer_list<std::pair<const key_type, std::vector<data_type>>> init)
+    inline CSVData<key_type, data_type> &CSVData<key_type, data_type>::operator=(std::initializer_list<std::pair<const key_type, std::vector<data_type>>> init)
     {
         container.clear();
         for (const auto& [key, vec] : init)
@@ -102,125 +102,125 @@ namespace nr
     }
 
     template <typename key_type, typename data_type>
-    inline CSVDataStore<key_type, data_type>::CSVDataStore(std::map<key_type, std::vector<data_type>> data)
+    inline CSVData<key_type, data_type>::CSVData(std::map<key_type, std::vector<data_type>> data)
     {
         container = data;
     }
 
     template <typename key_type, typename data_type>
-    inline std::vector<data_type> &CSVDataStore<key_type, data_type>::operator[](const key_type &key)
+    inline std::vector<data_type> &CSVData<key_type, data_type>::operator[](const key_type &key)
     {
         return container[key];
     }
 
     template <typename key_type, typename data_type>
-    inline const std::vector<data_type> &CSVDataStore<key_type, data_type>::operator[](const key_type &key) const
+    inline const std::vector<data_type> &CSVData<key_type, data_type>::operator[](const key_type &key) const
     {
         return container.at(key);
     }
 
     template <typename key_type, typename data_type>
-    inline void CSVDataStore<key_type, data_type>::add(const key_type &key, data_type value)
+    inline void CSVData<key_type, data_type>::add(const key_type &key, data_type value)
     {
         container[key].push_back(value);
     }
 
     template <typename key_type, typename data_type>
-    inline const std::vector<data_type> &CSVDataStore<key_type, data_type>::at(key_type key) const
+    inline const std::vector<data_type> &CSVData<key_type, data_type>::at(key_type key) const
     {
         return container.at(key);
     }
 
     template <typename key_type, typename data_type>
-    inline size_t CSVDataStore<key_type, data_type>::size() const
+    inline size_t CSVData<key_type, data_type>::size() const
     {
         return container.size();
     }
 
     template <typename key_type, typename data_type>
-    inline void CSVDataStore<key_type, data_type>::clear()
+    inline void CSVData<key_type, data_type>::clear()
     {
         container.clear();
     }
 
     template <typename key_type, typename data_type>
-    inline bool CSVDataStore<key_type, data_type>::empty() const
+    inline bool CSVData<key_type, data_type>::empty() const
     {
         return container.empty();
     }
 
     template <typename key_type, typename data_type>
-    inline void CSVDataStore<key_type, data_type>::remove_at(key_type key)
+    inline void CSVData<key_type, data_type>::remove_at(key_type key)
     {
         container.erase(key);
     }
 
     template <typename key_type, typename data_type>
-    inline data_type CSVDataStore<key_type, data_type>::min() const
+    inline data_type CSVData<key_type, data_type>::min() const
     {
         return nr::min(container);
     }
 
     template <typename key_type, typename data_type>
-    inline data_type CSVDataStore<key_type, data_type>::max() const
+    inline data_type CSVData<key_type, data_type>::max() const
     {
         return nr::max(container);
     }
 
     template <typename key_type, typename data_type>
-    inline data_type CSVDataStore<key_type, data_type>::mean() const
+    inline data_type CSVData<key_type, data_type>::mean() const
     {
         return 1;
     }
 
     template <typename key_type, typename data_type>
-    inline data_type CSVDataStore<key_type, data_type>::median() const
+    inline data_type CSVData<key_type, data_type>::median() const
     {
         return 1;
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::iterator CSVDataStore<key_type, data_type>::begin()
+    inline typename std::map<key_type, std::vector<data_type>>::iterator CSVData<key_type, data_type>::begin()
     {
         return container.begin();
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::iterator CSVDataStore<key_type, data_type>::end()
+    inline typename std::map<key_type, std::vector<data_type>>::iterator CSVData<key_type, data_type>::end()
     {
         return container.end();
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVDataStore<key_type, data_type>::begin() const noexcept
+    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVData<key_type, data_type>::begin() const noexcept
     {
         return container.begin();
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVDataStore<key_type, data_type>::end() const noexcept
+    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVData<key_type, data_type>::end() const noexcept
     {
         return container.end();
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVDataStore<key_type, data_type>::cbegin() const noexcept
+    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVData<key_type, data_type>::cbegin() const noexcept
     {
         return container.cbegin();
     }
 
     template <typename key_type, typename data_type>
-    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVDataStore<key_type, data_type>::cend() const noexcept
+    inline typename std::map<key_type, std::vector<data_type>>::const_iterator CSVData<key_type, data_type>::cend() const noexcept
     {
         return container.cend();
     }
     template <typename key_type, typename data_type>
-    inline void CSVDataStore<key_type, data_type>::remove_at(iterator it)
+    inline void CSVData<key_type, data_type>::remove_at(iterator it)
     {
         container.erase(it);
     }
     template <typename key_type, typename data_type>
-    inline void CSVDataStore<key_type, data_type>::remove_at(iterator it_begin, iterator it_end)
+    inline void CSVData<key_type, data_type>::remove_at(iterator it_begin, iterator it_end)
     {
         container.erase(it_begin, it_end);
     }

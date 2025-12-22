@@ -5,13 +5,22 @@
 #include <algorithm>
 #include <numeric>
 #include <type_traits>
-#include<map>
+#include <map>
 #include<vector>
 #include <cmath>
 #include <type_traits>
 
 namespace nr
 {
+    template<typename Iterator>
+    auto min(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    {
+        if(begin == end)
+            throw std::invalid_argument("min: empty container");
+        auto it = std::min_element(begin, end);
+        return (*it);
+    }
+
     template <typename T>
     typename T::value_type min(T& data)
     {
@@ -45,6 +54,15 @@ namespace nr
             out.push_back(local);
         }
         auto it = std::min_element(out.begin(), out.end());
+        return (*it);
+    }
+
+    template<typename Iterator>
+    auto max(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    {
+        if(begin == end)
+            throw std::invalid_argument("max: empty container");
+        auto it = std::max_element(begin, end);
         return (*it);
     }
 

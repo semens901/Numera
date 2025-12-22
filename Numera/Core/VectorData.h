@@ -60,6 +60,11 @@ namespace nr
         size_type size() const;
         void clear();
         bool empty() const;
+        value_type front();
+        value_type back();
+        void reserve(size_type size);
+        size_type capacity();
+        void shrink_to_fit();
 
         value_type min() const;
         value_type max() const;
@@ -68,6 +73,8 @@ namespace nr
 
         iterator begin ();
         iterator end ();
+        const_iterator begin () const noexcept; 
+        const_iterator end () const noexcept; 
         const_iterator cbegin () const noexcept; 
         const_iterator cend () const noexcept; 
 
@@ -174,6 +181,36 @@ namespace nr
     }
 
     template <typename T>
+    inline T VectorData<T>::front()
+    {
+        return this->container.front();
+    }
+
+    template <typename T>
+    inline T VectorData<T>::back()
+    {
+        return this->container.back();
+    }
+
+    template <typename T>
+    inline void VectorData<T>::reserve(size_type size)
+    {
+        this->container.reserve(size);
+    }
+
+    template <typename T>
+    inline size_t VectorData<T>::capacity()
+    {
+        return this->capacity();
+    }
+
+    template <typename T>
+    inline void VectorData<T>::shrink_to_fit()
+    {
+        this->container.shrink_to_fit();
+    }
+
+    template <typename T>
     inline typename std::vector<T>::iterator VectorData<T>::begin()
     {
         return this->container.begin();
@@ -183,6 +220,18 @@ namespace nr
     inline typename std::vector<T>::iterator VectorData<T>::end()
     {
         return this->container.end();
+    }
+
+    template <typename T>
+    inline typename std::vector<T>::const_iterator VectorData<T>::begin() const noexcept
+    {
+        return this->container.cbegin();
+    }
+
+    template <typename T>
+    inline typename std::vector<T>::const_iterator VectorData<T>::end() const noexcept
+    {
+        return this->container.cend();
     }
 
     template <typename T>

@@ -55,17 +55,17 @@ namespace nr
 ////////////////////////////////////////////////////
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> simple_random(
-            const nr::CSVDataStore<KEY_T, Value_T>& data,
+            const nr::CSVData<KEY_T, Value_T>& data,
             size_t sampleSize);
 
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> systematic(
-            const nr::CSVDataStore<KEY_T, Value_T>& data,
+            const nr::CSVData<KEY_T, Value_T>& data,
             size_t sample);
         
         template<typename KEY_T, typename Value_T>
         static std::vector<Value_T> stratified(
-            const nr::CSVDataStore<KEY_T, Value_T>& data,
+            const nr::CSVData<KEY_T, Value_T>& data,
             size_t sampleSize);
     };
 
@@ -375,7 +375,7 @@ namespace nr
 
     template<typename KEY_T, typename Value_T>
     std::vector<Value_T> ProbabilitySampling::simple_random(
-        const nr::CSVDataStore<KEY_T, Value_T>& data,
+        const nr::CSVData<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
         // Simple random sampling
@@ -405,7 +405,7 @@ namespace nr
 
     template<typename KEY_T, typename Value_T>
     std::vector<Value_T> ProbabilitySampling::systematic(
-        const nr::CSVDataStore<KEY_T, Value_T>& data,
+        const nr::CSVData<KEY_T, Value_T>& data,
         size_t sample)
     {
         //Systematic sampling
@@ -444,7 +444,7 @@ namespace nr
     
     template<typename KEY_T, typename Value_T>
     std::vector<Value_T> ProbabilitySampling::stratified(
-        const nr::CSVDataStore<KEY_T, Value_T>& data,
+        const nr::CSVData<KEY_T, Value_T>& data,
         size_t sampleSize)
     {
         // Stratified sampling
@@ -460,7 +460,7 @@ namespace nr
         if (totalDataSize == 0)
             return {};
 
-        // --- GROUPS ALREADY EXIST in CSVDataStore ---
+        // --- GROUPS ALREADY EXIST in CSVData ---
         // We convert it into a map<string, vector<double>> for easier usage:
         const auto& container(data); // If this method does not exist, I'll rewrite code without it.
 
