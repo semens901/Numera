@@ -49,10 +49,10 @@ namespace nr
         ~CSVData() = default;
 
         CSVData(std::initializer_list<
-    std::pair<const key_type, std::vector<data_type>>> init);
+        std::pair<const key_type, std::vector<data_type>>> init);
 
         CSVData& operator=(std::initializer_list<
-    std::pair<const key_type, std::vector<data_type>>> init);
+        std::pair<const key_type, std::vector<data_type>>> init);
 
         CSVData(std::map<key_type, std::vector<data_type>> data);
 
@@ -68,7 +68,7 @@ namespace nr
 
         data_type min() const;
         data_type max() const;
-        data_type mean() const;
+        data_type arithmetic_mean() const;
         data_type median() const;
 
         iterator begin();
@@ -168,7 +168,7 @@ namespace nr
     }
 
     template <typename key_type, typename data_type>
-    inline data_type CSVData<key_type, data_type>::mean() const
+    inline data_type CSVData<key_type, data_type>::arithmetic_mean() const
     {
         return 1;
     }

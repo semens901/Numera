@@ -150,10 +150,10 @@ void csv_data_tests()
     }
 
     // ----------------------------------------------------
-    // TEST 9: min(), max(), mean(), median()
+    // TEST 9: min(), max(), arithmetic_mean(), median()
     // ----------------------------------------------------
     {
-        std::cout << "[TEST] min(), max(), mean(), median() CSVData\n";
+        std::cout << "[TEST] min(), max(), arithmetic_mean(), median() CSVData\n";
         nr::CSVData<std::string, double> s;
         s.add("A", 10.0);
         s.add("A", 20.0);
@@ -162,7 +162,7 @@ void csv_data_tests()
         // значения: {10,20,30}
         assert(s.min() == 10.0);
         assert(s.max() == 30.0);
-        //assert(std::abs(s.mean() - 20.0) < 1e-9);
+        //assert(std::abs(s.arithmetic_mean() - 20.0) < 1e-9);
         //assert(std::abs(s.median() - 20.0) < 1e-9);
         std::cout << "Test passed\n";
     }

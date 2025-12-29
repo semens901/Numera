@@ -11,16 +11,16 @@
 
 int main()
 {    
-    CSVDataLoader store("example.csv");
+    //CSVDataLoader store("example.csv");
 
-    {
+   /* {
         nr::CSVData<std::string, double> csv;
         FileDataLoader file_loader;
         nr::VectorData<double> dt(file_loader.load("numbers.txt"));
         std::cout << "Count:\t" << dt.size() << std::endl;
         std::cout << "Min:\t" << nr::min(dt) << std::endl;
     }
-
+    */
     {
         nr::CSVData<std::string, double> csv(std::map<std::string, std::vector<double>>{{"hello", {1,2,3}},{"hi", {0,4,5}}});
         std::cout << "Min:\t" << "(" << csv.min() << ")" << std::endl; 

@@ -13,7 +13,7 @@ void probability_sampling_tests()
         assert(sample.size() == sampleSize);
 
         nr::VectorData<double> emptyStats;
-        auto emptySample = nr::ProbabilitySampling::simple_random<double>(emptyStats, sampleSize);
+        std::vector<double> emptySample = nr::ProbabilitySampling::simple_random<double>(emptyStats, sampleSize);
         assert(emptySample.size() == 0);
 
         nr::CSVData<std::string, double> cd{std::map<std::string, std::vector<double>>
@@ -54,7 +54,7 @@ void probability_sampling_tests()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        auto strat = nr::ProbabilitySampling::stratified<double>(stats, labels, sampleSize);
+        std::vector<double> strat = nr::ProbabilitySampling::stratified<double>(stats, labels, sampleSize);
 
         assert(strat.size() == sampleSize);
 

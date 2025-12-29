@@ -196,7 +196,7 @@ void non_probability_sampling_tests()
         // --- Тест 1: обычная выборка ---
         size_t sampleSize = 5;
         auto sample = nr::NonProbabilitySampling::haphazardSample(data, sampleSize);
-
+        std::cout << "SAMPLEEEEEEE SIIIZEEEE:\t" << sample.size() << std::endl;
         assert(sample.size() == sampleSize);
 
         // --- Тест 2: sampleSize больше общего количества элементов ---

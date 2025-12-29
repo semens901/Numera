@@ -10,7 +10,7 @@
 #include<iostream>
 #include<cassert>
 #include<string>
-
+#include<list>
 void basic_stats_tests();
 
 #endif // BASICSTATSTESTS_H
