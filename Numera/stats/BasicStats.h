@@ -15,8 +15,11 @@
 namespace nr
 {
     template<typename Iterator>
-    auto min(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto min(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
+        // Returns the minimum value in the range [begin, end). 
+        // Throws if the range is empty.
         if(begin == end)
             throw std::invalid_argument("min: empty container");
         auto it = std::min_element(begin, end);
@@ -24,92 +27,107 @@ namespace nr
     }
 
     template <typename Container>
-    typename Container::value_type min(Container& data)
+    auto min(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
-        // Finds the minimum element
-     
+        // Returns the minimum value in the range [data.begin, data.end). 
+        // Throws if the range is empty.
         if (data.empty()) 
         {
             throw std::invalid_argument("min: empty container");
         }
 
-        auto it = std::min_element(data.begin(), data.end());
-        return (*it);
+        return *std::min_element(data.begin(), data.end());
     }
     
-    template<typename key_type, typename data_type>
-    data_type min(const std::map<key_type, std::vector<data_type>>& data)
+    template<typename KeyType, typename ArrayDataType>
+    auto min(const std::map<KeyType, ArrayDataType>& data) 
+    -> typename ArrayDataType::value_type
     {
-        // Finds the minimum element among all values ​​(not counting keys)
+        using ValueType = typename ArrayDataType::value_type;
+        
         if (data.empty()) 
+            throw std::invalid_argument("min: empty map");
+
+        // Вместо создания вектора, будем хранить только указатель на текущий минимум
+        const ValueType* current_min = nullptr;
+
+        for (const auto& [key, vec] : data)
         {
-            throw std::invalid_argument("min: empty container");
-        }
-        std::vector<data_type> out;
-        for(const auto& [key, vec] : data)
-        {
-            if (vec.empty())
-                continue;
+            if (vec.empty()) continue;
 
             auto it = std::min_element(vec.begin(), vec.end());
-            data_type local = *it;
-            out.push_back(local);
+            
+            // Если это первый найденный элемент или он меньше текущего минимума
+            if (current_min == nullptr || *it < *current_min)
+            {
+                current_min = &(*it);
+            }
         }
-        auto it = std::min_element(out.begin(), out.end());
-        return (*it);
+
+        if (current_min == nullptr)
+            throw std::invalid_argument("min: all nested containers are empty");
+
+        return *current_min;
     }
 
     template<typename Iterator>
     auto max(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
     {
+        // Returns the maximum value in the range [begin, end)
+        // Throws if the range is empty.
         if(begin == end)
             throw std::invalid_argument("max: empty container");
         auto it = std::max_element(begin, end);
         return (*it);
     }
 
-    template <typename T>
-    typename T::value_type max(T& data)
+    template <typename Container>
+    auto max(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
-        // Finds the maximum element
+        // Returns the maximum value in the range [data.begin, data.end)
+        // Throws if the range is empty.
 
         if (data.empty()) 
         {
             throw std::invalid_argument("max: empty container");
         }
-        auto it = std::max_element(data.begin(), data.end());
-        return *it;
+        return *std::max_element(data.begin(), data.end());
     }
 
-    template<typename key_type, typename data_type>
-    data_type max(const std::map<key_type, std::vector<data_type>>& data)
+    template<typename KeyType, typename ArrayDataType>
+    auto max(const std::map<KeyType, ArrayDataType>& data) 
+    -> typename ArrayDataType::value_type
     {
         // Finds the maximum element among all values ​​(not counting keys)
-
+        // Throws if the range is empty.
         if (data.empty()) 
         {
             throw std::invalid_argument("max: empty container");
         }
 
-        std::vector<data_type> out;
+        using value_type = typename ArrayDataType::value_type;
+        
+        std::vector<value_type> out;
         for(const auto& [key, vec] : data)
         {
             if (vec.empty())
                 continue;
 
             auto it = std::max_element(vec.begin(), vec.end());
-            data_type local = *it;
+            value_type local = *it;
             out.push_back(local);
         }
-        auto it = std::max_element(out.begin(), out.end());
-        return (*it);
+        return *std::max_element(out.begin(), out.end());
     }
 
     template<typename Iterator>
-    auto arithmetic_mean(Iterator begin, Iterator end, typename std::iterator_traits<Iterator>::value_type init) -> typename std::iterator_traits<Iterator>::value_type
+    auto arithmetic_mean(Iterator begin, Iterator end, typename std::iterator_traits<Iterator>::value_type init) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // Calculates the arithmetic arithmetic_mean
-
+        // Throws if the range is empty.
         if (begin == end) 
         {
             throw std::invalid_argument("arithmetic_mean: empty container");
@@ -122,10 +140,11 @@ namespace nr
     }
 
     template <typename Container>
-    auto arithmetic_mean(const Container& data) -> typename std::decay_t<Container>::value_type
+    auto arithmetic_mean(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
         // Calculates the arithmetic arithmetic_mean
-
+        // Throws if the range is empty.
         if (data.empty()) 
         {
             throw std::invalid_argument("arithmetic_mean: empty container");
@@ -137,10 +156,33 @@ namespace nr
         return sum/data.size();
     }
 
+    template<typename KeyType, typename ArrayDataType>
+    auto arithmetic_mean(const std::map<KeyType, ArrayDataType>& data) 
+    -> typename ArrayDataType::value_type
+    {
+        // Calculates the arithmetic arithmetic_mean
+        // Throws if the range is empty.
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("arithmetic_mean: empty container");
+        }
+
+        using value_type = typename ArrayDataType::value_type;
+
+        std::vector<value_type> out;
+        for(const auto& [key, vec] : data)
+        {
+            out.insert(out.end(), vec.begin(), vec.end());
+        }
+        value_type sum = std::accumulate(out.cbegin(), out.cend(), 0.0);
+        return sum/data.size();
+    }
+
     template<typename Iterator>
-    auto median(Iterator begin, Iterator end, typename std::iterator_traits<Iterator>::value_type init) -> typename std::iterator_traits<Iterator>::value_type
+    auto median(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
     {
         // Finds the median
+        // Throws if the range is empty.
         using mut_container = std::vector<typename std::iterator_traits<Iterator>::value_type>;
         using value_type = typename mut_container::value_type;
 
@@ -163,13 +205,42 @@ namespace nr
     auto median(const Container& data) -> typename std::decay_t<Container>::value_type
     {
         // Finds the median
+        // Throws if the range is empty.
         using mut_container = std::decay_t<Container>;
         using value_type = typename mut_container::value_type;
 
-        if (std::begin(data) == std::end(data)) return value_type{};
+        if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
 
         // Make a mutable copy (decayed type) even if `Container` is const-qualified
         mut_container numbersCopy(std::begin(data), std::end(data));
+        std::sort(numbersCopy.begin(), numbersCopy.end());
+
+        size_t n = numbersCopy.size();
+        if (n % 2 == 1) {
+            return numbersCopy[n / 2];
+        } else {
+            // compute average of two middle elements, cast to value_type
+            return (numbersCopy[n / 2 - 1] + numbersCopy[n / 2]) / static_cast<value_type>(2);
+        }
+    }
+
+    template<typename KeyType, typename ArrayDataType>
+    auto median(const std::map<KeyType, ArrayDataType>& data) 
+    -> typename ArrayDataType::value_type
+    {
+        // Finds the median
+        // Throws if the range is empty.
+        using mut_container = ArrayDataType;
+        using value_type = typename mut_container::value_type;
+
+        if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
+
+        // Make a mutable copy (decayed type) even if `Container` is const-qualified
+        mut_container numbersCopy;
+        for(const auto& [key, vec] : data)
+        {
+            numbersCopy.insert(numbersCopy.end(), vec.begin(), vec.end());
+        }
         std::sort(numbersCopy.begin(), numbersCopy.end());
 
         size_t n = numbersCopy.size();
@@ -252,7 +323,8 @@ namespace nr
     }
 
     template <typename Container>
-    auto geometric_mean(const Container& data) -> typename std::decay_t<Container>::value_type
+    auto geometric_mean(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
         // finds the geometric arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
@@ -282,7 +354,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto geometric_mean(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto geometric_mean(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // finds the geometric arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
@@ -312,7 +385,8 @@ namespace nr
     }
 
     template <typename Container>
-    auto harmonic_mean(const Container& data) -> typename std::decay_t<Container>::value_type
+    auto harmonic_mean(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
@@ -342,7 +416,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto harmonic_mean(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto harmonic_mean(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
@@ -373,7 +448,7 @@ namespace nr
 
     template <typename Container>
     auto lower_quartile(const Container& data)
-        -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
         // Finds the lower quartile
         using mut_container = std::decay_t<Container>;
@@ -399,7 +474,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto lower_quartile(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto lower_quartile(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // Finds the lower quartile
         using mut_container = std::vector<typename std::iterator_traits<Iterator>::value_type>;
@@ -445,7 +521,7 @@ namespace nr
             throw std::logic_error("upper_quartile: not enough data");
         }
 
-        // для нечётного n пропускаем медиану
+        // For odd n we skip the median.
         const std::size_t start =
             (n % 2 == 0) ? mid : mid + 1;
 
@@ -458,7 +534,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto upper_quartile(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto upper_quartile(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // Finds the upper quartile
         using mut_container = std::vector<typename std::iterator_traits<Iterator>::value_type>;
@@ -477,7 +554,7 @@ namespace nr
             throw std::logic_error("upper_quartile: not enough data");
         }
 
-        // для нечётного n пропускаем медиану
+        // For odd n we skip the median.
         const std::size_t start =
             (n % 2 == 0) ? mid : mid + 1;
 
@@ -491,7 +568,7 @@ namespace nr
 
     template <typename Container>
     auto percentile(const Container& data, double p)
-        -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
         /**
      * Calculates the p-th percentile using linear interpolation (R7/Excel style).
@@ -524,9 +601,44 @@ namespace nr
             return sorted[idx];
     }
 
+    template<typename Iterator>
+    auto percentile(const Iterator& begin, const Iterator& end, double p)
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        /**
+         * Calculates the p-th percentile using linear interpolation (R7/Excel style).
+         * * Nuances:
+         * - Complexity: O(N log N) due to full internal copy & sort.
+         * - Interpolation: Uses (p/100)*(n-1) to find the fractional index.
+         * - Safety: Throws if data is empty or p is out of [0, 100] range.
+         * - Precision: Returns double to handle fractional results between elements.
+         */
+        using value_type = typename std::iterator_traits<Iterator>::value_type;
+
+        if (begin == end)
+            throw std::invalid_argument("percentile: empty data");
+
+        if (p < 0.0 || p > 100.0)
+            throw std::out_of_range("percentile: p must be in [0, 100]");
+
+        std::vector<value_type> sorted(begin, end);
+        std::sort(sorted.begin(), sorted.end());
+
+        const std::size_t n = sorted.size();
+        const double pos = (p / 100.0) * (n - 1);
+
+        const std::size_t idx = static_cast<std::size_t>(std::floor(pos));
+        const double frac = pos - idx;
+
+        if (idx + 1 < n)
+            return sorted[idx] * (1.0 - frac) + sorted[idx + 1] * frac;
+        else
+            return sorted[idx];
+    }
+
     template <typename Container>
     auto mode(const Container& data)
-        -> std::optional<typename std::decay_t<Container>::value_type>
+    -> std::optional<typename std::decay_t<Container>::value_type>
     {
         /**
          * Finds the unique mode of a container.
@@ -571,9 +683,56 @@ namespace nr
         return result;
     }
 
+    template <typename Iterator>
+    auto mode(const Iterator& begin, const Iterator& end)
+    -> std::optional<typename std::iterator_traits<Iterator>::value_type>
+    {
+        /**
+         * Finds the unique mode of a container.
+         * - Logic: Returns the most frequent element only if it's unique.
+         * - Edge Cases: Returns std::nullopt if the data is empty, 
+         * multi-modal (multiple values with same max frequency), 
+         * or if all elements appear only once.
+         * - Requirements: value_type must be hashable for std::unordered_map.
+         * - Complexity: O(N) average time.
+         */
+        using T = typename std::iterator_traits<Iterator>::value_type;
+
+        if (begin == end)
+            return std::nullopt;
+
+        std::unordered_map<T, std::size_t> freq;
+
+        for(const auto& v = begin; v != end; ++v)
+            ++freq[*v];
+
+        std::size_t max_count = 0;
+        T result{};
+        bool unique = true;
+
+        for (const auto& [value, count] : freq)
+        {
+            if (count > max_count)
+            {
+                max_count = count;
+                result = value;
+                unique = true;
+            }
+            else if (count == max_count)
+            {
+                unique = false;
+            }
+        }
+
+        if (!unique || max_count == 1)
+            return std::nullopt;
+
+        return result;
+    }
+
     template <typename Container>
     auto modes(const Container& data)
-        -> std::vector<typename std::decay_t<Container>::value_type>
+    -> std::vector<typename std::decay_t<Container>::value_type>
     {
         /**
          * Finds all modes in a container (supports multi-modal distributions).
@@ -609,6 +768,44 @@ namespace nr
         return result;
     }
 
+    template <typename Iterator>
+    auto modes(const Iterator& begin, const Iterator& end)
+    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
+    {
+        /**
+         * Finds all modes in a container (supports multi-modal distributions).
+         * - Logic: Returns a vector of values with the highest frequency.
+         * - Edge Cases: Returns an empty vector if data is empty or all elements are unique (max_count=1).
+         * - Complexity: O(N) average time (two passes over the frequency map).
+         * - Requirements: value_type must be hashable.
+         */
+        using T = typename std::iterator_traits<Iterator>::value_type;
+
+        if (begin == end)
+            return {};
+
+        std::unordered_map<T, std::size_t> freq;
+
+        for(const auto& v = begin; v != end; ++v)
+            ++freq[*v];
+
+        std::size_t max_count = 0;
+        for (const auto& [_, count] : freq)
+            max_count = std::max(max_count, count);
+
+        if (max_count <= 1)
+            return {}; // моды нет
+
+        std::vector<T> result;
+        for (const auto& [value, count] : freq)
+        {
+            if (count == max_count)
+                result.push_back(value);
+        }
+
+        return result;
+    }
+
     template <typename Container>
     auto Scope(const Container& data)
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
@@ -616,11 +813,25 @@ namespace nr
         return max(data) - min(data);
     }
 
+    template <typename Iterator>
+    auto Scope(const Iterator& begin, const Iterator& end)
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        return max(begin, end) - min(begin, end);
+    }
+
     template <typename Container>
     auto interquartile_range(const Container& data)
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
         return upper_quartile(data) - lower_quartile(data);
+    }
+
+    template <typename Iterator>
+    auto interquartile_range(const Iterator& begin, const Iterator& end)
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        return upper_quartile(begin, end) - lower_quartile(begin, end);
     }
 
     template <typename Container>
@@ -638,6 +849,26 @@ namespace nr
         double total_deviation = 0.0;
         for (const auto& value : data) {
             total_deviation += std::abs(static_cast<double>(value) - sum);
+        }
+
+        return total_deviation / n;
+    }
+
+    template <typename Iterator>
+    auto mean_absolute_deviation(const Iterator& begin, const Iterator& end) 
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        if (begin==end) {
+            throw std::invalid_argument("MAD: empty data");
+        }
+
+        const double n = static_cast<double>(std::distance(begin, end));
+
+        double sum = arithmetic_mean(begin, end, 0.0);
+
+        double total_deviation = 0.0;
+        for(auto it = begin; it != end; ++it) {
+            total_deviation += std::abs(static_cast<double>(*it) - sum);
         }
 
         return total_deviation / n;

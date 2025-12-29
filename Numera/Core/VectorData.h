@@ -42,7 +42,7 @@ namespace nr
         VectorData() = default;
         ~VectorData() = default;
         VectorData(const VectorData& other);
-        explicit VectorData(container_type vec) { this->container = vec; }
+        explicit VectorData(container_type vec) : container(std::move(vec)) {}
         VectorData(IDataLoader<std::vector<T>> loader, std::string filename);
         VectorData(iterator begin, iterator end);
 

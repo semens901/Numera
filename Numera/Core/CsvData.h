@@ -42,11 +42,12 @@ namespace nr
         using const_iterator =  typename container_type::const_iterator;
 
         CSVData() = default;
+        ~CSVData() = default;
         CSVData(const CSVData& other) = default;
         CSVData& operator=(const CSVData& other) = default;
-        CSVData(CSVData&& other) noexcept = default;
+        CSVData(CSVData&& other) : container(std::move(other.container)) {}
         CSVData& operator=(CSVData&& other) noexcept = default;
-        ~CSVData() = default;
+        
 
         CSVData(std::initializer_list<
         std::pair<const key_type, std::vector<data_type>>> init);
@@ -170,13 +171,13 @@ namespace nr
     template <typename key_type, typename data_type>
     inline data_type CSVData<key_type, data_type>::arithmetic_mean() const
     {
-        return 1;
+        return nr::arithmetic_mean(container);
     }
 
     template <typename key_type, typename data_type>
     inline data_type CSVData<key_type, data_type>::median() const
     {
-        return 1;
+        return nr::median(container);
     }
 
     template <typename key_type, typename data_type>
