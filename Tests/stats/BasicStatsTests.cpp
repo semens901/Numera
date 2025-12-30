@@ -175,6 +175,40 @@ void basic_stats_tests()
     }
 
     {
+        // 1. Common case: different values
+        nr::CSVData<int, int> m1 = {
+            {1, {10, 5, 8}},
+            {2, {20, 3, 15}},
+            {3, {7, 42}}
+        };
+        assert(nr::min(m1) == 3);
+
+        // 2. The case with negative numbers
+        std::map<std::string, std::vector<double>> m2 = {
+            {"a", {1.5, -2.5, 0.0}},
+            {"b", {-10.2, 5.5}}
+        };
+        assert(nr::min(m2) == -10.2);
+
+        // 3. Mixed case: there are empty vectors inside the map
+        nr::CSVData<int, int> m3 = {
+            {1, {}},
+            {2, {100, 50}},
+            {3, {}}
+        };
+        assert(nr::min(m3) == 50);
+
+        // 4. Checking for an empty map exception
+        nr::CSVData<int, int> empty_map;
+        try {
+            nr::min(empty_map);
+            assert(false);
+        } catch (const std::invalid_argument& e) {
+            assert(std::string(e.what()) == "min: empty CSVData");
+        }
+    }
+
+    {
         std::vector<int> data{5, 3, 8, 1, 4};
 
         int result = nr::max(data.begin(), data.end());
@@ -226,6 +260,49 @@ void basic_stats_tests()
     }
 
     {
+        // 1. Standard Test: Different Groups of Numbers
+        nr::CSVData<std::string, int> m1 = {
+            {"group1", {1, 5, 3}},
+            {"group2", {10, 2, 8}},
+            {"group3", {4, 9}}
+        };
+        assert(nr::max(m1) == 10);
+
+        // 2. Negative numbers test
+        nr::CSVData<int, double> m2 = {
+            {100, {-10.5, -20.0}},
+            {200, {-5.2, -1.1}}
+        };
+        assert(nr::max(m2) == -1.1);
+
+        // 3. Gap test (empty vectors inside)
+        nr::CSVData<int, int> m3 = {
+            {1, {}},
+            {2, {42}},
+            {3, {}}
+        };
+        assert(nr::max(m3) == 42);
+
+        // 4. Test for exception on empty map
+        nr::CSVData<int, double> m_empty;
+        bool exception_thrown = false;
+        try {
+            nr::max(m_empty);
+        } catch (const std::invalid_argument& e) {
+            exception_thrown = true;
+            assert(std::string(e.what()) == "max: empty container");
+        }
+        assert(exception_thrown);
+
+        // 5. Test with the same values
+        nr::CSVData<char, int> m4 = {
+            {'a', {7, 7}},
+            {'b', {7}}
+        };
+        assert(nr::max(m4) == 7);
+    }
+
+    {
         std::vector<double> data1 = {1.0, 2.0, 3.0, 4.0};
         double mean1 = nr::arithmetic_mean(data1.begin(), data1.end(), 0.0);
         assert(mean1 == 2.5); // (1+2+3+4)/4 = 2.5
@@ -243,7 +320,7 @@ void basic_stats_tests()
         }
         assert(exception_thrown);
     }
-
+    
     {
         // Test 1: Simple integer-based mean
         // Calculation: (10 + 20 + 30) / 3 keys = 60 / 3 = 20
@@ -264,6 +341,35 @@ void basic_stats_tests()
 
         // Test 3: Handling empty map (Exception test)
         std::map<int, std::vector<double>> empty_map;
+        bool exception_caught = false;
+        try {
+            nr::arithmetic_mean(empty_map);
+        } catch (const std::invalid_argument& e) {
+            exception_caught = true;
+        }
+        assert(exception_caught);
+    }
+
+    {
+        // Test 1: Simple integer-based mean
+        // Calculation: (10 + 20 + 30) / 3 keys = 60 / 3 = 20
+        nr::CSVData<int, double> m1 = {
+            {1, {10.0}},
+            {2, {20.0}},
+            {3, {30.0}}
+        };
+        assert(std::abs(nr::arithmetic_mean(m1) - 20.0) < 1e-9);
+
+        // Test 2: Multiple elements per key
+        // Calculation: (1 + 2 + 3 + 4) / 2 keys = 10 / 2 = 5.0
+        nr::CSVData<std::string, double> m2 = {
+            {"A", {1.0, 2.0}},
+            {"B", {3.0, 4.0}}
+        };
+        assert(std::abs(nr::arithmetic_mean(m2) - 5.0) < 1e-9);
+
+        // Test 3: Handling empty map (Exception test)
+        nr::CSVData<int, double> empty_map;
         bool exception_caught = false;
         try {
             nr::arithmetic_mean(empty_map);
@@ -328,6 +434,38 @@ void basic_stats_tests()
         assert(caught);
 
         std::cout << "All median tests passed successfully!" << std::endl;
+    }
+
+    {
+        // 1. Test Odd number of total elements
+        // Sorted: {1, 3, 5, 7, 9} -> Middle is 5
+        nr::CSVData<int, double> m1 = {
+            {1, {3.0, 1.0}},
+            {2, {7.0, 5.0, 9.0}}
+        };
+        assert(std::abs(nr::median(m1) - 5.0) < 1e-9);
+
+        // 2. Test Even number of total elements
+        // Sorted: {1, 2, 3, 4} -> Average of 2 and 3 is 2.5
+        nr::CSVData<std::string, double> m2 = {
+            {"first", {4.0, 1.0}},
+            {"second", {3.0, 2.0}}
+        };
+        assert(std::abs(nr::median(m2) - 2.5) < 1e-9);
+
+        // 3. Test with single element
+        nr::CSVData<int, int> m3 = {{1, {42}}};
+        assert(nr::median(m3) == 42);
+
+        // 4. Test Exception for empty map
+        nr::CSVData<int, int> empty_map;
+        bool caught = false;
+        try {
+            nr::median(empty_map);
+        } catch (const std::invalid_argument& e) {
+            caught = true;
+        }
+        assert(caught);
     }
 
     {

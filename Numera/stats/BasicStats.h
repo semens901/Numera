@@ -14,11 +14,16 @@
 
 namespace nr
 {
+    // Forward declaration of CSVData to allow providing overloads
+    // without including CsvData.h (avoids circular include).
+    template<typename KeyType, typename DataType>
+    class CSVData;
+
     template<typename Iterator>
     auto min(Iterator begin, Iterator end) 
     -> typename std::iterator_traits<Iterator>::value_type
     {
-        // Returns the minimum value in the range [begin, end). 
+        // Returns the minimum value in the range (begin, end). 
         // Throws if the range is empty.
         if(begin == end)
             throw std::invalid_argument("min: empty container");
@@ -30,7 +35,7 @@ namespace nr
     auto min(const Container& data) 
     -> typename std::decay_t<Container>::value_type
     {
-        // Returns the minimum value in the range [data.begin, data.end). 
+        // Returns the minimum value in the range (data.begin, data.end). 
         // Throws if the range is empty.
         if (data.empty()) 
         {
@@ -49,7 +54,7 @@ namespace nr
         if (data.empty()) 
             throw std::invalid_argument("min: empty map");
 
-        // Вместо создания вектора, будем хранить только указатель на текущий минимум
+        // Instead of creating a vector, we will store only a pointer to the current minimum
         const ValueType* current_min = nullptr;
 
         for (const auto& [key, vec] : data)
@@ -58,7 +63,7 @@ namespace nr
 
             auto it = std::min_element(vec.begin(), vec.end());
             
-            // Если это первый найденный элемент или он меньше текущего минимума
+            // If this is the first element found or it is less than the current minimum
             if (current_min == nullptr || *it < *current_min)
             {
                 current_min = &(*it);
@@ -71,10 +76,41 @@ namespace nr
         return *current_min;
     }
 
+    // CSVData-specific overload. This is a separate overload (more
+    // specialized than the generic Container version) and will be
+    // selected for objects of type CSVData<KeyType,DataType>.
+    template<typename KeyType, typename DataType>
+    auto min(const CSVData<KeyType, DataType>& data)
+    -> DataType
+    {
+        using ValueType = DataType;
+
+        if (data.empty())
+            throw std::invalid_argument("min: empty CSVData");
+
+        const ValueType* current_min = nullptr;
+
+        for (const auto& pair : data)
+        {
+            // pair is a std::pair<const KeyType, std::vector<DataType>>
+            const auto& vec = pair.second;
+            if (vec.empty()) continue;
+
+            auto it = std::min_element(vec.begin(), vec.end());
+            if (current_min == nullptr || *it < *current_min)
+                current_min = &(*it);
+        }
+
+        if (current_min == nullptr)
+            throw std::invalid_argument("min: all nested containers in CSVData are empty");
+
+        return *current_min;
+    }
+
     template<typename Iterator>
     auto max(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
     {
-        // Returns the maximum value in the range [begin, end)
+        // Returns the maximum value in the range (begin, end)
         // Throws if the range is empty.
         if(begin == end)
             throw std::invalid_argument("max: empty container");
@@ -86,7 +122,7 @@ namespace nr
     auto max(const Container& data) 
     -> typename std::decay_t<Container>::value_type
     {
-        // Returns the maximum value in the range [data.begin, data.end)
+        // Returns the maximum value in the range (data.begin, data.end)
         // Throws if the range is empty.
 
         if (data.empty()) 
@@ -117,6 +153,32 @@ namespace nr
 
             auto it = std::max_element(vec.begin(), vec.end());
             value_type local = *it;
+            out.push_back(local);
+        }
+        return *std::max_element(out.begin(), out.end());
+    }
+
+    template<typename KeyType, typename DataType>
+    auto max(const CSVData<KeyType, DataType>& data)
+    -> DataType
+    {
+        // Finds the maximum element among all values ​​(not counting keys)
+        // Throws if the range is empty.
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("max: empty container");
+        }
+
+        using ValueType = DataType;
+        
+        std::vector<ValueType> out;
+        for(const auto& [key, vec] : data)
+        {
+            if (vec.empty())
+                continue;
+
+            auto it = std::max_element(vec.begin(), vec.end());
+            ValueType local = *it;
             out.push_back(local);
         }
         return *std::max_element(out.begin(), out.end());
@@ -168,6 +230,28 @@ namespace nr
         }
 
         using value_type = typename ArrayDataType::value_type;
+
+        std::vector<value_type> out;
+        for(const auto& [key, vec] : data)
+        {
+            out.insert(out.end(), vec.begin(), vec.end());
+        }
+        value_type sum = std::accumulate(out.cbegin(), out.cend(), 0.0);
+        return sum/data.size();
+    }
+
+    template<typename KeyType, typename DataType>
+    auto arithmetic_mean(const CSVData<KeyType, DataType>& data)
+    -> DataType
+    {
+        // Calculates the arithmetic arithmetic_mean
+        // Throws if the range is empty.
+        if (data.empty()) 
+        {
+            throw std::invalid_argument("arithmetic_mean: empty container");
+        }
+
+        using value_type = DataType;
 
         std::vector<value_type> out;
         for(const auto& [key, vec] : data)
@@ -231,6 +315,34 @@ namespace nr
         // Finds the median
         // Throws if the range is empty.
         using mut_container = ArrayDataType;
+        using value_type = typename mut_container::value_type;
+
+        if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
+
+        // Make a mutable copy (decayed type) even if `Container` is const-qualified
+        mut_container numbersCopy;
+        for(const auto& [key, vec] : data)
+        {
+            numbersCopy.insert(numbersCopy.end(), vec.begin(), vec.end());
+        }
+        std::sort(numbersCopy.begin(), numbersCopy.end());
+
+        size_t n = numbersCopy.size();
+        if (n % 2 == 1) {
+            return numbersCopy[n / 2];
+        } else {
+            // compute average of two middle elements, cast to value_type
+            return (numbersCopy[n / 2 - 1] + numbersCopy[n / 2]) / static_cast<value_type>(2);
+        }
+    }
+
+    template<typename KeyType, typename DataType>
+    auto median(const CSVData<KeyType, DataType>& data)
+    -> DataType
+    {
+        // Finds the median
+        // Throws if the range is empty.
+        using mut_container = std::vector<DataType>;
         using value_type = typename mut_container::value_type;
 
         if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
