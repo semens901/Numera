@@ -8,8 +8,7 @@
 #include <unordered_map>
 #include<iostream>
 #include<cmath>
-#include "Core/VectorData.h"
-#include "Core/CsvData.h"
+#include "Core/NumericSample.h"
 
 namespace nr
 {
@@ -39,34 +38,19 @@ namespace nr
             size_t sampleSize);
     ///////////////////////////////////////////////////////
         template<typename T>
-        static VectorData<T> quotaSample(
-            const nr::VectorData<T>& data,
+        static NumericSample<T> quotaSample(
+            const nr::NumericSample<T>& data,
             const std::vector<size_t>& labels,             // group labels for each element
             const std::unordered_map<size_t, size_t>& quotas);
             
         template<typename T>
-        static VectorData<T> haphazardSample(
-            const nr::VectorData<T>& data, 
+        static NumericSample<T> haphazardSample(
+            const nr::NumericSample<T>& data, 
             size_t sampleSize);
             
         template<typename T>
-        static VectorData<T> convenienceSample(
-            const nr::VectorData<T>& data, 
-            size_t sampleSize);
-///////////////////////////////////////////////////////
-        template<typename KEY_T, typename Value_T>
-        static nr::VectorData<Value_T> quotaSample(
-        const nr::CSVData<KEY_T, Value_T>& data, 
-        const std::unordered_map<KEY_T, size_t>& quotas);
-        
-        template<typename KEY_T, typename Value_T>
-        static nr::VectorData<Value_T> haphazardSample(
-            const nr::CSVData<KEY_T, Value_T>& data, 
-            size_t sampleSize);
-
-        template<typename KEY_T, typename Value_T>
-        static nr::VectorData<Value_T> convenienceSample(
-            const nr::CSVData<KEY_T, Value_T>& data, 
+        static NumericSample<T> convenienceSample(
+            const nr::NumericSample<T>& data, 
             size_t sampleSize);
     };
 
@@ -144,13 +128,13 @@ namespace nr
     }
 
     template <typename T>
-    inline nr::VectorData<T> NonProbabilitySampling::quotaSample(const nr::VectorData<T> &data, const std::vector<size_t> &labels, const std::unordered_map<size_t, size_t> &quotas)
+    inline nr::NumericSample<T> NonProbabilitySampling::quotaSample(const nr::NumericSample<T> &data, const std::vector<size_t> &labels, const std::unordered_map<size_t, size_t> &quotas)
     {
         // Quota sampling
         if (data.empty() || labels.size() != data.size() || quotas.empty())
             return {};
 
-        nr::VectorData<T> out;
+        nr::NumericSample<T> out;
 
         // First, we collect the elements into groups
         std::unordered_map<size_t, std::vector<T>> groups;
@@ -174,7 +158,7 @@ namespace nr
     }
 
     template <typename T>
-    inline nr::VectorData<T> NonProbabilitySampling::haphazardSample(const nr::VectorData<T> &data, size_t sampleSize)
+    inline nr::NumericSample<T> NonProbabilitySampling::haphazardSample(const nr::NumericSample<T> &data, size_t sampleSize)
     {
         // Spontaneous sampling
         if (data.empty() || sampleSize == 0) 
@@ -182,7 +166,7 @@ namespace nr
             return {};
         }
 
-        nr::VectorData<T> shuffled = data;
+        nr::NumericSample<T> shuffled = data;
 
         // Non-deterministic source
         std::mt19937 gen(std::random_device{}());
@@ -193,20 +177,20 @@ namespace nr
             return shuffled;
         }
 
-        return nr::VectorData<T>(
+        return nr::NumericSample<T>(
             shuffled.begin(),
             shuffled.begin() + sampleSize
         );
     }
 
     template <typename T>
-    inline nr::VectorData<T> NonProbabilitySampling::convenienceSample(const nr::VectorData<T> &data, size_t sampleSize)
+    inline nr::NumericSample<T> NonProbabilitySampling::convenienceSample(const nr::NumericSample<T> &data, size_t sampleSize)
     {
         // Convenient selection
         if (data.empty() || sampleSize == 0)
             return {};
 
-        nr::VectorData<T> out;
+        nr::NumericSample<T> out;
         out.reserve(sampleSize);
 
         // We take elements based on availability (the first sampleSize of elements)
@@ -218,91 +202,6 @@ namespace nr
         return out;
     }
 
-    template <typename KEY_T, typename Value_T>
-    inline VectorData<Value_T> NonProbabilitySampling::quotaSample(
-        const CSVData<KEY_T, Value_T> &data,
-        const std::unordered_map<KEY_T, size_t> &quotas)
-    {
-        // Quota sampling
-        if (data.empty() || quotas.empty())
-            return {};
-
-        nr::VectorData<Value_T> out;
-
-        for (const auto& [label, values] : data)
-        {
-            // We check if there is a quota for this group
-            auto it = quotas.find(label);
-            if (it == quotas.end() || values.empty())
-                continue;
-
-            size_t k = it->second;             // Quota for this group
-            k = std::min(k, values.size());    // We do not exceed the available quantity
-
-            // We take the first k elements from values
-            for (size_t i = 0; i < k; ++i)
-                out.push_back(values[i]);
-        }
-
-        return out;
-    }
-
-    template <typename KEY_T, typename Value_T>
-    inline VectorData<Value_T> NonProbabilitySampling::haphazardSample(const nr::CSVData<KEY_T, Value_T> &data, size_t sampleSize)
-    {
-        // Spontaneous sampling
-        if (data.empty() || sampleSize == 0) {
-            return {};
-        }
-
-        std::vector<Value_T> allValues;
-
-        // 1. Collecting all the values
-        for (const auto& [_, values] : data) {
-            allValues.insert(allValues.end(), values.begin(), values.end());
-        }
-
-        if (allValues.empty()) {
-            return {};
-        }
-
-        // 2. Mixing without determinism
-        std::mt19937 gen(std::random_device{}());
-        std::shuffle(allValues.begin(), allValues.end(), gen);
-
-        // 3. Forming the result
-        const std::size_t n = std::min(sampleSize, allValues.size());
-
-        nr::VectorData<Value_T> out;
-        for (std::size_t i = 0; i < n; ++i) {
-            out.add(allValues[i]);
-        }
-
-        return out;
-    }
-
-    template <typename KEY_T, typename Value_T>
-    inline VectorData<Value_T> NonProbabilitySampling::convenienceSample(const nr::CSVData<KEY_T, Value_T> &data, size_t sampleSize)
-    {
-        if (data.empty() || sampleSize == 0)
-            return {};
-
-        nr::VectorData<Value_T> out;
-        //out.reserve(sampleSize);
-
-        // We take elements by availability (for example, the first elements in the group order)
-        for (const auto& [label, values] : data)
-        {
-            for (const auto& v : values)
-            {
-                if (out.size() >= sampleSize)
-                    return out;
-                out.push_back(v);
-            }
-        }
-
-        return out;
-    }
 }
 
 #endif //NON_PROBABILITY_SAMPLIG_H

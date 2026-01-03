@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include <string>
-#include "Core/VectorData.h"
+#include "Core/NumericSample.h"
 
 void file_data_loader_tests();
 

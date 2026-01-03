@@ -1,5 +1,5 @@
-#include "Core/CsvDataTests.h"
-#include "Core/VectorDataTests.h"
+#include "Core/CSVTableTests.h"
+#include "Core/NumericSampleTests.h"
 #include "io/CsvDataLoaderTests.h"
 #include "io/FileDataLoaderTests.h"
 #include "stats/BasicStatsTests.h"
@@ -9,8 +9,8 @@
 int main()
 {
     basic_stats_tests();
-    csv_data_tests();
-    vector_data_tests();
+    csv_table_tests();
+    numeric_sample_tests();
     csv_data_loader();
     file_data_loader_tests();    
     non_probability_sampling_tests();

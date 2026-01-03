@@ -1,100 +1,67 @@
 #include "CsvDataLoader.h"
 
-std::map<std::string, std::vector<std::string>> CSVDataLoader::load(const std::string& filename)
+std::unordered_map<std::string, std::vector<std::string>> CSVDataLoader::load(const std::string& filename)
 {
-    char delimiter = ',';
+    container_type result;
+    column_order.clear();
 
     std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return {};
-    }
+    if (!file.is_open()) throw std::runtime_error("Cannot open file: " + filename);
 
     std::string line;
-    
-    // Count headers (column names)
-    if (!std::getline(file, line)) return {};
-    std::vector<std::string> headers = split(line, delimiter);
+    if (!std::getline(file, line)) return result; // пустой файл
 
-    // Initialize the map with empty vectors
-    for (const auto& header : headers) {
-        m_data[header] = {};
-    }
+    // Сохраняем заголовки и порядок
+    column_order = split(line, ',');
+    for (const auto& col : column_order) result[col] = {};
 
-    // Reading data
+    // Чтение строк
     while (std::getline(file, line)) {
-        std::vector<std::string> row = split(line, delimiter);
-        for (size_t i = 0; i < headers.size(); ++i) {
-            if (i < row.size()) {
-                m_data[headers[i]].push_back(row[i]);
-            } else {
-                m_data[headers[i]].push_back(""); // если данных меньше, чем колонок
-            }
+        auto values = split(line, ',');
+        for (size_t i = 0; i < values.size() && i < column_order.size(); ++i) {
+            result[column_order[i]].push_back(values[i]);
         }
     }
 
-    file.close();
-    return m_data;
+    m_data = result; // сохраняем внутрь класса, если нужно
+    return result;
 }
 
-void CSVDataLoader::save(const std::string &filename, const std::map<std::string, std::vector<std::string>> &data) const
+void CSVDataLoader::save(const std::string &filename, const std::unordered_map<std::string, std::vector<std::string>> &data) const
 {
-    char delimiter = ',';
     std::ofstream file(filename);
+    if (!file.is_open()) throw std::runtime_error("Cannot open file for writing: " + filename);
 
-    if (!file) {
-        throw std::runtime_error("Failed to open file: " + filename);
+    // Пишем заголовки в порядке column_order
+    for (size_t i = 0; i < column_order.size(); ++i) {
+        file << column_order[i];
+        if (i + 1 < column_order.size()) file << ",";
     }
+    file << "\n";
 
-    if (data.empty()) {
-        return; // empty csv
-    }
+    // Определяем количество строк (берём длину первой колонки)
+    size_type n = 0;
+    if (!column_order.empty()) n = data.at(column_order[0]).size();
 
-    // --- 1. Write down the title ---
-    {
-        bool first = true;
-        for (const auto& [column, _] : data) {
-            if (!first) {
-                file << delimiter;
-            }
-            file << column;
-            first = false;
+    for (size_type row = 0; row < n; ++row) {
+        for (size_t col = 0; col < column_order.size(); ++col) {
+            file << data.at(column_order[col])[row];
+            if (col + 1 < column_order.size()) file << ",";
         }
-        file << '\n';
+        file << "\n";
     }
+}
 
-    // --- 2. Checking if columns are the same length ---
-    const std::size_t row_count = data.begin()->second.size();
-
-    for (const auto& [_, column_data] : data) {
-        if (column_data.size() != row_count) {
-            throw std::runtime_error("CSVDataLoader::save: columns have different sizes");
-        }
-    }
-
-    // --- 3. Write down the lines ---
-    for (std::size_t row = 0; row < row_count; ++row) {
-        bool first = true;
-
-        for (const auto& [_, column_data] : data) {
-            if (!first) {
-                file << delimiter;
-            }
-            file << column_data[row];
-            first = false;
-        }
-
-        file << '\n';
-    }
+const std::vector<std::string> &CSVDataLoader::get_column_order() const
+{
+    return column_order; 
 }
 
 std::vector<std::string> CSVDataLoader::split(const std::string &s, char delimiter) const
 {
-    std::vector<std::string> result;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delimiter)) {
-        result.push_back(item);
-    }
-    return result;
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream ss(s);
+    while (std::getline(ss, token, delimiter)) tokens.push_back(token);
+    return tokens;
 }

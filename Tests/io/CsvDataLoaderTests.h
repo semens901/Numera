@@ -4,7 +4,8 @@
 #include <iostream>
 #include <cassert>
 #include <string>
-#include "Core/CsvData.h"
+#include <fstream>
+#include "Core/CSVTable.h"
 
 void csv_data_loader();
 

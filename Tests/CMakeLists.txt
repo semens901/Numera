@@ -5,8 +5,8 @@ add_executable(numera_tests
     NumeraTests.cpp
 
     # Core tests
-    Core/VectorDataTests.cpp
-    Core/CsvDataTests.cpp
+    Core/NumericSampleTests.cpp
+    Core/CSVTableTests.cpp
     Core/JsonDataStoreTests.cpp
 
     # IO tests

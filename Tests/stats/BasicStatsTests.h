@@ -1,7 +1,6 @@
 #ifndef BASICSTATSTESTS_H
 #define BASICSTATSTESTS_H
-#include "Core/VectorData.h"
-#include "Core/CsvData.h"
+#include "Core/NumericSample.h"
 #include "io/CsvDataLoader.h"
 #include "stats/NonProbabilitySampling.h"
 #include "stats/BasicStats.h"
