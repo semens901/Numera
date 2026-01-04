@@ -52,6 +52,7 @@ namespace nr
         CSVTable& operator=(const CSVTable&) = default;
         CSVTable& operator=(CSVTable&&) = default;
         explicit CSVTable(std::vector<cell_type> headers);
+        CSVTable(std::vector<std::string> headers, std::vector<row_type> rows);
         //CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>& loader, std::string filename);
         ~CSVTable() = default;
 
@@ -90,6 +91,8 @@ namespace nr
         void clear();
 
     private:
+        void fill_in_the_blanks();
+        
         template <typename T>
         static T string_to(const std::string& s);
 
@@ -117,14 +120,42 @@ namespace nr
     template <typename T>
     inline T CSVTable::string_to(const std::string &s)
     {
+        static_assert(
+        std::is_arithmetic_v<T> ||
+        std::is_same_v<T, bool> ||
+        std::is_same_v<T, std::string>,
+        "CSVTable::string_to<T>: unsupported target type"
+        );
+
+         // Strings are returned as-is (no parsing required)
+        if constexpr (std::is_same_v<T, std::string>) 
+        {
+            return s;
+        }
+
         std::istringstream iss(s);
         T value;
 
-        if constexpr (std::is_same_v<T, bool>) {
-            if (s == "0" || s == "false") value = false;
-            else if (s == "1" || s == "true") value = true;
-            else throw std::invalid_argument("Invalid bool: " + s);
-        } else {
+        // Special handling for boolean values
+    if constexpr (std::is_same_v<T, bool>) 
+    {
+        std::string tmp;
+        iss >> tmp;
+
+        // Normalize to lowercase for robust comparison
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+
+        // Accept common CSV boolean representations
+        if (tmp == "1" || tmp == "true" || tmp == "yes")
+            return true;
+        if (tmp == "0" || tmp == "false" || tmp == "no")
+            return false;
+
+        // Invalid boolean value
+        throw std::invalid_argument(
+            "CSVTable: invalid boolean value: '" + s + "'"
+        );
+    } else {
             iss >> value;
             if (iss.fail() || !iss.eof()) {
                 throw std::invalid_argument("Cannot convert string to value: " + s);

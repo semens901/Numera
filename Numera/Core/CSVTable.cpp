@@ -38,10 +38,20 @@ nr::CSVTable::CSVTable(CSVDataLoader &loader, std::string filename)
         }
         data.push_back(std::move(row));
     }
+
+    fill_in_the_blanks();
 }
 
 nr::CSVTable::CSVTable(std::vector<cell_type> headers) : headers(std::move(headers)), cols_count(headers.size()), rows_count(0) {}
- 
+
+nr::CSVTable::CSVTable(std::vector<std::string> headers, std::vector<row_type> rows)
+{
+    this->headers = std::move(headers);
+    this->data = std::move(rows);
+    cols_count = this->headers.size();
+    rows_count = this->data.size();
+    fill_in_the_blanks();
+}
 
 nr::CSVTable::size_type nr::CSVTable::row_count() const noexcept
 {
@@ -117,4 +127,19 @@ void nr::CSVTable::clear()
     headers.clear();
     rows_count = 0;
     cols_count = 0;
+}
+
+void nr::CSVTable::fill_in_the_blanks()
+{
+    /*
+        Ensures all rows have the same number of columns by filling
+        missing cells with empty strings.
+    */
+    for (auto& row : data)
+    {
+        while (row.size() < cols_count)
+        {
+            row.push_back("");
+        }
+    }
 }

@@ -35,6 +35,7 @@ private:
 
     // Helper function for splitting a string by a delimiter
     std::vector<std::string> split(const std::string& s, char delimiter) const;
+    static std::string trim(const std::string& s);
 };
 
 #endif //CSVDATALOADER_H
