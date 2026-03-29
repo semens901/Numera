@@ -42,7 +42,7 @@ nr::CSVTable::CSVTable(CSVDataLoader &loader, std::string filename)
     fill_in_the_blanks();
 }
 
-nr::CSVTable::CSVTable(std::vector<cell_type> headers) : headers(std::move(headers)), cols_count(headers.size()), rows_count(0) {}
+nr::CSVTable::CSVTable(std::vector<cell_type> headers) : headers(std::move(headers)), cols_count(this->headers.size()), rows_count(0) {}
 
 nr::CSVTable::CSVTable(std::vector<std::string> headers, std::vector<row_type> rows)
 {
@@ -68,9 +68,19 @@ bool nr::CSVTable::empty() const noexcept
     return data.empty();
 }
 
-nr::CSVTable::row_type nr::CSVTable::row(size_type index) const
+const nr::CSVTable::row_type nr::CSVTable::row(size_type index) const
 {
-    return data.at(index);
+    // TODO: insert return statement here
+    nr::CSVTable::row_type result;
+    if (index >= rows_count)
+          throw std::out_of_range("row: index out of range");
+    
+    for (const auto &col : this->data) 
+    {
+        result.push_back(col[index]);
+    }
+
+    return result;
 }
 
 bool nr::CSVTable::has_column(const std::string &name) const noexcept

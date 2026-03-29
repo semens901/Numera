@@ -14,6 +14,9 @@
 
 namespace nr
 {
+    // Forward declaration of CSVTable to allow providing overloads
+    // without including CSVTable.h (avoids circular include).
+
     template<typename Iterator>
     auto min(Iterator begin, Iterator end) 
     -> typename std::iterator_traits<Iterator>::value_type
@@ -30,45 +33,19 @@ namespace nr
     auto min(const Container& data) 
     -> typename std::decay_t<Container>::value_type
     {
-        // Returns the minimum value in the range (data.begin, data.end). 
-        // Throws if the range is empty.
+        // Returns the minimum value in the range [data.begin(), data.end()].
+        // Throws std::invalid_argument if the container is empty.
+        //
+        // Note: This function is intended to work with sequential containers
+        // (e.g., std::vector, std::list, std::deque) that provide iterators.
+        // It is not suitable for associative containers where ordering semantics differ.
+
         if (data.empty()) 
         {
             throw std::invalid_argument("min: empty container");
         }
 
         return *std::min_element(data.begin(), data.end());
-    }
-    
-    template<typename KeyType, typename ArrayDataType>
-    auto min(const std::map<KeyType, ArrayDataType>& data) 
-    -> typename ArrayDataType::value_type
-    {
-        using ValueType = typename ArrayDataType::value_type;
-        
-        if (data.empty()) 
-            throw std::invalid_argument("min: empty map");
-
-        // Instead of creating a vector, we will store only a pointer to the current minimum
-        const ValueType* current_min = nullptr;
-
-        for (const auto& [key, vec] : data)
-        {
-            if (vec.empty()) continue;
-
-            auto it = std::min_element(vec.begin(), vec.end());
-            
-            // If this is the first element found or it is less than the current minimum
-            if (current_min == nullptr || *it < *current_min)
-            {
-                current_min = &(*it);
-            }
-        }
-
-        if (current_min == nullptr)
-            throw std::invalid_argument("min: all nested containers are empty");
-
-        return *current_min;
     }
 
     template<typename Iterator>
@@ -94,32 +71,6 @@ namespace nr
             throw std::invalid_argument("max: empty container");
         }
         return *std::max_element(data.begin(), data.end());
-    }
-
-    template<typename KeyType, typename ArrayDataType>
-    auto max(const std::map<KeyType, ArrayDataType>& data) 
-    -> typename ArrayDataType::value_type
-    {
-        // Finds the maximum element among all values ​​(not counting keys)
-        // Throws if the range is empty.
-        if (data.empty()) 
-        {
-            throw std::invalid_argument("max: empty container");
-        }
-
-        using value_type = typename ArrayDataType::value_type;
-        
-        std::vector<value_type> out;
-        for(const auto& [key, vec] : data)
-        {
-            if (vec.empty())
-                continue;
-
-            auto it = std::max_element(vec.begin(), vec.end());
-            value_type local = *it;
-            out.push_back(local);
-        }
-        return *std::max_element(out.begin(), out.end());
     }
 
     template<typename Iterator>
@@ -154,28 +105,6 @@ namespace nr
 
         T sum = std::accumulate(data.cbegin(), data.cend(), 0.0);
         return sum/data.size();
-    }
-
-    template<typename KeyType, typename ArrayDataType>
-    auto arithmetic_mean(const std::map<KeyType, ArrayDataType>& data) 
-    -> typename ArrayDataType::value_type
-    {
-        // Calculates the arithmetic arithmetic_mean
-        // Throws if the range is empty.
-        if (data.empty()) 
-        {
-            throw std::invalid_argument("arithmetic_mean: empty container");
-        }
-
-        using value_type = typename ArrayDataType::value_type;
-
-        std::vector<value_type> out;
-        for(const auto& [key, vec] : data)
-        {
-            out.insert(out.end(), vec.begin(), vec.end());
-        }
-        value_type sum = std::accumulate(out.cbegin(), out.cend(), 0.0);
-        return sum/out.size();
     }
 
     template<typename Iterator>
@@ -213,34 +142,6 @@ namespace nr
 
         // Make a mutable copy (decayed type) even if `Container` is const-qualified
         mut_container numbersCopy(std::begin(data), std::end(data));
-        std::sort(numbersCopy.begin(), numbersCopy.end());
-
-        size_t n = numbersCopy.size();
-        if (n % 2 == 1) {
-            return numbersCopy[n / 2];
-        } else {
-            // compute average of two middle elements, cast to value_type
-            return (numbersCopy[n / 2 - 1] + numbersCopy[n / 2]) / static_cast<value_type>(2);
-        }
-    }
-
-    template<typename KeyType, typename ArrayDataType>
-    auto median(const std::map<KeyType, ArrayDataType>& data) 
-    -> typename ArrayDataType::value_type
-    {
-        // Finds the median
-        // Throws if the range is empty.
-        using mut_container = ArrayDataType;
-        using value_type = typename mut_container::value_type;
-
-        if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
-
-        // Make a mutable copy (decayed type) even if `Container` is const-qualified
-        mut_container numbersCopy;
-        for(const auto& [key, vec] : data)
-        {
-            numbersCopy.insert(numbersCopy.end(), vec.begin(), vec.end());
-        }
         std::sort(numbersCopy.begin(), numbersCopy.end());
 
         size_t n = numbersCopy.size();

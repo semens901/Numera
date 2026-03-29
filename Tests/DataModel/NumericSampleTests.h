@@ -1,6 +1,6 @@
 #ifndef NUMERICSAMPLETESTS_H
 #define NUMERICSAMPLETESTS_H
-#include "Core/NumericSample.h"
+#include "DataModel/NumericSample.h"
 #include <iostream>
 #include <cassert>
 #include <string>

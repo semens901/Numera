@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cassert>
 #include <string>
-#include "Core/NumericSample.h"
+#include "DataModel/NumericSample.h"
 
 void file_data_loader_tests();
 

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <string>
 #include <fstream>
-#include "Core/CSVTable.h"
+#include "DataModel/CSVTable.h"
 
 void csv_data_loader();
 

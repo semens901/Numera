@@ -31,20 +31,20 @@ void csv_table_tests()
     assert(age_column[1] == "30");
     assert(age_column[2] == "22");
 
-    // Tests for extract<T>
-    auto ages = table.extract<int>("Age");
+    // Tests for extract_column<T>
+    auto ages = table.extract_column<int>("Age");
     assert(ages.size() == 3);
     assert(ages[0] == 25);
     assert(ages[1] == 30);
     assert(ages[2] == 22);
 
-    auto heights = table.extract<double>("Height");
+    auto heights = table.extract_column<double>("Height");
     assert(heights.size() == 3);
     assert(heights[0] == 1.65);
     assert(heights[1] == 1.80);
     assert(heights[2] == 1.75);
 
-    auto names = table.extract<std::string>("Name");
+    auto names = table.extract_column<std::string>("Name");
     assert(names.size() == 3);
     assert(names[0] == "Alice");
     assert(names[1] == "Bob");

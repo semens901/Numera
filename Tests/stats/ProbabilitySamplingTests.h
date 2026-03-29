@@ -1,6 +1,6 @@
 #ifndef PROBABILITYSAMPLING_H
 #define PROBABILITYSAMPLING_H
-#include "Core/NumericSample.h"
+#include "DataModel/NumericSample.h"
 #include "io/CsvDataLoader.h"
 #include "stats/ProbabilitySampling.h"
 #include "stats/NonProbabilitySampling.h"

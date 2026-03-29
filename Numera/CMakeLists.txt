@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 # Library: numera
 add_library(Numera STATIC
 
-    Core/CSVTable.h
-    Core/CSVTable.cpp
-    Core/NumericSample.h
+    DataModel/CSVTable.h
+    DataModel/CSVTable.cpp
+    DataModel/NumericSample.h
 
     io/CsvDataLoader.h
     io/CsvDataLoader.cpp

@@ -66,7 +66,7 @@ namespace nr
         bool empty() const noexcept;
 
         /// Access row by index (throws if out of range)
-        row_type row(size_type index) const;
+        const row_type row(size_type index) const;
 
         /// Check if column exists
         bool has_column(const std::string& name) const noexcept;
@@ -82,7 +82,10 @@ namespace nr
 
         /// Extract column and convert to type T (strict)
         template <typename T>
-        std::vector<T> extract(const std::string& column_name) const;
+        std::vector<T> extract_column(const std::string& column_name) const;
+
+        template <typename T>
+        std::vector<T> extract_row(const CSVTable::size_type& row_index) const;
 
         /// Add a new row (must match column count)
         void add_row(row_type row);
@@ -103,17 +106,31 @@ namespace nr
     };
     
     template <typename T>
-    inline std::vector<T> CSVTable::extract(const std::string &column_name) const
+    inline std::vector<T> CSVTable::extract_column(const std::string &column_name) const
     {
-        std::vector<nr::CSVTable::cell_type> col = column(column_name);
+        // Extract a column by name and convert each cell to type T.
+        // Throws if the column does not exist or conversion fails.
+        const auto col = column(column_name);
 
         std::vector<T> result;
         result.reserve(col.size());
 
         for (const auto& var : col) {
-            result.push_back(string_to<T>(var));
+            result.push_back(string_to<T>(var)); // Convert string → T
         }
 
+        return result;
+    }
+
+    template <typename T>
+    inline std::vector<T> CSVTable::extract_row(const CSVTable::size_type& row_index) const
+    {
+        auto row = this->row(row_index);
+        std::vector<T> result;
+        result.reserve(row.size());
+        for (const auto& var : row) {
+            result.push_back(string_to<T>(var)); // Convert string → T
+        }
         return result;
     }
 
@@ -137,30 +154,30 @@ namespace nr
         T value;
 
         // Special handling for boolean values
-    if constexpr (std::is_same_v<T, bool>) 
-    {
-        std::string tmp;
-        iss >> tmp;
+        if constexpr (std::is_same_v<T, bool>) 
+        {
+            std::string tmp;
+            iss >> tmp;
 
-        // Normalize to lowercase for robust comparison
-        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+            // Normalize to lowercase for robust comparison
+            std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 
-        // Accept common CSV boolean representations
-        if (tmp == "1" || tmp == "true" || tmp == "yes")
-            return true;
-        if (tmp == "0" || tmp == "false" || tmp == "no")
-            return false;
+            // Accept common CSV boolean representations
+            if (tmp == "1" || tmp == "true" || tmp == "yes")
+                return true;
+            if (tmp == "0" || tmp == "false" || tmp == "no")
+                return false;
 
-        // Invalid boolean value
-        throw std::invalid_argument(
-            "CSVTable: invalid boolean value: '" + s + "'"
-        );
-    } else {
-            iss >> value;
-            if (iss.fail() || !iss.eof()) {
-                throw std::invalid_argument("Cannot convert string to value: " + s);
+            // Invalid boolean value
+            throw std::invalid_argument(
+                "CSVTable: invalid boolean value: '" + s + "'"
+            );
+        } else {
+                iss >> value;
+                if (iss.fail() || !iss.eof()) {
+                    throw std::invalid_argument("Cannot convert string to value: " + s);
+                }
             }
-        }
 
         return value;
     }

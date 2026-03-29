@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include<iostream>
 #include<cmath>
-#include "Core/NumericSample.h"
+#include "DataModel/NumericSample.h"
 
 namespace nr
 {

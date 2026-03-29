@@ -1,5 +1,5 @@
-#include "Core/CSVTableTests.h"
-#include "Core/NumericSampleTests.h"
+#include "DataModel/CSVTableTests.h"
+#include "DataModel/NumericSampleTests.h"
 #include "io/CsvDataLoaderTests.h"
 #include "io/FileDataLoaderTests.h"
 #include "stats/BasicStatsTests.h"
