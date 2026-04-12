@@ -16,7 +16,7 @@ void csv_table_tests()
     out.close();
 
     CSVDataLoader loader;
-    nr::CSVTable table(loader, std::string(tmp_file));
+    nr::CSVTable table(&loader, std::string(tmp_file));
     std::remove(tmp_file);
 
     assert(table.row_count() == 3);

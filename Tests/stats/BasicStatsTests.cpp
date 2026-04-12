@@ -55,7 +55,7 @@ void basic_stats_tests()
         double gm1 = nr::geometric_mean(data1.begin(), data1.end());
         assert(std::abs(gm1 - 3.0) < 1e-9); // geometric arithmetic_mean = 3
 
-        std::vector<int> data2 = {42};
+        std::vector<double> data2 = {42};
         int gm2 = nr::geometric_mean(data2.begin(), data2.end());
         assert(gm2 == 42);
 
@@ -422,7 +422,7 @@ void basic_stats_tests()
 
         try {
             CSVDataLoader loader;
-            nr::CSVTable table(loader, std::string(tmp_file));
+            nr::CSVTable table(&loader, std::string(tmp_file));
 
             // Extract numeric columns
             auto ages = table.extract_column<int>("Age");

@@ -10,10 +10,9 @@
 #include <map>
 #include <unordered_map>
 
-class CSVDataLoader : public IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>{
+class CSVDataLoader : public IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>
+{
 public:
-    CSVDataLoader(const std::string& filename)
-        : m_filename(filename) {}
     CSVDataLoader() = default;
     /*
         This class can work with CSV files.

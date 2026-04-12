@@ -63,7 +63,7 @@ int main()
 
         try {
             CSVDataLoader loader;
-            nr::CSVTable table(loader, std::string(tmp_file));
+            nr::CSVTable table(&loader, std::string(tmp_file));
 
             std::cout << "Rows: " << table.row_count() << ", Cols: " << table.column_count() << std::endl;
             std::cout << "Has column 'Age': " << table.has_column("Age") << std::endl;

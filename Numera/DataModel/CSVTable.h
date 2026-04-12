@@ -1,6 +1,7 @@
 #ifndef CSVTABLE_H
 #define CSVTABLE_H
 #include "stats/BasicStats.h"
+#include "io/IDataLoader.h"
 #include "io/CsvDataLoader.h"
 
 #include <optional>
@@ -46,7 +47,7 @@ namespace nr
         using size_type   = std::size_t;
 
         CSVTable() : headers(), data(), rows_count(0), cols_count(0) {};
-        CSVTable(CSVDataLoader& loader, std::string filename);
+        CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename);
         CSVTable(const CSVTable&) = default;
         CSVTable(CSVTable&&) = default;
         CSVTable& operator=(const CSVTable&) = default;

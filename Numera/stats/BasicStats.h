@@ -160,6 +160,7 @@ namespace nr
     ) -> std::decay_t<decltype(
             std::declval<T>() * std::declval<W>())>
     {
+        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<W>())>;
         /*
             The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
         */
@@ -173,8 +174,8 @@ namespace nr
             throw std::invalid_argument("Values and weights must have the same size");
         }
 
-        double sum = 0.0;
-        double weight_sum = 0.0;
+        returnType  sum = 0.0;
+        returnType  weight_sum = 0.0;
 
         for (std::size_t i = 0; i < values.size(); ++i) {
             sum += values[i] * weights[i];
@@ -260,6 +261,7 @@ namespace nr
     {
         // finds the geometric arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
+        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<T>())>;
         static_assert(
             std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
@@ -269,7 +271,7 @@ namespace nr
             throw std::invalid_argument("Data vector is empty");
         }
 
-        double log_sum = std::accumulate(
+        returnType log_sum = std::accumulate(
             begin, end,
             0.0,
             [](double acc, T value) {
@@ -291,6 +293,7 @@ namespace nr
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
+        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<T>())>;
         static_assert(
             std::is_arithmetic_v<T>,
             "harmonic_mean requires arithmetic type"
@@ -300,10 +303,10 @@ namespace nr
             throw std::invalid_argument("Data vector is empty");
         }
 
-        double reciprocal_sum = std::accumulate(
+        returnType reciprocal_sum = std::accumulate(
             data.begin(), data.end(),
             0.0,
-            [](double acc, T value) {
+            [](returnType acc, T value) {
                 if (value <= static_cast<T>(0)) {
                     throw std::domain_error(
                         "Harmonic arithmetic_mean requires positive values"
@@ -480,6 +483,7 @@ namespace nr
      * - Precision: Returns double to handle fractional results between elements.
      */
         using value_type = typename std::decay_t<Container>::value_type;
+        using returnType = std::common_type_t<value_type, double>;
 
         if (data.empty())
             throw std::invalid_argument("percentile: empty data");
@@ -491,10 +495,10 @@ namespace nr
         std::sort(sorted.begin(), sorted.end());
 
         const std::size_t n = sorted.size();
-        const double pos = (p / 100.0) * (n - 1);
+        const returnType pos = (p / 100.0) * (n - 1);
 
         const std::size_t idx = static_cast<std::size_t>(std::floor(pos));
-        const double frac = pos - idx;
+        const returnType frac = pos - idx;
 
         if (idx + 1 < n)
             return sorted[idx] * (1.0 - frac) + sorted[idx + 1] * frac;
@@ -515,6 +519,13 @@ namespace nr
          * - Precision: Returns double to handle fractional results between elements.
          */
         using value_type = typename std::iterator_traits<Iterator>::value_type;
+        using returnType = std::common_type_t<value_type, double>;
+
+         if (begin == end)
+             throw std::invalid_argument("percentile: empty data");
+
+         if (p < 0.0 || p > 100.0)
+             throw std::out_of_range("percentile: p must be in [0, 100]");
 
         if (begin == end)
             throw std::invalid_argument("percentile: empty data");
@@ -526,10 +537,10 @@ namespace nr
         std::sort(sorted.begin(), sorted.end());
 
         const std::size_t n = sorted.size();
-        const double pos = (p / 100.0) * (n - 1);
+        const returnType pos = (p / 100.0) * (n - 1);
 
         const std::size_t idx = static_cast<std::size_t>(std::floor(pos));
-        const double frac = pos - idx;
+        const returnType frac = pos - idx;
 
         if (idx + 1 < n)
             return sorted[idx] * (1.0 - frac) + sorted[idx + 1] * frac;
@@ -739,15 +750,18 @@ namespace nr
     auto mean_absolute_deviation(const Container& data) 
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        using T = typename std::decay_t<Container>::value_type;
+        using returnType = std::common_type_t<T, double>;
+
         if (data.empty()) {
             throw std::invalid_argument("MAD: empty data");
         }
 
-        const double n = static_cast<double>(data.size());
+        const returnType n = static_cast<returnType>(data.size());
 
-        double sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
 
-        double total_deviation = 0.0;
+        returnType total_deviation = 0.0;
         for (const auto& value : data) {
             total_deviation += std::abs(static_cast<double>(value) - sum);
         }
@@ -759,17 +773,19 @@ namespace nr
     auto mean_absolute_deviation(const Iterator& begin, const Iterator& end) 
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using returnType = std::common_type_t<T, double>;
         if (begin==end) {
             throw std::invalid_argument("MAD: empty data");
         }
 
-        const double n = static_cast<double>(std::distance(begin, end));
+        const returnType n = static_cast<returnType>(std::distance(begin, end));
 
-        double sum = arithmetic_mean(begin, end, 0.0);
+        returnType sum = arithmetic_mean(begin, end, 0.0);
 
-        double total_deviation = 0.0;
+        returnType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
-            total_deviation += std::abs(static_cast<double>(*it) - sum);
+            total_deviation += std::abs(static_cast<returnType>(*it) - sum);
         }
 
         return total_deviation / n;
