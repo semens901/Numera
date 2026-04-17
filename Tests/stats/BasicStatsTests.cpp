@@ -1,5 +1,9 @@
 #include "BasicStatsTests.h"
 
+// is_close: compare two floating-point values for approximate equality.
+// Returns true when the absolute difference between `a` and `b` is
+// strictly less than `epsilon`. Useful in tests to avoid relying on
+// exact equality for results of floating-point computations.
 bool is_close(double a, double b, double epsilon = 0.0001) {
     return std::abs(a - b) < epsilon;
 }
@@ -447,4 +451,84 @@ void basic_stats_tests()
 
         std::remove(tmp_file);
     }
+
+    {
+        // Tests for nr::dispersion (population variance)
+        std::vector<double> data1 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        // mean = 3, variance = 2.0
+        assert(is_close(nr::dispersion(data1), 2.0));
+        assert(is_close(nr::dispersion(data1.begin(), data1.end()), 2.0));
+
+        std::vector<double> data2 = {42.0, 42.0, 42.0};
+        // all equal -> variance = 0
+        assert(is_close(nr::dispersion(data2), 0.0));
+
+        std::vector<int> data3 = {-1, 1};
+        // mean = 0, variance = 1
+        double expected3 = 1.0;
+        assert(is_close(nr::dispersion(data3), expected3));
+        assert(is_close(nr::dispersion(data3.begin(), data3.end()), expected3));
+
+        // empty data should throw
+        std::vector<int> empty;
+        bool threw = false;
+        try {
+            nr::dispersion(empty);
+        } catch (const std::invalid_argument&) {
+            threw = true;
+        }
+        assert(threw);
+
+        std::cout << "All dispersion tests passed!" << std::endl;
+
+        // Tests for nr::dispersion (population variance)
+        std::vector<double> data4 = {100.0, 107.0, 110.0, 113.0, 117.0, 121.0, 126.0, 129.0, 135.0, 138.0, 144.0, 148.0};
+        // mean = 124.0, variance = 213.5
+        assert(is_close(nr::dispersion(data4), 213.5, 1.0));
+        assert(is_close(nr::dispersion(data4.begin(), data4.end()), 213.5, 1.0));
+
+        // Tests for nr::dispersion (population variance)
+        std::vector<double> data5 = {101.0, 107.0, 110.0, 113.0, 117.0, 115.0, 126.0, 129.0, 180.0, 138.0, 148.0, 148.0};
+        // variance = 468.06
+        std::cout << "Calculated mean: " << nr::dispersion(data5) << std::endl;
+        assert(is_close(nr::dispersion(data5), 468.06, 0.01));
+        assert(is_close(nr::dispersion(data5.begin(), data5.end()), 468.06, 0.01));
+
+    }
+
+    {
+        // Tests for nr::standard_deviation (population standard deviation)
+        std::vector<double> s1 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        double expected_s1 = std::sqrt(2.0); // variance = 2.0 -> stddev = sqrt(2)
+        assert(is_close(nr::standard_deviation(s1), expected_s1));
+        assert(is_close(nr::standard_deviation(s1.begin(), s1.end()), expected_s1));
+
+        std::vector<double> s2 = {42.0, 42.0, 42.0};
+        // all equal -> stddev = 0
+        assert(is_close(nr::standard_deviation(s2), 0.0));
+
+        std::vector<int> s3 = {-1, 1};
+        // mean = 0, variance = 1 -> stddev = 1
+        assert(is_close(nr::standard_deviation(s3), 1.0));
+        assert(is_close(nr::standard_deviation(s3.begin(), s3.end()), 1.0));
+
+        // empty data should throw
+        std::vector<int> empty_sd;
+        bool threw_sd = false;
+        try {
+            nr::standard_deviation(empty_sd);
+        } catch (const std::invalid_argument&) {
+            threw_sd = true;
+        }
+        assert(threw_sd);
+
+        // Tests for nr::standard_deviation (population standard deviation)
+        std::vector<double> s4 = {1.0, 2.0, 3.0, 4.0, 5.0, 13.0, 24.0, 10.0, 71.0};
+        double expected_s4 = std::sqrt(441.73);
+        assert(is_close(nr::standard_deviation(s4), expected_s4));
+        assert(is_close(nr::standard_deviation(s4.begin(), s4.end()), expected_s4));
+
+        std::cout << "All standard_deviation tests passed!" << std::endl;
+    }
+
 }

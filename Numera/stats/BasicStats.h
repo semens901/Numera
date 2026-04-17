@@ -790,5 +790,96 @@ namespace nr
 
         return total_deviation / n;
     }
+
+    template <typename Container>
+    auto dispersion(const Container& data) 
+    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    {
+        using T = typename std::decay_t<Container>::value_type;
+        using returnType = std::common_type_t<T, double>;
+
+        if (data.empty()) {
+            throw std::invalid_argument("MAD: empty data");
+        }
+
+        const returnType n = static_cast<returnType>(data.size());
+
+        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+
+        returnType total_deviation = 0.0;
+        for (const auto& value : data) {
+            total_deviation += std::pow((static_cast<double>(value) - sum), 2);
+        }
+
+        return total_deviation / n;
+    }
+
+    template <typename Iterator>
+    auto dispersion(const Iterator& begin, const Iterator& end) 
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using returnType = std::common_type_t<T, double>;
+        if (begin==end) {
+            throw std::invalid_argument("MAD: empty data");
+        }
+
+        const returnType n = static_cast<returnType>(std::distance(begin, end));
+
+        returnType sum = arithmetic_mean(begin, end, 0.0);
+
+        returnType total_deviation = 0.0;
+        for(auto it = begin; it != end; ++it) {
+            total_deviation += std::pow((static_cast<returnType>(*it) - sum), 2);
+        }
+
+        return total_deviation / n;
+    }
+
+    template <typename Container>
+    auto standard_deviation(const Container& data) 
+    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    {
+        using T = typename std::decay_t<Container>::value_type;
+        using returnType = std::common_type_t<T, double>;
+
+        if (data.empty()) {
+            throw std::invalid_argument("MAD: empty data");
+        }
+
+        const returnType n = static_cast<returnType>(data.size());
+
+        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+
+        returnType total_deviation = 0.0;
+        for (const auto& value : data) {
+            total_deviation += std::pow((static_cast<double>(value) - sum), 2);
+        }
+
+        return std::sqrt(total_deviation / n);
+    }
+    
+    template <typename Iterator>
+    auto standard_deviation(const Iterator& begin, const Iterator& end) 
+    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using returnType = std::common_type_t<T, double>;
+        if (begin==end) {
+            throw std::invalid_argument("MAD: empty data");
+        }
+
+        const returnType n = static_cast<returnType>(std::distance(begin, end));
+
+        returnType sum = arithmetic_mean(begin, end, 0.0);
+
+        returnType total_deviation = 0.0;
+        for(auto it = begin; it != end; ++it) {
+            total_deviation += std::pow((static_cast<returnType>(*it) - sum), 2);
+        }
+
+        return std::sqrt(total_deviation / n);
+    }
+
 }
 #endif // NUMERA_STATS_BASICSTATS_H
