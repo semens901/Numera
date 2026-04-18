@@ -9,7 +9,7 @@ void non_probability_sampling_tests()
         // Group tags: 0, 1, 2, 3
         std::vector<size_t> labels = {1, 1, 1, 1, 0, 0, 0, 0, 0, 2, 2, 2, 3, 3, 3, 3, 3, 3};
 
-        // --- Квоты для групп ---
+        // --- Quotas for groups ---
         std::unordered_map<size_t, size_t> quotas = {
             {0, 2},  // we take 2 elements from group 0
             {1, 2},  // we take 2 elements from group 1
@@ -22,7 +22,7 @@ void non_probability_sampling_tests()
         // Checking the sample size
         assert(sample.size() == 8); // 2+2+1+3 = 8
 
-        // Проверяем, что элементы действительно из исходных групп
+        // We check that the elements are indeed from the original groups
         for (auto v : sample) {
             bool inGroup0 = std::find(data.begin() + 4, data.begin() + 9, v) != data.begin() + 9;
             bool inGroup1 = std::find(data.begin(), data.begin() + 4, v) != data.begin() + 4;
@@ -44,22 +44,22 @@ void non_probability_sampling_tests()
     {
         std::cout << "[TEST] Haphazard sampling with NumericSample\n";
 
-        // --- Подготовка данных ---
+        // --- Data preparation ---
         nr::NumericSample<double> data({10, 11, 12, 13, 20, 21, 22, 23, 24, 30, 31, 32, 40, 41, 42, 43, 44, 45});
 
-        // --- Тест 1: обычная выборка ---
+        // --- Test 1: Normal sampling ---
         size_t sampleSize = 5;
         auto sample = nr::NonProbabilitySampling::haphazardSample(data, sampleSize);
         std::cout << "SAMPLEEEEEEE SIIIZEEEE:\t" << sample.size() << std::endl;
         assert(sample.size() == sampleSize);
 
-        // --- Тест 2: sampleSize больше общего количества элементов ---
+        // --- Test 2: sampleSize greater than the total number of elements ---
         size_t largeSampleSize = 20;
         auto largeSample = nr::NonProbabilitySampling::haphazardSample(data, largeSampleSize);
 
-        assert(largeSample.size() == data.size()); // всего 18 элементов
+        assert(largeSample.size() == data.size()); // only 18 elements
 
-        // --- Тест 3: пустой NumericSample ---
+        // --- Test 3: empty NumericSample ---
         nr::NumericSample<double> emptyData;
         auto emptySample = nr::NonProbabilitySampling::haphazardSample(emptyData, 5);
         assert(emptySample.size() == 0);

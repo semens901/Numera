@@ -2,6 +2,11 @@
 
 nr::CSVTable::CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename)
 {
+    /*
+        This constructor accepts an IDataLoader object and a CSV file name. 
+        The constructor uses the IDataLoader object as a CSVDataLoader object. 
+        It populates the class fields with the data stored in the file filename.
+    */
     CSVDataLoader* csv_loader = dynamic_cast<CSVDataLoader*>(loader);
     if (!csv_loader) {
         throw std::invalid_argument("CSVTable constructor: loader must be a CSVDataLoader");
@@ -47,11 +52,16 @@ nr::CSVTable::CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<s
 }
 
 nr::CSVTable::CSVTable(std::vector<cell_type> headers) : headers(std::move(headers)), cols_count(this->headers.size()), rows_count(0) {}
+//initializes headers and sets column count, but leaves data empty (no rows)
 
-nr::CSVTable::CSVTable(std::vector<std::string> headers, std::vector<row_type> rows)
+nr::CSVTable::CSVTable(const std::vector<std::string>& headers, const std::vector<row_type>& rows)
 {
-    this->headers = std::move(headers);
-    this->data = std::move(rows);
+    /*
+        This constructor accepts a vector of column headers and a vector of rows.
+        It initializes the class fields with the provided data.
+    */
+    this->headers = headers;
+    this->data = rows;
     cols_count = this->headers.size();
     rows_count = this->data.size();
     fill_in_the_blanks();
@@ -59,16 +69,25 @@ nr::CSVTable::CSVTable(std::vector<std::string> headers, std::vector<row_type> r
 
 nr::CSVTable::size_type nr::CSVTable::row_count() const noexcept
 {
+    /*
+        Returns the number of rows in the table (excluding the header).
+    */
     return data.size();
 }
 
 nr::CSVTable::size_type nr::CSVTable::column_count() const noexcept
 {
+    /*
+        Returns the number of columns in the table.
+    */
     return headers.size();
 }
 
 bool nr::CSVTable::empty() const noexcept
 {
+    /*
+        Returns true if the table is empty (no data rows), false otherwise.
+    */
     return data.empty();
 }
 
@@ -89,11 +108,18 @@ const nr::CSVTable::row_type nr::CSVTable::row(size_type index) const
 
 bool nr::CSVTable::has_column(const std::string &name) const noexcept
 {
+    /*
+        Returns true if the table has a column with the given name, false otherwise.
+    */
     return std::find(headers.begin(), headers.end(), name) != headers.end();
 }
 
 nr::CSVTable::size_type nr::CSVTable::column_index(const std::string &name) const
 {
+    /*
+        Returns the index of the column with the given name.
+        Throws std::out_of_range if the column does not exist.
+    */
     auto it = std::find(headers.begin(), headers.end(), name);
     if (it == headers.end())
         throw std::out_of_range("column_index: column not found: " + name);
@@ -102,6 +128,10 @@ nr::CSVTable::size_type nr::CSVTable::column_index(const std::string &name) cons
 
 std::vector<nr::CSVTable::cell_type> nr::CSVTable::column(size_type index) const
 {
+    /*
+        Returns a vector of cell values for the column at the given index.
+        Throws std::out_of_range if the index is invalid.
+    */
     if (index >= cols_count) throw std::out_of_range("column: index out of range");
 
     std::vector<cell_type> result;
@@ -117,12 +147,20 @@ std::vector<nr::CSVTable::cell_type> nr::CSVTable::column(size_type index) const
 
 std::vector<nr::CSVTable::cell_type> nr::CSVTable::column(const std::string &name) const
 {
+    /*
+        Returns a vector of cell values for the column with the given name.
+        Throws std::out_of_range if the column does not exist.
+    */
     size_type index = column_index(name);
     return column(index);
 }
 
 void nr::CSVTable::add_row(row_type row)
 {
+    /*
+        Adds a new row to the table.
+        Throws std::invalid_argument if the row size does not match the number of columns.
+    */
     if (headers.empty()) {
         throw std::invalid_argument("Cannot add row: headers not defined");
     }
@@ -137,6 +175,9 @@ void nr::CSVTable::add_row(row_type row)
 
 void nr::CSVTable::clear()
 {
+    /*
+        Clears all data from the table, keeping the headers.
+    */
     data.clear();
     headers.clear();
     rows_count = 0;

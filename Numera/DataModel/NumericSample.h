@@ -29,7 +29,7 @@
 namespace nr
 {   
     template <typename T>
-    class NumericSample
+    class NumericSample final
     {
     public:
         //Stores data in std::vector
@@ -53,6 +53,10 @@ namespace nr
         value_type& operator[](size_t index);
         const value_type& operator[](size_t index) const;
 
+        /*
+            Basic container operations.
+            These methods provide basic vector-like functionality for adding, removing, and accessing elements.
+        */
         void push_back(value_type value);
         void add(value_type element);
         void add(container_type elements);
@@ -67,21 +71,53 @@ namespace nr
         size_type capacity();
         void shrink_to_fit();
 
+        /*
+            Descriptive statistics methods.
+            These methods compute common statistics over the stored data.
+        */
+        // Returns the minimum value in the sample. Throws if empty.
         value_type min() const;
+
+        // Returns the maximum value in the sample. Throws if empty.
         value_type max() const;
+
+        // Returns the arithmetic mean of the sample. Throws if empty.
         value_type arithmetic_mean() const;
+
+        // Returns the median of the sample. Throws if empty.
         value_type median() const;
 
+        // Returns the weighted mean of the sample given a vector of weights. Throws if sizes don't match or if empty.
         value_type weighted_mean(container_type weights) const;
+        
+        // Returns the geometric mean of the sample. Throws if empty or if any value is non-positive.
         value_type geometric_mean() const;
+
+        // Returns the harmonic mean of the sample. Throws if empty or if any value is non-positive.
         value_type harmonic_mean() const;
+
+        // Returns the lower quartile (Q1) of the sample. Throws if empty.
         value_type lower_quartile() const;
+
+        // Returns the upper quartile (Q3) of the sample. Throws if empty.
         value_type upper_quartile() const;
+
+        // Returns the p-th percentile of the sample. Throws if empty or if p is out of range [0, 100].
         auto percentile(double p) const -> std::common_type_t<value_type, double>;
+
+        // Returns the mode of the sample. If there are multiple modes, returns an empty optional. Throws if empty.
         std::optional<value_type> mode() const;
+
+        // Returns all modes of the sample. If there are no modes (all values unique), returns an empty vector. Throws if empty.
         std::vector<value_type> modes() const;
+
+        // Returns the range (max - min) of the sample. Throws if empty.
         value_type Scope() const;
+
+        // Returns the interquartile range (Q3 - Q1) of the sample. Throws if empty.
         value_type interquartile_range() const;
+
+        // Returns the mean absolute deviation from the mean. Throws if empty.
         auto mean_absolute_deviation() const -> std::common_type_t<NumericSample<T>::value_type, double>;
 
         iterator begin ();

@@ -1,10 +1,13 @@
 #include "CsvDataLoader.h"
 
-// Loads a CSV file into an unordered_map while preserving column order
-// - First line is treated as a header
-// - Leading and trailing whitespaces are trimmed
-// - Column values preserve row order
-// - Throws std::runtime_error if the file cannot be opened
+/*
+    Loads a CSV file into an unordered_map while preserving column order
+    - First line is treated as a header
+    - Leading and trailing whitespaces are trimmed
+    - Column values preserve row order
+    - Throws std::runtime_error if the file cannot be opened
+*/
+
 std::unordered_map<std::string, std::vector<std::string>>
 CSVDataLoader::load(const std::string& filename)
 {
@@ -46,14 +49,14 @@ void CSVDataLoader::save(const std::string &filename, const std::unordered_map<s
     std::ofstream file(filename);
     if (!file.is_open()) throw std::runtime_error("Cannot open file for writing: " + filename);
 
-    // Пишем заголовки в порядке column_order
+    // Write header
     for (size_t i = 0; i < column_order.size(); ++i) {
         file << column_order[i];
         if (i + 1 < column_order.size()) file << ",";
     }
     file << "\n";
 
-    // Определяем количество строк (берём длину первой колонки)
+    // Determine the number of rows (take the length of the first column)
     size_type n = 0;
     if (!column_order.empty()) n = data.at(column_order[0]).size();
 
@@ -73,6 +76,11 @@ const std::vector<std::string> &CSVDataLoader::get_column_order() const
 
 std::vector<std::string> CSVDataLoader::split(const std::string &s, char delimiter) const
 {
+    /*
+        Splits a string by the given delimiter and returns a vector of tokens.
+        - Example: split("a,b,c", ',') → ["a", "b", "c"]
+        - Note: This is a simple split that does not handle quoted delimiters or escaped characters.
+    */
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream ss(s);
@@ -82,12 +90,15 @@ std::vector<std::string> CSVDataLoader::split(const std::string &s, char delimit
 
 std::string CSVDataLoader::trim(const std::string &s)
 {
-    {
+    /*
+        Trims leading and trailing whitespace from a string.
+        - Example: trim("  hello ") → "hello"
+        - Note: This function considers spaces, tabs, carriage returns, and newlines as whitespace
+    */
     const auto first = s.find_first_not_of(" \t\r\n");
     if (first == std::string::npos)
         return "";
 
     const auto last = s.find_last_not_of(" \t\r\n");
     return s.substr(first, last - first + 1);
-}
 }

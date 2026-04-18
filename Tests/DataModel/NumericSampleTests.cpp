@@ -100,30 +100,38 @@ void numeric_sample_tests()
     }
 
     {
+        std::cout << "[TEST] Weighted mean\n";
         nr::NumericSample<double> v({1.0, 2.0, 3.0});
         std::vector<double> w{1.0, 1.0, 1.0};
 
         double result = v.weighted_mean(w);
         assert(std::abs(result - 2.0) < 1e-9);
+        std::cout << "Test passed: weighted_mean is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Single element weighted mean\n";
         nr::NumericSample<double> v({42.0});
         std::vector<double> w{10.0};
 
         double result = v.weighted_mean(w);
         assert(result == 42.0);
+        std::cout << "Test passed: weighted_mean is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Multiple element weighted mean\n";
         nr::NumericSample<double> v({15, 10, 5, 90});
         std::vector <double> w{0.25, 0.20, 0.05, 0.50};
 
         double result = v.weighted_mean(w);
         assert(result == 51.0);
+        std::cout << "Test passed: weighted_mean is " << result << "\n";
+
     }
 
     {
+        std::cout << "[TEST] Geometric mean\n";
         nr::NumericSample<double> population({
             54, 63, 48, 29, 27, 32, 41
         });
@@ -133,9 +141,11 @@ void numeric_sample_tests()
         const double eps = 1e-6;
 
         assert(std::abs(result - expected) < eps);
+        std::cout << "Test passed: geometric_mean is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Geometric mean with iterators\n";
         nr::NumericSample<double> data1({1.0, 3.0, 9.0});
         double gm1 = data1.geometric_mean();
         assert(std::abs(gm1 - 3.0) < 1e-9); // geometric arithmetic_mean = 3
@@ -161,9 +171,11 @@ void numeric_sample_tests()
             exception_thrown = true;
         }
         assert(exception_thrown);
+        std::cout << "Test passed: geometric_mean with iterators works correctly.\n";
     }
 
     {
+        std::cout << "[TEST] Harmonic mean\n";
         nr::NumericSample<double> population({54, 63, 48, 29, 27, 32, 41});
 
         double expected = 38.380368771744429; // calculated harmonic arithmetic_mean manually or using a calculator
@@ -171,25 +183,31 @@ void numeric_sample_tests()
         // Using assert with tolerance for real numbers
         double eps = 1e-4; 
         assert(std::abs(result - expected) < eps);
+        std::cout << "Test passed: harmonic_mean is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Lower quartile\n";
         nr::NumericSample<int> data({54, 63, 48, 29, 27, 32, 41});
 
         auto q1 = data.lower_quartile();
 
         assert(q1 == 29.0);
+        std::cout << "Test passed: lower_quartile is " << q1 << "\n";
     }
 
     {
+        std::cout << "[TEST] Upper quartile\n";
         nr::NumericSample<int> data({54, 63, 48, 29, 27, 32, 41});
 
         auto q3 = data.upper_quartile();
 
         assert(q3 == 54.0);
+        std::cout << "Test passed: upper_quartile is " << q3 << "\n";
     }
 
     {
+        std::cout << "[TEST] Arithmetic mean\n";
         nr::NumericSample<double> data1({1.0, 2.0, 3.0, 4.0});
         double mean1 = data1.arithmetic_mean();
         assert(mean1 == 2.5); // (1+2+3+4)/4 = 2.5
@@ -206,9 +224,11 @@ void numeric_sample_tests()
             exception_thrown = true;
         }
         assert(exception_thrown);
+        std::cout << "Test passed: arithmetic_mean works correctly.\n";
     }
 
     {
+        std::cout << "[TEST] Percentiles\n";
         nr::NumericSample<double> data({54, 63, 48, 29, 27, 32, 41});
 
         // Sorted data:
@@ -221,9 +241,11 @@ void numeric_sample_tests()
         assert(std::abs(p25 - 30.5) < 1e-9);
         assert(std::abs(p50 - 41.0) < 1e-9);
         assert(std::abs(p75 - 51.0) < 1e-9);
+        std::cout << "Test passed: percentiles are p25=" << p25 << ", p50=" << p50 << ", p75=" << p75 << "\n";
     }
 
     {
+        std::cout << "[TEST] Large dataset percentiles\n";
         nr::NumericSample<int> data;
         data.reserve(100);
 
@@ -233,17 +255,21 @@ void numeric_sample_tests()
         double p50 = data.percentile(50);
 
         assert(std::abs(p50 - 50.5) < 1e-9);
+        std::cout << "Test passed: large dataset percentiles work correctly.\n";
     }
 
     {
+        std::cout << "[TEST] Uniform dataset percentiles\n";
         std::vector<double> vec(100, 42.0);
         nr::NumericSample<double> data(vec);
         assert(data.percentile(10) == 42.0);
         assert(data.percentile(50) == 42.0);
         assert(data.percentile(90) == 42.0);
+        std::cout << "Test passed: uniform dataset percentiles work correctly.\n";
     }
     
     {
+        std::cout << "[TEST] Mode and modes\n";
         nr::NumericSample<int> data({1, 2, 2, 3, 4});
 
         auto m = data.mode();
@@ -253,9 +279,11 @@ void numeric_sample_tests()
         auto ms = data.modes();
         assert(ms.size() == 1);
         assert(ms[0] == 2);
+        std::cout << "Test passed: mode is " << *m << ", modes size is " << ms.size() << "\n";
     }
 
     {
+        std::cout << "[TEST] No mode\n";
         nr::NumericSample<int> data({1, 2, 3, 4, 5});
 
         auto m = data.mode();
@@ -263,9 +291,11 @@ void numeric_sample_tests()
 
         auto ms = data.modes();
         assert(ms.empty());
+        std::cout << "Test passed: no mode, modes size is " << ms.size() << "\n";
     }
 
     {
+        std::cout << "[TEST] Multiple modes\n";
         nr::NumericSample<int> data({1, 1, 2, 2, 3});
 
         auto m = data.mode();
@@ -277,37 +307,47 @@ void numeric_sample_tests()
         std::sort(ms.begin(), ms.end());
         assert(ms[0] == 1);
         assert(ms[1] == 2);
+        std::cout << "Test passed: multiple modes, modes size is " << ms.size() << "\n";
     }
 
     {
+        std::cout << "[TEST] All values are modes\n";
         nr::NumericSample<int> data({1, 2, 3, 4, 5});
 
         auto result = data.Scope();
         assert(result == 4); // 5 - 1
+        std::cout << "Test passed: all values are modes, scope is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Scope\n";
         nr::NumericSample<int> data({10, 3, 7, 1, 9});
 
         auto result = data.Scope();
         assert(result == 9); // 10 - 1
+        std::cout << "Test passed: scope is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Scope with negative values\n";
         nr::NumericSample<int> data({-10, -5, -3, -20});
 
         auto result = data.Scope();
         assert(result == 17); // -3 - (-20)
+        std::cout << "Test passed: scope with negative values is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Scope with NumericSample\n";
         nr::NumericSample<int> data({-5, 0, 10});
 
         auto result = data.Scope();
         assert(result == 15); // 10 - (-5)
+        std::cout << "Test passed: scope with NumericSample is " << result << "\n";
     }
 
     {
+        std::cout << "[TEST] Interquartile range\n";
         nr::NumericSample<int> data1({1, 2, 3, 4, 5, 6, 7, 8});
         assert(is_close1(data1.interquartile_range(), 4.0));
 
@@ -350,4 +390,6 @@ void numeric_sample_tests()
 
         std::cout << "All mean_absolute_deviation tests passed!" << std::endl;
     }
+
+    std::cout << "All NumericSample tests passed!" << std::endl;
 }

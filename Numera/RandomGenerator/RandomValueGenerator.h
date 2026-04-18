@@ -5,6 +5,14 @@
 
 namespace nr
 {
+
+    /*
+        A class for generating random values using a thread-local Mersenne Twister 64-bit generator.
+         - The generator is seeded with a combination of the current time and the thread ID to ensure different sequences across threads.
+         - Provides a static method to access the thread-local generator instance.
+         - This design allows for efficient and thread-safe random number generation without the overhead of locking.
+    */
+
     class RandomValueGenerator
     {
         public:

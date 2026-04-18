@@ -10,7 +10,7 @@
 #include <map>
 #include <unordered_map>
 
-class CSVDataLoader : public IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>
+class CSVDataLoader final : public IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>
 {
 public:
     CSVDataLoader() = default;
@@ -34,6 +34,7 @@ private:
 
     // Helper function for splitting a string by a delimiter
     std::vector<std::string> split(const std::string& s, char delimiter) const;
+    // Helper function to trim whitespace from a string
     static std::string trim(const std::string& s);
 };
 

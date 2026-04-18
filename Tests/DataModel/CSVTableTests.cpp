@@ -2,7 +2,7 @@
 
 void csv_table_tests()
 {
-    
+    std::cout << "Running CSVTable tests..." << std::endl;
     std::string csv_content = 
         " Name,Age,Height\n"
         "Alice, 25,1.65\n"
@@ -49,5 +49,5 @@ void csv_table_tests()
     assert(names[0] == "Alice");
     assert(names[1] == "Bob");
     assert(names[2] == "Charlie");
-    
+    std::cout << "CSVTable tests passed!" << std::endl;
 }

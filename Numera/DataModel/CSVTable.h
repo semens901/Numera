@@ -37,7 +37,7 @@
 
 namespace nr
 {
-    class CSVTable
+    class CSVTable final
     {
     public:
         // Basic types
@@ -53,8 +53,8 @@ namespace nr
         CSVTable& operator=(const CSVTable&) = default;
         CSVTable& operator=(CSVTable&&) = default;
         explicit CSVTable(std::vector<cell_type> headers);
-        CSVTable(std::vector<std::string> headers, std::vector<row_type> rows);
-        //CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>& loader, std::string filename);
+        CSVTable(const std::vector<std::string>& headers, const std::vector<row_type>& rows);
+
         ~CSVTable() = default;
 
         /// Number of rows (excluding header)
@@ -126,6 +126,10 @@ namespace nr
     template <typename T>
     inline std::vector<T> CSVTable::extract_row(const CSVTable::size_type& row_index) const
     {
+        /*
+            Extract a row by index and convert each cell to type T.
+            Throws if the row index is out of range or conversion fails.
+        */
         auto row = this->row(row_index);
         std::vector<T> result;
         result.reserve(row.size());
@@ -138,6 +142,12 @@ namespace nr
     template <typename T>
     inline T CSVTable::string_to(const std::string &s)
     {
+        /*
+            Convert a string to type T.
+             - Supported types: arithmetic (int, double, etc.), bool, std::string.
+             - For bool: accepts "1", "0", "true", "false", "yes", "no" (case-insensitive).
+             - Throws std::invalid_argument if conversion fails or type is unsupported.
+         */
         static_assert(
         std::is_arithmetic_v<T> ||
         std::is_same_v<T, bool> ||

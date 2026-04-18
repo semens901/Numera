@@ -10,6 +10,7 @@ bool is_close(double a, double b, double epsilon = 0.0001) {
 
 void basic_stats_tests()
 {
+    std::cout << "[TESTS] Basic statistics\n";
     {
         std::vector<double> v{1.0, 2.0, 3.0};
         std::vector<double> w{1.0, 1.0, 1.0};
@@ -385,29 +386,29 @@ void basic_stats_tests()
     }
 
     {
-        // Тест 1: Простой набор данных
-        // Данные: {2, 2, 3, 4, 14}, Mean = 5
-        // Отклонения: |2-5|=3, |2-5|=3, |3-5|=2, |4-5|=1, |14-5|=9
-        // Сумма отклонений: 18. MAD = 18 / 5 = 3.6
+        // Test 1: Simple Dataset
+        // Data: {2, 2, 3, 4, 14}, Mean = 5
+        // Deviations: |2-5|=3, |2-5|=3, |3-5|=2, |4-5|=1, |14-5|=9
+        // Sum of deviations: 18. MAD = 18 / 5 = 3.6
         std::vector<int> data1 = {2, 2, 3, 4, 14};
         assert(is_close(nr::mean_absolute_deviation(data1), 3.6));
 
-        // Тест 2: Все элементы одинаковые
-        // Данные: {5, 5, 5, 5}, Mean = 5
-        // Отклонения все равны 0. MAD = 0
+        // Test 2: All elements are the same
+        // Data: {5, 5, 5, 5}, Mean = 5
+        // Deviations are all 0. MAD = 0
         std::vector<double> data2 = {5.0, 5.0, 5.0, 5.0};
         assert(is_close(nr::mean_absolute_deviation(data2), 0.0));
 
-        // Тест 3: Отрицательные значения
-        // Данные: {-10, 10}, Mean = 0
-        // Отклонения: |-10-0|=10, |10-0|=10
-        // Сумма: 20. MAD = 20 / 2 = 10.0
+        // Test 3: Negative values
+        // Data: {-10, 10}, Mean = 0
+        // Deviations: |-10-0|=10, |10-0|=10
+        // Sum of deviations: 20. MAD = 20 / 2 = 10.0
         std::vector<int> data3 = {-10, 10};
         assert(is_close(nr::mean_absolute_deviation(data3), 10.0));
 
-        // Тест 4: Дробные значения
-        // Данные: {1.5, 2.5, 3.5, 4.5}, Mean = 3.0
-        // Отклонения: 1.5, 0.5, 0.5, 1.5. Сумма: 4.0. MAD = 4 / 4 = 1.0
+        // Test 4: Fractional values
+        // Data: {1.5, 2.5, 3.5, 4.5}, Mean = 3.0
+        // Deviations: 1.5, 0.5, 0.5, 1.5. Sum of deviations: 4.0. MAD = 4 / 4 = 1.0
         std::vector<double> data4 = {1.5, 2.5, 3.5, 4.5};
         assert(is_close(nr::mean_absolute_deviation(data4), 1.0));
 
@@ -530,5 +531,7 @@ void basic_stats_tests()
 
         std::cout << "All standard_deviation tests passed!" << std::endl;
     }
+
+    std::cout << "All basic statistics tests passed!" << std::endl;
 
 }

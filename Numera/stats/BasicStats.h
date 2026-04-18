@@ -722,6 +722,16 @@ namespace nr
     auto Scope(const Container& data)
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        /*
+         * Calculates the scope (range) of a container.
+         * - Logic: Returns the difference between the maximum and minimum values.
+         * - Edge Cases: Returns 0 if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
+
+        if (data.empty())
+            return 0.0;
         return max(data) - min(data);
     }
 
@@ -729,6 +739,17 @@ namespace nr
     auto Scope(const Iterator& begin, const Iterator& end)
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        /*
+         * Calculates the scope (range) of a container.
+         * - Logic: Returns the difference between the maximum and minimum values.
+         * - Edge Cases: Returns 0 if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
+        
+        if(begin == end)
+            return 0.0;
+        
         return max(begin, end) - min(begin, end);
     }
 
@@ -736,6 +757,17 @@ namespace nr
     auto interquartile_range(const Container& data)
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        /*
+         * Calculates the interquartile range of a container.
+         * - Logic: Returns the difference between the upper and lower quartiles.
+         * - Edge Cases: Returns 0 if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
+
+        if (data.empty())
+            return 0.0;
+
         return upper_quartile(data) - lower_quartile(data);
     }
 
@@ -743,6 +775,17 @@ namespace nr
     auto interquartile_range(const Iterator& begin, const Iterator& end)
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        /*
+         * Calculates the interquartile range of a container.
+         * - Logic: Returns the difference between the upper and lower quartiles.
+         * - Edge Cases: Returns 0 if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
+
+        if(begin == end)
+            return 0.0;
+        
         return upper_quartile(begin, end) - lower_quartile(begin, end);
     }
 
@@ -750,6 +793,14 @@ namespace nr
     auto mean_absolute_deviation(const Container& data) 
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        /**
+         * Calculates the mean absolute deviation of a container.
+         * - Logic: Returns the average of the absolute deviations from the mean.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
+
         using T = typename std::decay_t<Container>::value_type;
         using returnType = std::common_type_t<T, double>;
 
@@ -773,9 +824,16 @@ namespace nr
     auto mean_absolute_deviation(const Iterator& begin, const Iterator& end) 
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        /**
+         * Calculates the mean absolute deviation of a container.
+         * - Logic: Returns the average of the absolute deviations from the mean.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
         using T = typename std::iterator_traits<Iterator>::value_type;
         using returnType = std::common_type_t<T, double>;
-        if (begin==end) {
+        if (begin == end) {
             throw std::invalid_argument("MAD: empty data");
         }
 
@@ -795,11 +853,18 @@ namespace nr
     auto dispersion(const Container& data) 
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        /**
+         * Calculates the dispersion (variance) of a container.
+         * - Logic: Returns the average of the squared deviations from the mean.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
         using T = typename std::decay_t<Container>::value_type;
         using returnType = std::common_type_t<T, double>;
 
         if (data.empty()) {
-            throw std::invalid_argument("MAD: empty data");
+            throw std::invalid_argument("Dispersion: empty data");
         }
 
         const returnType n = static_cast<returnType>(data.size());
@@ -818,10 +883,17 @@ namespace nr
     auto dispersion(const Iterator& begin, const Iterator& end) 
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        /**
+         * Calculates the dispersion (variance) of a container.
+         * - Logic: Returns the average of the squared deviations from the mean.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
         using T = typename std::iterator_traits<Iterator>::value_type;
         using returnType = std::common_type_t<T, double>;
         if (begin==end) {
-            throw std::invalid_argument("MAD: empty data");
+            throw std::invalid_argument("Dispersion: empty data");
         }
 
         const returnType n = static_cast<returnType>(std::distance(begin, end));
@@ -840,11 +912,18 @@ namespace nr
     auto standard_deviation(const Container& data) 
     -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
     {
+        /**
+         * Calculates the standard deviation of a container.
+         * - Logic: Returns the square root of the dispersion.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
         using T = typename std::decay_t<Container>::value_type;
         using returnType = std::common_type_t<T, double>;
 
         if (data.empty()) {
-            throw std::invalid_argument("MAD: empty data");
+            throw std::invalid_argument("Standard Deviation: empty data");
         }
 
         const returnType n = static_cast<returnType>(data.size());
@@ -863,10 +942,17 @@ namespace nr
     auto standard_deviation(const Iterator& begin, const Iterator& end) 
     -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
     {
+        /**
+         * Calculates the standard deviation of a container.
+         * - Logic: Returns the square root of the dispersion.
+         * - Edge Cases: throw std::invalid_argument if data is empty.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable.
+         */
         using T = typename std::iterator_traits<Iterator>::value_type;
         using returnType = std::common_type_t<T, double>;
         if (begin==end) {
-            throw std::invalid_argument("MAD: empty data");
+            throw std::invalid_argument("Standard Deviation: empty data");
         }
 
         const returnType n = static_cast<returnType>(std::distance(begin, end));
