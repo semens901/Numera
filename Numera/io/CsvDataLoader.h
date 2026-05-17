@@ -22,7 +22,7 @@ public:
     using size_type = std::size_t;
 
     // Reading a CSV file
-    container_type load(const std::string& filename) override;
+    container_type load(const std::string& filename, char delimiter = ',') override;
 
     // Write to file
     void save(const std::string& filename, const std::unordered_map<std::string, std::vector<std::string>>& data) const override;

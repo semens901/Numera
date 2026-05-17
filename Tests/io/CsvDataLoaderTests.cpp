@@ -2,6 +2,11 @@
 
 void csv_data_loader()
 {
+    csv_data_FileRead_test();
+}
+
+void csv_data_FileRead_test()
+{
     std::cout << "Running CSVDataLoader tests..." << std::endl;
     std::string csv_content = 
         "Name,Age,Height\n"

@@ -43,7 +43,7 @@ namespace nr
         ~NumericSample() = default;
         NumericSample(const NumericSample& other);
         explicit NumericSample(container_type vec) : container(std::move(vec)) {}
-        NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename);
+        NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename, char delimiter = ',');
         NumericSample(iterator begin, iterator end);
 
         NumericSample<T>& operator=(const NumericSample<T>& other);
@@ -138,9 +138,9 @@ namespace nr
     }
 
     template <typename T>
-    inline NumericSample<T>::NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename)
+    inline NumericSample<T>::NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename, char delimiter)
     {
-        container = loader.load(filename);
+        container = loader.load(filename, delimiter);
     }
 
     template <typename T>

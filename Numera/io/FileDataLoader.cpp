@@ -1,8 +1,7 @@
 #include "FileDataLoader.h"
 
-std::vector<double> FileDataLoader::load(const std::string& filename)
+std::vector<double> FileDataLoader::load(const std::string& filename, char delimiter)
 {
-    char delimiter = ',';
     std::vector<double> numbers;
     std::ifstream file(filename);
 

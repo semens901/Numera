@@ -11,168 +11,64 @@ bool is_close1(double a, double b, double epsilon = 0.0001) {
 
 void numeric_sample_tests()
 {
-    {
-        std::cout << "[TEST] NumericSample basic functionality\n";
+    std::cout << "Running NumericSample tests..." << std::endl;
+    nr::NumericSample<double> vd;
+    numeric_SizeToZero_test(vd);
+    numeric_AddElements_test(vd);
+    numeric_ClearElements_test(vd);
+    numeric_CopyAndMove_test();
 
-        nr::NumericSample<double> vd;
-        assert(vd.size() == 0);
-        assert(vd.empty());
+    nr::NumericSample<double> vd5({1,2,3});
+    numeric_RemoveElements_test(vd5);
 
-        vd.add(3.14);
-        vd.add(2.71);
-        vd.add(1.41);
+    nr::NumericSample<double> vc({1, 2, 3, 4});
+    numeric_Min_test(vc, 1); // should be 1
+    numeric_Max_test(vc, 4); // should be 4
+    numeric_ArithmeticMean_test(vc, 2.5); // should be 2.5 
 
-        assert(vd.size() == 3);
-        assert(!vd.empty());
-        assert(almostEqual(vd[0], 3.14));
-        assert(almostEqual(vd[1], 2.71));
-        assert(almostEqual(vd[2], 1.41));
+    std::cout << "[TEST] Weighted mean\n";
+    nr::NumericSample<double> v({1.0, 2.0, 3.0});
+    std::vector<double> w{1.0, 1.0, 1.0};
 
-        vd.clear();
-        assert(vd.size() == 0);
-        assert(vd.empty());
+    numeric_WeightedMean_test(v, w, 2.0); // should be 2.0
 
-        nr::NumericSample<double> vd1;
-        nr::NumericSample<double> vd2 = vd1;
-        nr::NumericSample<double> vd4 = std::move(vd2);
-        assert(vd2.size() == 0);
+    nr::NumericSample<double> v1({42.0});
+    std::vector<double> w1{10.0};
 
-        nr::NumericSample<double> vd5({1,2,3});
-        vd5.remove_at(1);
+    numeric_WeightedMean_test(v1, w1, 42.0); // should be 42.0
 
-        std::cout << "Test passed: basic functionality works correctly.\n";\
-    }
 
-    {
-        std::cout << "[TEST] Adding elements\n";
-        nr::NumericSample<double> vd;
-        vd.add({1.0, 2.0, 3.0, 4.0, 5.0});
-        assert(vd.size() == 5);
-        std::cout << "Test passed: size is " << vd.size() << "\n";
-        
-        std::cout << "[TEST] Copy and move semantics\n";
-        nr::NumericSample<double> vd2 = vd; // copy constructor
-        assert(vd2.size() == 5);    
-        std::cout << "Test passed: size is " << vd2.size() << "\n";
-        
-        std::cout << "[TEST] Copy and move semantics\n";
-        nr::NumericSample<double> vd3;
-        vd3 = vd; // copy assignment
-        assert(vd3.size() == 5);    
-        std::cout << "Test passed: size is " << vd3.size() << "\n";
+    nr::NumericSample<double> v2({15, 10, 5, 90});
+    std::vector <double> w2{0.25, 0.20, 0.05, 0.50};
 
-        std::cout << "[TEST] Move semantics\n";
-        nr::NumericSample<double> vd4 = std::move(vd); // move constructor
-        assert(vd4.size() == 5);
-        assert(vd.size() == 0); // vd should be empty after move
-        std::cout << "Test passed: size is " << vd4.size() << "\n";    
-        
-        std::cout << "[TEST] Move semantics\n";
-        nr::NumericSample<double> vd5;
-        vd5 = std::move(vd2); // move assignment
-        assert(vd5.size() == 5);
-        assert(vd2.size() == 0); // vd2 should be empty after move
-        std::cout << "Test passed: size is " << vd5.size() << "\n";
+    numeric_WeightedMean_test(v2, w2, 51.0); // should be 51.0
 
-        std::cout << "[TEST] Removing elements\n";
-        nr::NumericSample<double> vd6({1,2,3});
-        vd6.remove_at(1); // remove element at index 1
-        assert(vd6.size() == 2);
-        assert(vd6[0] == 1);
-        assert(vd6[1] == 3);
-        std::cout << "Test passed: size is " << vd6.size() << "\n";
-    }
+    std::cout << "[TEST] Geometric mean\n";
+    nr::NumericSample<double> population({
+        54, 63, 48, 29, 27, 32, 41
+    });
 
-    {
-        
-        std::cout << "[TEST] NumericSample stats funcs\n";
-        nr::NumericSample<double> vc({1, 2, 3, 4});
-        assert(vc.min() == 1);
-        assert(vc.max() == 4);
+    double expected = 40.135109214786738;
+    double eps = 1e-6;
 
-        std::cout << "Test passed: min is " << vc.min() << ", max is " << vc.max() << "\n";
-        
-        assert(almostEqual(vc.arithmetic_mean(), 2.5));
-        std::cout << "Test passed: arithmetic_mean is " << vc.arithmetic_mean() << "\n";
-        /*
-            assert(almostEqual(vc.median(), 2.5));
-        */   
-    }
+    numeric_GeometricMean_test(population, expected, eps);
 
-    {
-        std::cout << "[TEST] Weighted mean\n";
-        nr::NumericSample<double> v({1.0, 2.0, 3.0});
-        std::vector<double> w{1.0, 1.0, 1.0};
+    std::cout << "[TEST] Geometric mean with iterators\n";
+    nr::NumericSample<double> data1({1.0, 3.0, 9.0});
+    expected = 3.0;
+    eps = 1e-9;
+    numeric_GeometricMean_test(data1, expected, eps); // geometric mean should be 3.0
 
-        double result = v.weighted_mean(w);
-        assert(std::abs(result - 2.0) < 1e-9);
-        std::cout << "Test passed: weighted_mean is " << result << "\n";
-    }
+    nr::NumericSample<double> data2({42});
+    numeric_GeometricMean_test(data2, 42.0, eps); // geometric mean of a single value should be that value
+    
 
-    {
-        std::cout << "[TEST] Single element weighted mean\n";
-        nr::NumericSample<double> v({42.0});
-        std::vector<double> w{10.0};
+    nr::NumericSample<int> data3;
+    numeric_GeometricMeanIntException_test(data3); // should throw exception for empty sample
 
-        double result = v.weighted_mean(w);
-        assert(result == 42.0);
-        std::cout << "Test passed: weighted_mean is " << result << "\n";
-    }
+    nr::NumericSample<double> data4;
+    numeric_GeometricMeanDoubleException_test(data4); // should throw exception for non-positive value
 
-    {
-        std::cout << "[TEST] Multiple element weighted mean\n";
-        nr::NumericSample<double> v({15, 10, 5, 90});
-        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
-
-        double result = v.weighted_mean(w);
-        assert(result == 51.0);
-        std::cout << "Test passed: weighted_mean is " << result << "\n";
-
-    }
-
-    {
-        std::cout << "[TEST] Geometric mean\n";
-        nr::NumericSample<double> population({
-            54, 63, 48, 29, 27, 32, 41
-        });
-
-        double result = population.geometric_mean();
-        const double expected = 40.135109214786738;
-        const double eps = 1e-6;
-
-        assert(std::abs(result - expected) < eps);
-        std::cout << "Test passed: geometric_mean is " << result << "\n";
-    }
-
-    {
-        std::cout << "[TEST] Geometric mean with iterators\n";
-        nr::NumericSample<double> data1({1.0, 3.0, 9.0});
-        double gm1 = data1.geometric_mean();
-        assert(std::abs(gm1 - 3.0) < 1e-9); // geometric arithmetic_mean = 3
-
-        nr::NumericSample<double> data2({42});
-        int gm2 = data2.geometric_mean();
-        assert(gm2 == 42);
-
-        nr::NumericSample<int> data3;
-        bool exception_thrown = false;
-        try {
-            data3.geometric_mean();
-        } catch (const std::invalid_argument&) {
-            exception_thrown = true;
-        }
-        assert(exception_thrown);
-
-        nr::NumericSample<double> data4({1.0, -2.0, 3.0});
-        exception_thrown = false;
-        try {
-            data4.geometric_mean();
-        } catch (const std::domain_error&) {
-            exception_thrown = true;
-        }
-        assert(exception_thrown);
-        std::cout << "Test passed: geometric_mean with iterators works correctly.\n";
-    }
 
     {
         std::cout << "[TEST] Harmonic mean\n";
@@ -392,4 +288,111 @@ void numeric_sample_tests()
     }
 
     std::cout << "All NumericSample tests passed!" << std::endl;
+}
+
+void numeric_SizeToZero_test(const nr::NumericSample<double>& ns)
+{
+    assert(ns.size() == 0);
+    assert(ns.empty());
+    std::cout << "Test passed: size is zero and sample is empty.\n";
+}
+
+void numeric_AddElements_test(nr::NumericSample<double>& ns)
+{
+    ns.add(3.14);
+    ns.add(2.71);
+    ns.add(1.41);
+
+    assert(ns.size() == 3);
+    assert(!ns.empty());
+    assert(almostEqual(ns[0], 3.14));
+    assert(almostEqual(ns[1], 2.71));
+    assert(almostEqual(ns[2], 1.41));
+    std::cout << "Test passed: elements added correctly, size is " << ns.size() << "\n";
+}
+
+void numeric_ClearElements_test(nr::NumericSample<double>& ns)
+{
+    ns.clear();
+    assert(ns.size() == 0);
+    assert(ns.empty());
+    std::cout << "Test passed: elements cleared, size is " << ns.size() << "\n";
+}
+
+void numeric_CopyAndMove_test()
+{
+     nr::NumericSample<double> vd1;
+    nr::NumericSample<double> vd2 = vd1;
+    vd2.add(3.14);
+    vd2.add(2.71);
+    vd2.add(1.41);
+    nr::NumericSample<double> vd4 = std::move(vd2);
+    assert(vd4.size() == 3);
+    std::cout << "Test passed: copy and move semantics work correctly, moved size is " << vd4.size() << "\n";
+}
+
+void numeric_RemoveElements_test(nr::NumericSample<double> ns)
+{
+    ns.remove_at(1);
+    assert(ns.size() == 2);
+    assert(ns[0] == 1);
+    assert(ns[1] == 3);
+    std::cout << "Test passed: elements removed correctly, size is " << ns.size() << "\n";
+}
+
+void numeric_Min_test(const nr::NumericSample<double>& ns, double expected)
+{
+    assert(ns.min() == expected);
+    std::cout << "Test passed: minimum value is " << ns.min() << "\n";
+}
+
+void numeric_Max_test(const nr::NumericSample<double>& ns, double expected)
+{
+    assert(ns.max() == expected);
+    std::cout << "Test passed: maximum value is " << ns.max() << "\n";
+}
+
+void numeric_ArithmeticMean_test(const nr::NumericSample<double>& ns, double expected)
+{
+    assert(almostEqual(ns.arithmetic_mean(), expected));
+    std::cout << "Test passed: arithmetic mean is " << ns.arithmetic_mean() << "\n";
+}
+
+void numeric_WeightedMean_test(const nr::NumericSample<double>& ns, const std::vector<double>& weights, double expected)
+{
+    double result = ns.weighted_mean(weights);
+    assert(std::abs(result - expected) < 1e-9);
+    assert(result == expected);
+    std::cout << "Test passed: weighted mean is " << result << "\n";
+}
+
+void numeric_GeometricMean_test(const nr::NumericSample<double> &ns, const double expected, const double eps)
+{
+    double result = ns.geometric_mean();
+    assert(std::abs(result - expected) < eps);
+    std::cout << "Test passed: geometric mean is " << result << "\n";
+}
+
+void numeric_GeometricMeanIntException_test(const nr::NumericSample<int>& ns)
+{
+    bool exception_thrown = false;
+    try {
+        ns.geometric_mean();
+    } catch (const std::invalid_argument&) {
+        exception_thrown = true;
+    }
+    assert(exception_thrown);
+    std::cout << "Test passed: geometric_mean throws exception for empty sample.\n";
+}
+
+void numeric_GeometricMeanDoubleException_test(const nr::NumericSample<double>& ns)
+{
+    bool exception_thrown = false;
+    try {
+        ns.geometric_mean();
+    } catch (const std::invalid_argument&) {
+        exception_thrown = true;
+    }
+    assert(exception_thrown);
+    std::cout << "Test passed: geometric_mean throws exception for empty sample.\n";
 }

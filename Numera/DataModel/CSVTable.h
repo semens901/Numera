@@ -47,7 +47,7 @@ namespace nr
         using size_type   = std::size_t;
 
         CSVTable() : headers(), data(), rows_count(0), cols_count(0) {};
-        CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename);
+        CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename, char delimiter = ',');
         CSVTable(const CSVTable&) = default;
         CSVTable(CSVTable&&) = default;
         CSVTable& operator=(const CSVTable&) = default;

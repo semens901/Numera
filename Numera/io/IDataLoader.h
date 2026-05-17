@@ -13,7 +13,7 @@ struct IDataLoader {
     */
     virtual ~IDataLoader() = default; 
 
-    virtual Container load(const std::string& filename) = 0;
+    virtual Container load(const std::string& filename, char delimiter) = 0;
     
     virtual void save(const std::string& filename, const Container& data) const = 0;
 

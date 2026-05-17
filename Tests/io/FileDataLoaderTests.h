@@ -8,4 +8,6 @@
 
 void file_data_loader_tests();
 
+void file_data_FileRead_test();
+
 #endif // FILEDATALOADERTESTS_H

@@ -21,7 +21,7 @@ public:
     using size_type = std::size_t;
 
     //Reading a file
-    std::vector<double> load(const std::string& filename) override;
+    std::vector<double> load(const std::string& filename, char delimiter) override;
 
     //Writing to a file
     void save(const std::string& filename, const std::vector<double>& data) const override;

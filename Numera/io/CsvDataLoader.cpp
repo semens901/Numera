@@ -9,7 +9,7 @@
 */
 
 std::unordered_map<std::string, std::vector<std::string>>
-CSVDataLoader::load(const std::string& filename)
+CSVDataLoader::load(const std::string& filename, char delimiter)
 {
     container_type result;
     column_order.clear();
@@ -26,7 +26,7 @@ CSVDataLoader::load(const std::string& filename)
         return result; // empty file
 
     // Parse and store column names (preserve order)
-    column_order = split(line, ',');
+    column_order = split(line, delimiter);
     for (auto& col : column_order) {
         col = trim(col);
         result[col] = {};
@@ -34,7 +34,7 @@ CSVDataLoader::load(const std::string& filename)
 
     // Read data rows
     while (std::getline(file, line)) {
-        auto values = split(line, ',');
+        auto values = split(line, delimiter);
         for (size_t i = 0; i < values.size() && i < column_order.size(); ++i) {
             result[column_order[i]].push_back(trim(values[i]));
         }

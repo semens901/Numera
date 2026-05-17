@@ -1,6 +1,6 @@
 #include "CSVTable.h"
 
-nr::CSVTable::CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename)
+nr::CSVTable::CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<std::string>>>* loader, std::string filename, char delimiter)
 {
     /*
         This constructor accepts an IDataLoader object and a CSV file name. 
@@ -11,7 +11,7 @@ nr::CSVTable::CSVTable(IDataLoader<std::unordered_map<std::string, std::vector<s
     if (!csv_loader) {
         throw std::invalid_argument("CSVTable constructor: loader must be a CSVDataLoader");
     }
-    auto loaded_data = csv_loader->load(filename);
+    auto loaded_data = csv_loader->load(filename, delimiter);
     headers = csv_loader->get_column_order();
     // initialize counts
     cols_count = headers.size();
