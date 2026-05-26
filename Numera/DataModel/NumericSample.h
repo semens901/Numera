@@ -42,9 +42,10 @@ namespace nr
         NumericSample() = default;
         ~NumericSample() = default;
         NumericSample(const NumericSample& other);
-        explicit NumericSample(container_type vec) : container(std::move(vec)) {}
+        NumericSample(std::initializer_list<T> init) : container(init){}
+        template<typename Iterator>
+        NumericSample(Iterator begin, Iterator end) : container(begin, end){}
         NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename, char delimiter = ',');
-        NumericSample(iterator begin, iterator end);
 
         NumericSample<T>& operator=(const NumericSample<T>& other);
         NumericSample(NumericSample&& other) noexcept;
@@ -103,7 +104,7 @@ namespace nr
         value_type upper_quartile() const;
 
         // Returns the p-th percentile of the sample. Throws if empty or if p is out of range [0, 100].
-        auto percentile(double p) const -> std::common_type_t<value_type, double>;
+        value_type percentile(double p) const;
 
         // Returns the mode of the sample. If there are multiple modes, returns an empty optional. Throws if empty.
         std::optional<value_type> mode() const;
@@ -118,7 +119,11 @@ namespace nr
         value_type interquartile_range() const;
 
         // Returns the mean absolute deviation from the mean. Throws if empty.
-        auto mean_absolute_deviation() const -> std::common_type_t<NumericSample<T>::value_type, double>;
+        value_type mean_absolute_deviation() const;
+
+        value_type standard_deviation() const;
+
+        value_type dispersion() const;
 
         iterator begin ();
         iterator end ();
@@ -141,12 +146,6 @@ namespace nr
     inline NumericSample<T>::NumericSample(IDataLoader<std::vector<T>>& loader, std::string filename, char delimiter)
     {
         container = loader.load(filename, delimiter);
-    }
-
-    template <typename T>
-    inline NumericSample<T>::NumericSample(iterator begin, iterator end)
-    {
-        std::copy(begin, end, std::back_inserter(container));
     }
 
     template <typename T>
@@ -343,7 +342,7 @@ namespace nr
         return nr::upper_quartile(container);
     }
     template <typename T>
-    inline auto NumericSample<T>::percentile(double p) const -> std::common_type_t<NumericSample<T>::value_type, double>
+    inline typename NumericSample<T>::value_type NumericSample<T>::percentile(double p) const
     {
         return nr::percentile(container, p);
     }
@@ -368,9 +367,19 @@ namespace nr
         return nr::interquartile_range(container);
     }
     template <typename T>
-    inline auto NumericSample<T>::mean_absolute_deviation() const -> std::common_type_t<NumericSample<T>::value_type, double>
+    inline typename NumericSample<T>::value_type NumericSample<T>::mean_absolute_deviation() const
     {
         return nr::mean_absolute_deviation(container);
+    }
+    template <typename T>
+    inline typename NumericSample<T>::value_type NumericSample<T>::standard_deviation() const
+    {
+        return nr::standard_deviation(container);
+    }
+    template <typename T>
+    inline typename NumericSample<T>::value_type NumericSample<T>::dispersion() const
+    {
+        return nr::dispersion(container);
     }
     template <typename T>
     inline typename NumericSample<T>::value_type NumericSample<T>::weighted_mean(container_type weights) const

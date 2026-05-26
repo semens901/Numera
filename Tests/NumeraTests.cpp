@@ -1,3 +1,4 @@
+#include "Moduls/Moduls.cpp"
 #include "DataModel/CSVTableTests.h"
 #include "DataModel/NumericSampleTests.h"
 #include "io/CsvDataLoaderTests.h"

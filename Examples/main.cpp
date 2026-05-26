@@ -157,6 +157,5 @@ int main()
         for (const auto &c : colX) std::cout << ' ' << c;
         std::cout << std::endl;
     }
-
     return 0;
 }

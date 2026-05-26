@@ -14,7 +14,6 @@ add_library(Numera STATIC
     io/IDataLoader.h
     io/json_reader.h
     io/json_writer.h
-    io/FileDataLoader.cpp
 
     RandomGenerator/RandomValueGenerator.h
     RandomGenerator/RandomValueGenerator.cpp
@@ -23,6 +22,9 @@ add_library(Numera STATIC
     stats/Distributions.h
     stats/ProbabilitySampling.h
     stats/NonProbabilitySampling.h
+
+    Moduls/Moduls.cpp
+    Moduls/Moduls.h
 )
 
 target_include_directories(Numera

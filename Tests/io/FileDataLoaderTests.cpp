@@ -15,7 +15,8 @@ void file_data_FileRead_test()
 
         std::cout << "[TEST] Open simple file\n";
         FileDataLoader file_loader;
-        nr::NumericSample<double> dt(file_loader.load(tmp_file, '\n'));
+        auto file = file_loader.load(tmp_file, '\n');
+        nr::NumericSample<double> dt(file.begin(), file.end());
         std::cout << "Count:\t" << dt.size() << std::endl;
         std::cout << "Min:\t" << nr::min(dt) << std::endl;
 

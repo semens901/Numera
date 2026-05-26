@@ -49,7 +49,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto max(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto max(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // Returns the maximum value in the range (begin, end)
         // Throws if the range is empty.
@@ -74,7 +75,7 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto arithmetic_mean(Iterator begin, Iterator end, typename std::iterator_traits<Iterator>::value_type init) 
+    auto arithmetic_mean(Iterator begin, Iterator end) 
     -> typename std::iterator_traits<Iterator>::value_type
     {
         // Calculates the arithmetic arithmetic_mean
@@ -86,7 +87,7 @@ namespace nr
 
         using T = typename std::iterator_traits<Iterator>::value_type;
 
-        T sum = std::accumulate(begin, end, init);
+        T sum = std::accumulate(begin, end, 0.0);
         return sum/std::distance(begin, end);
     }
 
@@ -108,7 +109,8 @@ namespace nr
     }
 
     template<typename Iterator>
-    auto median(Iterator begin, Iterator end) -> typename std::iterator_traits<Iterator>::value_type
+    auto median(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         // Finds the median
         // Throws if the range is empty.
@@ -131,7 +133,8 @@ namespace nr
     }
 
     template <typename Container>
-    auto median(const Container& data) -> typename std::decay_t<Container>::value_type
+    auto median(const Container& data) 
+    -> typename std::decay_t<Container>::value_type
     {
         // Finds the median
         // Throws if the range is empty.
@@ -153,48 +156,11 @@ namespace nr
         }
     }
 
-    template <typename T, typename W>
-    auto weighted_mean(
-        const std::vector<T>& values,
-        const std::vector<W>& weights
-    ) -> std::decay_t<decltype(
-            std::declval<T>() * std::declval<W>())>
-    {
-        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<W>())>;
-        /*
-            The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
-        */
-
-        static_assert(
-            std::is_arithmetic_v<T>,
-            "geometric_mean requires arithmetic type"
-        );
-
-        if (values.size() != weights.size()) {
-            throw std::invalid_argument("Values and weights must have the same size");
-        }
-
-        returnType  sum = 0.0;
-        returnType  weight_sum = 0.0;
-
-        for (std::size_t i = 0; i < values.size(); ++i) {
-            sum += values[i] * weights[i];
-            weight_sum += weights[i];
-        }
-
-        if (weight_sum == 0.0) {
-            throw std::runtime_error("Sum of weights is zero");
-        }
-
-        return sum / weight_sum;
-    }
-
     template <typename Container, typename Weight>
     auto weighted_mean(
         const Container& values,
         const Weight& weights
-    ) -> std::decay_t<decltype(
-            std::declval<typename Container::value_type>() * std::declval<typename Weight::value_type>())>
+    ) -> typename std::decay_t<Container>::value_type
     {
         /*
             The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
@@ -215,6 +181,94 @@ namespace nr
         for (std::size_t i = 0; i < values.size(); ++i) {
             sum += values[i] * weights[i];
             weight_sum += weights[i];
+        }
+
+        if (weight_sum == 0.0) {
+            throw std::runtime_error("Sum of weights is zero");
+        }
+
+        return sum / weight_sum;
+    }
+
+    template <typename IteratorData, typename IteratorWeight>
+    auto weighted_mean(
+        IteratorData beginData,
+        IteratorData endData,
+        IteratorWeight beginWeight,
+        IteratorWeight endWeight
+    ) -> typename std::iterator_traits<IteratorData>::value_type
+    {
+        using value_type = typename std::iterator_traits<IteratorData>::value_type;
+        /*
+            The function finds a weighted average value, the first parameter is the population (begin, end), the second is the "weight"(begin, end) of each population
+        */
+        
+        static_assert(
+            std::is_arithmetic_v<value_type>,
+            "geometric_mean requires arithmetic type"
+        );
+        
+        size_t distance_data = std::distance(beginData, endData);
+        size_t distance_Weight = std::distance(beginWeight, endWeight);
+        
+        if (distance_data != distance_Weight) 
+        {
+            throw std::invalid_argument("Values and weights must have the same size");
+        }
+
+        value_type sum = 0.0;
+        value_type weight_sum = 0.0;
+        
+        for (std::pair<IteratorData, IteratorWeight> it_pair{beginData, beginWeight}; (it_pair.first != endData) && (it_pair.second != endWeight); ++it_pair.first, ++it_pair.second)
+        {
+            sum += *it_pair.first * *it_pair.second;
+            weight_sum += *it_pair.second;
+        }
+
+        if (weight_sum == 0.0) {
+            throw std::runtime_error("Sum of weights is zero");
+        }
+
+        return sum / weight_sum;
+    }
+
+    template <typename IteratorData, typename IteratorWeight>
+    auto weighted_mean(
+        IteratorData beginData,
+        IteratorData endData,
+        IteratorWeight beginWeight
+    ) -> typename std::iterator_traits<IteratorData>::value_type
+    {
+        using value_type = typename std::iterator_traits<IteratorData>::value_type;
+        /*
+            Computes the weighted mean for the data range [beginData, endData)
+            using weights provided starting from `beginWeight`. The function
+            advances the weight iterator in lockstep with the data iterator.
+
+            WARNING: This overload is unsafe because it does NOT verify that
+            the weight iterator range is long enough or matches the data
+            range. Passing a shorter or mismatched weight sequence leads to
+            undefined behavior. Callers must ensure the weight range corresponds
+            to the data range before invoking this function.
+        */
+
+        static_assert(
+            std::is_arithmetic_v<value_type>,
+            "geometric_mean requires arithmetic type"
+        );
+        
+        if (std::distance(beginData, endData) == 0) 
+        {
+            throw std::invalid_argument("Values ​​cannot be empty");
+        }
+
+        value_type sum = 0.0;
+        value_type weight_sum = 0.0;
+        
+        for (std::pair<IteratorData, IteratorWeight> it_pair{beginData, beginWeight}; it_pair.first != endData; ++it_pair.first, ++it_pair.second)
+        {
+            sum += *it_pair.first * *it_pair.second;
+            weight_sum += *it_pair.second;
         }
 
         if (weight_sum == 0.0) {
@@ -261,7 +315,6 @@ namespace nr
     {
         // finds the geometric arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
-        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<T>())>;
         static_assert(
             std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
@@ -271,10 +324,10 @@ namespace nr
             throw std::invalid_argument("Data vector is empty");
         }
 
-        returnType log_sum = std::accumulate(
+        T log_sum = std::accumulate(
             begin, end,
             0.0,
-            [](double acc, T value) {
+            [](T acc, T value) {
                 if (value <= static_cast<T>(0)) {
                     throw std::domain_error(
                         "Geometric arithmetic_mean requires positive values"
@@ -293,7 +346,6 @@ namespace nr
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
-        using returnType = std::decay_t<decltype(std::declval<T>() * std::declval<T>())>;
         static_assert(
             std::is_arithmetic_v<T>,
             "harmonic_mean requires arithmetic type"
@@ -303,10 +355,10 @@ namespace nr
             throw std::invalid_argument("Data vector is empty");
         }
 
-        returnType reciprocal_sum = std::accumulate(
+        T reciprocal_sum = std::accumulate(
             data.begin(), data.end(),
             0.0,
-            [](returnType acc, T value) {
+            [](T acc, T value) {
                 if (value <= static_cast<T>(0)) {
                     throw std::domain_error(
                         "Harmonic arithmetic_mean requires positive values"
@@ -347,12 +399,12 @@ namespace nr
             }
         );
 
-        return static_cast<T>(std::distance(begin, end) / reciprocal_sum);
+        return static_cast<T>(std::distance(begin, end)) / reciprocal_sum;
     }
 
     template <typename Container>
     auto lower_quartile(const Container& data)
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         // Finds the lower quartile
         using mut_container = std::decay_t<Container>;
@@ -406,7 +458,7 @@ namespace nr
 
     template <typename Container>
     auto upper_quartile(const Container& data)
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         // Finds the upper quartile
         using mut_container = std::decay_t<Container>;
@@ -472,7 +524,7 @@ namespace nr
 
     template <typename Container>
     auto percentile(const Container& data, double p)
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /**
      * Calculates the p-th percentile using linear interpolation (R7/Excel style).
@@ -508,7 +560,7 @@ namespace nr
 
     template<typename Iterator>
     auto percentile(const Iterator& begin, const Iterator& end, double p)
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /**
          * Calculates the p-th percentile using linear interpolation (R7/Excel style).
@@ -596,7 +648,7 @@ namespace nr
     }
 
     template <typename Iterator>
-    auto mode(const Iterator& begin, const Iterator& end)
+    auto mode(Iterator begin, Iterator end)
     -> std::optional<typename std::iterator_traits<Iterator>::value_type>
     {
         /**
@@ -615,12 +667,12 @@ namespace nr
 
         std::unordered_map<T, std::size_t> freq;
 
-        for(const auto& v = begin; v != end; ++v)
-            ++freq[*v];
+        for(auto it = begin; it != end; ++it)
+            ++freq[*it];
 
         std::size_t max_count = 0;
-        T result{};
-        bool unique = true;
+        std::size_t mode_count = 0;
+        std::optional<T> result;
 
         for (const auto& [value, count] : freq)
         {
@@ -628,15 +680,15 @@ namespace nr
             {
                 max_count = count;
                 result = value;
-                unique = true;
+                mode_count = 1;
             }
             else if (count == max_count)
             {
-                unique = false;
+                ++mode_count;
             }
         }
 
-        if (!unique || max_count == 1)
+        if (max_count <= 1 || mode_count != 1)
             return std::nullopt;
 
         return result;
@@ -676,12 +728,13 @@ namespace nr
             if (count == max_count)
                 result.push_back(value);
         }
-
+        
+        std::sort(result.begin(), result.end());
         return result;
     }
 
     template <typename Iterator>
-    auto modes(const Iterator& begin, const Iterator& end)
+    auto modes(Iterator begin, Iterator end)
     -> std::vector<typename std::iterator_traits<Iterator>::value_type>
     {
         /**
@@ -698,8 +751,8 @@ namespace nr
 
         std::unordered_map<T, std::size_t> freq;
 
-        for(const auto& v = begin; v != end; ++v)
-            ++freq[*v];
+        for(auto it = begin; it != end; ++it)
+            ++freq[*it];
 
         std::size_t max_count = 0;
         for (const auto& [_, count] : freq)
@@ -714,13 +767,13 @@ namespace nr
             if (count == max_count)
                 result.push_back(value);
         }
-
+        std::sort(result.begin(), result.end());
         return result;
     }
 
     template <typename Container>
     auto Scope(const Container& data)
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /*
          * Calculates the scope (range) of a container.
@@ -731,13 +784,13 @@ namespace nr
          */
 
         if (data.empty())
-            return 0.0;
-        return max(data) - min(data);
+            throw std::invalid_argument("Scope: empty data");
+        return nr::max(data) - nr::min(data);
     }
 
     template <typename Iterator>
-    auto Scope(const Iterator& begin, const Iterator& end)
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    auto Scope(Iterator begin, Iterator end)
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /*
          * Calculates the scope (range) of a container.
@@ -748,14 +801,14 @@ namespace nr
          */
         
         if(begin == end)
-            return 0.0;
+            throw std::invalid_argument("Scope: empty data");
         
-        return max(begin, end) - min(begin, end);
+        return (nr::max(begin, end) - nr::min(begin, end));
     }
 
     template <typename Container>
     auto interquartile_range(const Container& data)
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /*
          * Calculates the interquartile range of a container.
@@ -766,14 +819,14 @@ namespace nr
          */
 
         if (data.empty())
-            return 0.0;
+            throw std::invalid_argument("interquartile_range: empty data");
 
         return upper_quartile(data) - lower_quartile(data);
     }
 
     template <typename Iterator>
-    auto interquartile_range(const Iterator& begin, const Iterator& end)
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    auto interquartile_range(Iterator begin, Iterator end)
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /*
          * Calculates the interquartile range of a container.
@@ -784,14 +837,14 @@ namespace nr
          */
 
         if(begin == end)
-            return 0.0;
+            throw std::invalid_argument("interquartile_range: empty data");
         
         return upper_quartile(begin, end) - lower_quartile(begin, end);
     }
 
     template <typename Container>
     auto mean_absolute_deviation(const Container& data) 
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -810,7 +863,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+        returnType sum = arithmetic_mean(data.begin(), data.end());
 
         returnType total_deviation = 0.0;
         for (const auto& value : data) {
@@ -821,8 +874,8 @@ namespace nr
     }
 
     template <typename Iterator>
-    auto mean_absolute_deviation(const Iterator& begin, const Iterator& end) 
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    auto mean_absolute_deviation(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -839,7 +892,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end, 0.0);
+        returnType sum = arithmetic_mean(begin, end);
 
         returnType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
@@ -851,7 +904,7 @@ namespace nr
 
     template <typename Container>
     auto dispersion(const Container& data) 
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -869,7 +922,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+        returnType sum = arithmetic_mean(data.begin(), data.end());
 
         returnType total_deviation = 0.0;
         for (const auto& value : data) {
@@ -880,8 +933,8 @@ namespace nr
     }
 
     template <typename Iterator>
-    auto dispersion(const Iterator& begin, const Iterator& end) 
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    auto dispersion(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -898,7 +951,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end, 0.0);
+        returnType sum = arithmetic_mean(begin, end);
 
         returnType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
@@ -910,7 +963,7 @@ namespace nr
 
     template <typename Container>
     auto standard_deviation(const Container& data) 
-    -> std::common_type_t<typename std::decay_t<Container>::value_type, double>
+    -> typename std::decay_t<Container>::value_type
     {
         /**
          * Calculates the standard deviation of a container.
@@ -928,7 +981,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end(), 0.0);
+        returnType sum = arithmetic_mean(data.begin(), data.end());
 
         returnType total_deviation = 0.0;
         for (const auto& value : data) {
@@ -939,8 +992,8 @@ namespace nr
     }
     
     template <typename Iterator>
-    auto standard_deviation(const Iterator& begin, const Iterator& end) 
-    -> std::common_type_t<typename std::iterator_traits<Iterator>::value_type, double>
+    auto standard_deviation(Iterator begin, Iterator end) 
+    -> typename std::iterator_traits<Iterator>::value_type
     {
         /**
          * Calculates the standard deviation of a container.
@@ -957,7 +1010,7 @@ namespace nr
 
         const returnType n = static_cast<returnType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end, 0.0);
+        returnType sum = arithmetic_mean(begin, end);
 
         returnType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
