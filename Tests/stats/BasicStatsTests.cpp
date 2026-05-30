@@ -8,421 +8,55 @@
 void basic_stats_tests()
 {
     std::cout << "[TESTS] Basic statistics\n";
-    double expected;
-    double eps;
+    
+    BasicStats_Min_tests();
+
+    BasicStats_Max_tests();
+
+    BasicStats_WeightedMean_tests();
+
+    BasicStats_GeometricMean_tests();
+
+    BasicStats_HarmonicMean_tests();
+
+    BasicStats_LowerQuartile_tests();
+
+    BasicStats_UpperQuartile_tests();
+
+    BasicStats_ArithmeticMean_tests();
+
+    BasicStats_Median_tests();
+
+    BasicStats_Percentile_tests();
+
+    BasicStats_Mode_tests();
+    
+    BasicStats_Modes_tests();
+
+    BasicStats_Scope_tests();
+    
+    BasicStats_InterquartileRange_tests();
+    
+    BasicStats_MeanAbsoluteDeviation_tests();
+
+    BasicStats_Dispersion_tests();
+    
+    BasicStats_StandardDeviation_tests();
+    
+
+    std::cout << "All basic statistics tests passed!" << std::endl;
+
+}
+
+void BasicStats_Min_tests()
+{
     {
         nr::NumericSample<double> vc({1, 2, 3, 4});
-        expected = 1;
+        double expected = 1;
         BasicStats_Min_test(vc, expected); // should be 1
         nr::NumericSample<double> emptySample;
         BasicStats_ExceptionTrue_In_Min_test(emptySample);
     }
-    {
-        nr::NumericSample<double> vc({1, 2, 3, 4});
-        expected = 4;
-        BasicStats_Max_test(vc, expected); // should be 4
-        nr::NumericSample<double> emptySample;
-        BasicStats_ExceptionTrue_In_Max_test(emptySample);
-    }
-
-    {
-        std::vector<double> v{1.0, 2.0, 3.0};
-        std::vector<double> w{1.0, 1.0, 1.0};
-        eps = 2.0;
-        BasicStats_VectorWeightedMean_test(v, w, eps);
-    }
-
-    {
-        std::vector<double> v{42.0};
-        std::vector<double> w{10.0};
-        eps = 42.0;
-        BasicStats_VectorWeightedMean_test(v, w, eps);
-    }
-
-    {
-        std::vector<double> v{15, 10, 5, 90};
-        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
-        eps = 51.0;
-        BasicStats_VectorWeightedMean_test(v, w, eps);
-        BasicStats_IteratorWeightedMean_test(v.begin(), v.end(), w.begin(), w.end(), eps);
-        
-    }
-
-    {
-        nr::NumericSample<double> v({15, 10, 5, 90});
-        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
-        eps = 51.0;
-        BasicStats_NumericSampleWeightedMean_test(v, w, eps);
-    }
-
-    {
-        nr::NumericSample<double> v({15, 10, 5, 90});
-        std::vector<double> v1({15, 10, 5, 90});
-        std::vector <double> w{0.25, 0.20, 0.05};
-        eps = 51.0;
-        BasicStats_ExceptionTrue_In_VectorWeightedMean_test(v1, w);
-        BasicStats_ExceptionTrue_In_NumericSampleWeightedMean_test(v, w);
-        BasicStats_ExceptionTrue_In_IteratorWeightedMean_test(v1.begin(), v1.end(), w.begin(), w.end());
-    }
-
-    {
-        std::vector<double> population{
-            54, 63, 48, 29, 27, 32, 41
-        };
-        expected = 40.135109214786738;
-        eps = 1e-6;
-        BasicStats_VectorGeometricMean_test(population, expected, eps);
-
-        nr::NumericSample<double> populationSample(population.begin(), population.end());
-        BasicStats_NumericSampleGeometricMean_test(populationSample, expected, eps);
-    }
-
-    {
-        std::vector<double> data1 = {1.0, 3.0, 9.0};
-        expected = 3.0;
-        eps = nr::Moduls::DEFAULT_EPS;
-
-        BasicStats_IteratorGeometricMean_test(data1.begin(), data1.end(), expected, eps); // geometric mean should be 3.0
-
-        expected = 42.0;
-        std::vector<double> data2 = {42};
-        BasicStats_IteratorGeometricMean_test(data2.begin(), data2.end(), expected, eps); // geometric mean should be 42.0
-    }
-
-    {
-        std::vector<double> data = {1.0, -2.0, 3.0};
-        BasicStats_ExceptionTrue_In_VectorGeometricMean_test(data);
-
-        nr::NumericSample<double> n(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_NumericGeometricMean_test(n);
-
-        std::vector<double> data3(data);
-        BasicStats_ExceptionTrue_In_IteratorGeometricMean_test(data3.begin(), data3.end());
-        std::vector<double> data4 = {0.0, 1.0, 2.0};
-    }
-    
-    {
-        std::vector<double> population{54, 63, 48, 29, 27, 32, 41};
-        nr::NumericSample<double> populationSample(population.begin(), population.end());
-        expected = 38.380368771744429; // calculated harmonic arithmetic_mean manually or using a calculator
-        eps = 1e-4; 
-
-        BasicStats_VectorHarmonicMean_test(population, expected, eps);
-        BasicStats_NumericSampleHarmonicMean_test(populationSample, expected, eps);
-    }
-
-    {
-        std::vector<double> population{54, 63, 48, 29, 27, 32, 41};
-
-        expected = 38.380368771744429; // calculated harmonic arithmetic_mean manually or using a calculator
-        eps = 1e-4; 
-        BasicStats_IteratorHarmonicMean_test(population.begin(), population.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> population{54, 63, 48, 29, 27, 32, -41};
-        BasicStats_ExceptionTrue_In_VectorHarmonicMean_test(population);
-        
-        nr::NumericSample<double> populationSample(population.begin(), population.end());
-        BasicStats_ExceptionTrue_In_NumericHarmonicMean_test(populationSample);
-        
-        std::vector<double> populationCopy(population);
-        BasicStats_ExceptionTrue_In_IteratorHarmonicMean_test(populationCopy.begin(), populationCopy.end());
-    }
-
-    {
-        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        expected = 29.0;
-        eps = nr::Moduls::DEFAULT_EPS;
-
-        BasicStats_VectorLowerQuartile_test(data, expected, eps);
-        BasicStats_NumericSampleLowerQuartile_test(dataSample, expected, eps);
-        BasicStats_IteratorLowerQuartile_test(data.begin(), data.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data{};
-        BasicStats_ExceptionTrue_In_VectorLowerQuartile_test(data);
-
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_NumericSampleLowerQuartile_test(dataSample);
-
-        std::vector<double> dataCopy(data);
-        BasicStats_ExceptionTrue_In_IteratorLowerQuartile_test(dataCopy.begin(), dataCopy.end());
-    }
-
-    {
-        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        eps = nr::Moduls::DEFAULT_EPS;
-        expected = 54.0;
-
-        BasicStats_VectorUpperQuartile_test(data, expected, eps);
-        BasicStats_NumericSampleUpperQuartile_test(dataSample, expected, eps);
-        BasicStats_IteratorUpperQuartile_test(data.begin(), data.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data{};
-        BasicStats_ExceptionTrue_In_VectorUpperQuartile_test(data);
-
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_NumericSampleUpperQuartile_test(dataSample);
-
-        std::vector<double> dataCopy(data);
-        BasicStats_ExceptionTrue_In_IteratorUpperQuartile_test(dataCopy.begin(), dataCopy.end());
-    }
-
-    {
-        std::vector<double> data1 = {1.0, 2.0, 3.0, 4.0};
-        nr::NumericSample<double> dataSample(data1.begin(), data1.end());
-        eps = 1e-9;
-        expected = 2.5;
-
-
-        BasicStats_VectorArithmeticMean_test(data1, expected, eps); // arithmetic mean should be 2.5
-        BasicStats_NumericSampleArithmeticMean_test(dataSample, expected, eps);
-        BasicStats_IteratorArithmeticMean_test(data1.begin(), data1.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data3;
-        nr::NumericSample<double> dataSample3(data3.begin(), data3.end());
-
-        BasicStats_ExceptionTrue_In_VectorArithmeticMean_test(data3);
-        BasicStats_ExceptionTrue_In_NumericArithmeticMean_test(dataSample3);
-        BasicStats_ExceptionTrue_In_IteratorArithmeticMean_test(data3.begin(), data3.end());
-    }
-
-    {
-        std::vector<double> data1 = {3.0, 1.0, 4.0, 2.0, 5.0};
-        nr::NumericSample<double> dataSample(data1.begin(), data1.end());
-        eps = 1e-9;
-        expected = 3.0;
-
-        BasicStats_VectorMedian_test(data1, expected, eps); // median should be 3.0
-        BasicStats_NumericSampleMedian_test(dataSample, expected, eps);
-        BasicStats_IteratorMedian_test(data1.begin(), data1.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data4;
-        nr::NumericSample<double> dataSample4(data4.begin(), data4.end());
-        BasicStats_ExceptionTrue_In_VectorMedian_test(data4);
-        BasicStats_ExceptionTrue_In_NumericSampleMedian_test(dataSample4);
-        BasicStats_ExceptionTrue_In_IteratorMedian_test(data4.begin(), data4.end());
-    }
-
-    {
-        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
-
-        // Sorted data:
-        // [27, 29, 32, 41, 48, 54, 63]
-        expected = 30.5;
-        double perc = 25;
-        eps = nr::Moduls::DEFAULT_EPS;
-        BasicStats_VectorPercentile_test(data, perc, expected, eps);
-        
-        perc = 50;
-        expected = 41.0;
-        BasicStats_VectorPercentile_test(data, perc, expected, eps);
-        
-        perc = 75;
-        expected = 51.0;
-        BasicStats_VectorPercentile_test(data, perc, expected, eps);
-    }
-
-    {
-        std::vector<double> data;
-        data.reserve(100);
-
-        for (int i = 100; i >= 1; --i)
-            data.push_back(i);
-
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        double p = 50;
-        expected = 50.5;
-        eps = nr::Moduls::DEFAULT_EPS;
-        BasicStats_NumericSamplePercentile_test(dataSample, p, expected, eps);
-
-        BasicStats_IteratorPercentile_test(data.begin(), data.end(), p, expected, eps);
-    }
-
-    {
-        std::vector<double> data;
-        BasicStats_ExceptionTrue_In_VectorPercentile_test(data);
-        
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_NumericSamplePercentile_test(dataSample);
-    
-        BasicStats_ExceptionTrue_In_IteratorPercentile_test(data.begin(), data.end());
-    }
-
-    {
-        std::vector<double> data{1, 2, 2, 3, 4};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        expected = 2;
-        BasicStats_VectorMode_test(data, expected);
-        BasicStats_NumericSampleMode_test(dataSample, expected);
-        BasicStats_IteratorMode_test(data.begin(), data.end(), expected);
-    }
-
-    {
-        std::vector<double> data{1, 2, 3, 4, 5};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_VectorModeHasValueFalse_test(data);
-        BasicStats_NumericSampleModeHasValueFalse_test(dataSample);
-        BasicStats_IteratorModeHasValueFalse_test(data.begin(), data.end());
-    }
-
-    {
-        std::vector<double> data{1, 2, 2, 3, 4};
-        std::vector<double> expected{2};
-        BasicStats_VectorModes_test(data, expected);
-    }
-
-    {
-        std::vector<double> data{1, 2, 3, 4, 5};
-        std::vector<double> expected;
-        BasicStats_VectorModes_test(data, expected);
-    }
-
-    {
-        std::vector<double> data{1, 1, 2, 2, 3};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        std::vector<double> expected{1,2};
-
-        BasicStats_VectorModes_test(data, expected);
-        BasicStats_NumericSampleModes_test(dataSample, expected);
-        BasicStats_IteratorModes_test(data.begin(), data.end(), expected);
-    }
-
-    {
-        std::vector<double> data{1, 1, 2, 2, 3, 3};
-        std::vector<double> expected{1,2,3};
-        BasicStats_VectorModes_test(data, expected);
-    }
-
-    {
-        std::vector<double> data{1, 2, 3, 4, 5};
-        expected = 4;
-        BasicStats_VectorScope_test(data, expected);
-    }
-
-    {
-        std::vector<double> data{10, 3, 7, 1, 9};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        expected = 9;
-        BasicStats_VectorScope_test(data, expected);
-        BasicStats_NumericSampleScope_test(dataSample, expected);
-        BasicStats_IteratorScope_test(data.begin(), data.end(), expected);
-    }
-
-    {
-        std::vector<double> data;
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_VectorScope_test(data);
-        BasicStats_ExceptionTrue_In_NumericSampleScope_test(dataSample);
-        BasicStats_ExceptionTrue_In_IteratorScope_test(data.begin(), data.end());
-    }
-
-    {
-        std::vector<double> data = {9, 1, 8, 2, 7, 3, 6, 4, 5};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        expected = 5.0;
-        eps = nr::Moduls::DEFAULT_EPS;
-        BasicStats_VectorInterquartileRange_test(data, expected, eps);
-        BasicStats_NumericSampleInterquartileRange_test(dataSample, expected, eps);
-        BasicStats_IteratorInterquartileRange_test(data.begin(), data.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data;
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_VectorInterquartileRange_test(data);
-        BasicStats_ExceptionTrue_In_NumericSampleInterquartileRange_test(dataSample);
-        BasicStats_ExceptionTrue_In_IteratorInterquartileRange_test(data.begin(), data.end());
-    }
-
-    {
-        // Test 1: Simple Dataset
-        // Data: {2, 2, 3, 4, 14}, Mean = 5
-        // Deviations: |2-5|=3, |2-5|=3, |3-5|=2, |4-5|=1, |14-5|=9
-        // Sum of deviations: 18. MAD = 18 / 5 = 3.6
-        std::vector<double> data = {2, 2, 3, 4, 14};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        expected = 3.6;
-        eps = nr::Moduls::DEFAULT_EPSILON;
-        BasicStats_VectorMeanAbsoluteDeviation_test(data, expected, eps);
-        BasicStats_NumericSampleMeanAbsoluteDeviation_test(dataSample, expected, eps);
-        BasicStats_IteratorMeanAbsoluteDeviation_test(data.begin(), data.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data;
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_VectorMeanAbsoluteDeviation_test(data);
-        BasicStats_ExceptionTrue_In_NumericSampleMeanAbsoluteDeviation_test(dataSample);
-        BasicStats_ExceptionTrue_In_IteratorMeanAbsoluteDeviation_test(data.begin(), data.end());
-    }
-
-    {
-        // Tests for nr::dispersion (population variance)
-        std::vector<double> data = {1.0, 2.0, 3.0, 4.0, 5.0};
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        // mean = 3, variance = 2.0
-        expected = 2.0;
-        eps = nr::Moduls::DEFAULT_EPSILON;
-        BasicStats_VectorDispersion_test(data, expected, eps);
-        BasicStats_NumericSampleDispersion_test(dataSample, expected, eps);
-        BasicStats_IteratorDispersion_test(data.begin(), data.end(), expected, eps);
-
-        std::vector<double> data4 = {100.0, 107.0, 110.0, 113.0, 117.0, 121.0, 126.0, 129.0, 135.0, 138.0, 144.0, 148.0};
-        // mean = 124.0, variance = 213.5
-        expected = 213.5;
-        eps = 1.0;
-        nr::NumericSample<double> dataSample1(data4.begin(), data4.end());
-        BasicStats_VectorDispersion_test(data4, expected, eps);
-        BasicStats_NumericSampleDispersion_test(dataSample1, expected, eps);
-        BasicStats_IteratorDispersion_test(data4.begin(), data4.end(), expected, eps);
-    }
-
-    {
-        std::vector<double> data;
-        nr::NumericSample<double> dataSample(data.begin(), data.end());
-        BasicStats_ExceptionTrue_In_VectorDispersion_test(data);
-        BasicStats_ExceptionTrue_In_NumericSampleDispersion_test(dataSample);
-        BasicStats_ExceptionTrue_In_IteratorDispersion_test(data.begin(), data.end());
-    }
-
-    {
-        // Tests for nr::standard_deviation (population standard deviation)
-        std::vector<double> s1 = {1.0, 2.0, 3.0, 4.0, 5.0};
-        nr::NumericSample<double> dataSample(s1.begin(), s1.end());
-        expected = std::sqrt(2.0); // variance = 2.0 -> stddev = sqrt(2)
-        eps = nr::Moduls::DEFAULT_EPSILON;
-        BasicStats_VectorStandardDeviation_test(s1, expected, eps);
-        BasicStats_NumericSampleStandardDeviation_test(dataSample, expected, eps);
-        BasicStats_IteratorStandardDeviation_test(s1.begin(), s1.end(), expected, eps);
-
-        // Tests for nr::standard_deviation (population standard deviation)
-        std::vector<double> s4 = {1.0, 2.0, 3.0, 4.0, 5.0, 13.0, 24.0, 10.0, 71.0};
-        expected = std::sqrt(441.73);
-        eps = nr::Moduls::DEFAULT_EPSILON;
-        BasicStats_VectorStandardDeviation_test(s4, expected, eps);
-        BasicStats_IteratorStandardDeviation_test(s4.begin(), s4.end(), expected, eps);
-
-        // empty data should throw
-        std::vector<double> empty_sd;
-        nr::NumericSample<double> emptyDataSample(empty_sd.begin(), empty_sd.end());
-        BasicStats_ExceptionTrue_In_VectorStandardDeviation_test(empty_sd);
-        BasicStats_ExceptionTrue_In_NumericSampleStandardDeviation_test(emptyDataSample);
-        BasicStats_ExceptionTrue_In_IteratorStandardDeviation_test(empty_sd.begin(), empty_sd.end());
-    }
-
-    std::cout << "All basic statistics tests passed!" << std::endl;
-
 }
 
 void BasicStats_Min_test(const nr::NumericSample<double>& ns, double expected)
@@ -433,6 +67,7 @@ void BasicStats_Min_test(const nr::NumericSample<double>& ns, double expected)
 
 void BasicStats_ExceptionTrue_In_Min_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.min();
@@ -443,6 +78,17 @@ void BasicStats_ExceptionTrue_In_Min_test(const nr::NumericSample<double>& ns)
     std::cout << "Test passed: min() threw exception for empty sample\n";
 }
 
+void BasicStats_Max_tests()
+{
+     {
+        nr::NumericSample<double> vc({1, 2, 3, 4});
+        double expected = 4;
+        BasicStats_Max_test(vc, expected); // should be 4
+        nr::NumericSample<double> emptySample;
+        BasicStats_ExceptionTrue_In_Max_test(emptySample);
+    }
+}
+
 void BasicStats_Max_test(const nr::NumericSample<double>& ns, double expected)
 {
     assert(ns.max() == expected);
@@ -451,6 +97,7 @@ void BasicStats_Max_test(const nr::NumericSample<double>& ns, double expected)
 
 void BasicStats_ExceptionTrue_In_Max_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.max();
@@ -482,7 +129,50 @@ void BasicStats_IteratorWithNoWeightedEndWeightedMean_test(std::vector<double>::
     std::cout << "Test passed: weighted mean is " << result << "\n";
 }
 
-void BasicStats_VectorWeightedMean_test(const std::vector<double>& vec, const std::vector<double>& weights, double expected)
+void BasicStats_WeightedMean_tests()
+{
+    {
+        std::vector<double> v{1.0, 2.0, 3.0};
+        std::vector<double> w{1.0, 1.0, 1.0};
+        double eps = 2.0;
+        BasicStats_VectorWeightedMean_test(v, w, eps);
+    }
+
+    {
+        std::vector<double> v{42.0};
+        std::vector<double> w{10.0};
+        double eps = 42.0;
+        BasicStats_VectorWeightedMean_test(v, w, eps);
+    }
+
+    {
+        std::vector<double> v{15, 10, 5, 90};
+        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
+        double eps = 51.0;
+        BasicStats_VectorWeightedMean_test(v, w, eps);
+        BasicStats_IteratorWeightedMean_test(v.begin(), v.end(), w.begin(), w.end(), eps);
+        
+    }
+
+    {
+        nr::NumericSample<double> v({15, 10, 5, 90});
+        std::vector <double> w{0.25, 0.20, 0.05, 0.50};
+        double eps = 51.0;
+        BasicStats_NumericSampleWeightedMean_test(v, w, eps);
+    }
+
+    {
+        nr::NumericSample<double> v({15, 10, 5, 90});
+        std::vector<double> v1({15, 10, 5, 90});
+        std::vector <double> w{0.25, 0.20, 0.05};
+        double eps = 51.0;
+        BasicStats_ExceptionTrue_In_VectorWeightedMean_test(v1, w);
+        BasicStats_ExceptionTrue_In_NumericSampleWeightedMean_test(v, w);
+        BasicStats_ExceptionTrue_In_IteratorWeightedMean_test(v1.begin(), v1.end(), w.begin(), w.end());
+    }
+}
+
+void BasicStats_VectorWeightedMean_test(const std::vector<double> &vec, const std::vector<double> &weights, double expected)
 {
     auto result = nr::weighted_mean(vec, weights);
     assert(nr::Moduls::almostEqual(result, expected, nr::Moduls::DEFAULT_EPS));
@@ -491,6 +181,7 @@ void BasicStats_VectorWeightedMean_test(const std::vector<double>& vec, const st
 
 void BasicStats_ExceptionTrue_In_VectorWeightedMean_test(const std::vector<double>& vec, const std::vector<double>& weights)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::weighted_mean(vec, weights);
@@ -502,6 +193,7 @@ void BasicStats_ExceptionTrue_In_VectorWeightedMean_test(const std::vector<doubl
 
 void BasicStats_ExceptionTrue_In_NumericSampleWeightedMean_test(const nr::NumericSample<double>& ns, const std::vector<double>& weights)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.weighted_mean(weights);
@@ -513,6 +205,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleWeightedMean_test(const nr::Numeri
 
 void BasicStats_ExceptionTrue_In_IteratorWeightedMean_test(std::vector<double>::iterator beginData, std::vector<double>::iterator endData, std::vector<double>::iterator beginWeights, std::vector<double>::iterator endWeights)
 {
+    // beginData must be == endData
     bool exception_thrown = false;
     try {
         nr::weighted_mean(beginData, endData, beginWeights, endWeights);
@@ -529,7 +222,46 @@ void BasicStats_NumericSampleGeometricMean_test(const nr::NumericSample<double>&
     std::cout << "Test passed: geometric mean is " << result << "\n";
 }
 
-void BasicStats_VectorGeometricMean_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_GeometricMean_tests()
+{
+    {
+        std::vector<double> population{
+            54, 63, 48, 29, 27, 32, 41
+        };
+        double expected = 40.135109214786738;
+        double eps = 1e-6;
+        BasicStats_VectorGeometricMean_test(population, expected, eps);
+
+        nr::NumericSample<double> populationSample(population.begin(), population.end());
+        BasicStats_NumericSampleGeometricMean_test(populationSample, expected, eps);
+    }
+
+    {
+        std::vector<double> data1 = {1.0, 3.0, 9.0};
+        double expected = 3.0;
+        double eps = nr::Moduls::DEFAULT_EPS;
+
+        BasicStats_IteratorGeometricMean_test(data1.begin(), data1.end(), expected, eps); // geometric mean should be 3.0
+
+        expected = 42.0;
+        std::vector<double> data2 = {42};
+        BasicStats_IteratorGeometricMean_test(data2.begin(), data2.end(), expected, eps); // geometric mean should be 42.0
+    }
+
+    {
+        std::vector<double> data = {1.0, -2.0, 3.0};
+        BasicStats_ExceptionTrue_In_VectorGeometricMean_test(data);
+
+        nr::NumericSample<double> n(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_NumericGeometricMean_test(n);
+
+        std::vector<double> data3(data);
+        BasicStats_ExceptionTrue_In_IteratorGeometricMean_test(data3.begin(), data3.end());
+        std::vector<double> data4 = {0.0, 1.0, 2.0};
+    }
+}
+
+void BasicStats_VectorGeometricMean_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::geometric_mean(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -545,6 +277,7 @@ void BasicStats_IteratorGeometricMean_test(std::vector<double>::iterator begin, 
 
 void BasicStats_ExceptionTrue_In_IteratorGeometricMean_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin must be == end
     bool exception_thrown = false;
     try {
         nr::geometric_mean(begin, end);
@@ -557,6 +290,7 @@ void BasicStats_ExceptionTrue_In_IteratorGeometricMean_test(std::vector<double>:
 
 void BasicStats_ExceptionTrue_In_NumericGeometricMean_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         nr::geometric_mean(ns);
@@ -569,6 +303,7 @@ void BasicStats_ExceptionTrue_In_NumericGeometricMean_test(const nr::NumericSamp
 
 void BasicStats_ExceptionTrue_In_VectorGeometricMean_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::geometric_mean(vec);
@@ -586,7 +321,39 @@ void BasicStats_NumericSampleHarmonicMean_test(const nr::NumericSample<double>& 
     std::cout << "Test passed: harmonic mean is " << result << "\n";
 }
 
-void BasicStats_VectorHarmonicMean_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_HarmonicMean_tests()
+{
+    {
+        std::vector<double> population{54, 63, 48, 29, 27, 32, 41};
+        nr::NumericSample<double> populationSample(population.begin(), population.end());
+        double expected = 38.380368771744429; // calculated harmonic arithmetic_mean manually or using a calculator
+        double eps = 1e-4; 
+
+        BasicStats_VectorHarmonicMean_test(population, expected, eps);
+        BasicStats_NumericSampleHarmonicMean_test(populationSample, expected, eps);
+    }
+
+    {
+        std::vector<double> population{54, 63, 48, 29, 27, 32, 41};
+
+        double expected = 38.380368771744429; // calculated harmonic arithmetic_mean manually or using a calculator
+        double eps = 1e-4; 
+        BasicStats_IteratorHarmonicMean_test(population.begin(), population.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> population{54, 63, 48, 29, 27, 32, -41};
+        BasicStats_ExceptionTrue_In_VectorHarmonicMean_test(population);
+        
+        nr::NumericSample<double> populationSample(population.begin(), population.end());
+        BasicStats_ExceptionTrue_In_NumericHarmonicMean_test(populationSample);
+        
+        std::vector<double> populationCopy(population);
+        BasicStats_ExceptionTrue_In_IteratorHarmonicMean_test(populationCopy.begin(), populationCopy.end());
+    }
+}
+
+void BasicStats_VectorHarmonicMean_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::harmonic_mean(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -602,6 +369,7 @@ void BasicStats_IteratorHarmonicMean_test(std::vector<double>::iterator begin, s
 
 void BasicStats_ExceptionTrue_In_NumericHarmonicMean_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.harmonic_mean();
@@ -613,7 +381,8 @@ void BasicStats_ExceptionTrue_In_NumericHarmonicMean_test(const nr::NumericSampl
 }
 
 void BasicStats_ExceptionTrue_In_IteratorHarmonicMean_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
-{
+{   
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::harmonic_mean(begin, end);
@@ -626,6 +395,7 @@ void BasicStats_ExceptionTrue_In_IteratorHarmonicMean_test(std::vector<double>::
 
 void BasicStats_ExceptionTrue_In_VectorHarmonicMean_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::harmonic_mean(vec);
@@ -636,7 +406,32 @@ void BasicStats_ExceptionTrue_In_VectorHarmonicMean_test(const std::vector<doubl
     std::cout << "Test passed: harmonic mean threw exception for invalid input\n";
 }
 
-void BasicStats_VectorLowerQuartile_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_LowerQuartile_tests()
+{
+    {
+        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double expected = 29.0;
+        double eps = nr::Moduls::DEFAULT_EPS;
+
+        BasicStats_VectorLowerQuartile_test(data, expected, eps);
+        BasicStats_NumericSampleLowerQuartile_test(dataSample, expected, eps);
+        BasicStats_IteratorLowerQuartile_test(data.begin(), data.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data{};
+        BasicStats_ExceptionTrue_In_VectorLowerQuartile_test(data);
+
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_NumericSampleLowerQuartile_test(dataSample);
+
+        std::vector<double> dataCopy(data);
+        BasicStats_ExceptionTrue_In_IteratorLowerQuartile_test(dataCopy.begin(), dataCopy.end());
+    }
+}
+
+void BasicStats_VectorLowerQuartile_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::lower_quartile(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -659,6 +454,7 @@ void BasicStats_IteratorLowerQuartile_test(std::vector<double>::iterator begin, 
 
 void BasicStats_ExceptionTrue_In_VectorLowerQuartile_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::lower_quartile(vec);
@@ -671,6 +467,7 @@ void BasicStats_ExceptionTrue_In_VectorLowerQuartile_test(const std::vector<doub
 
 void BasicStats_ExceptionTrue_In_NumericSampleLowerQuartile_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.lower_quartile();
@@ -683,6 +480,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleLowerQuartile_test(const nr::Numer
 
 void BasicStats_ExceptionTrue_In_IteratorLowerQuartile_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // vegin == end must be empty
     bool exception_thrown = false;
     try {
         nr::lower_quartile(begin, end);
@@ -693,7 +491,32 @@ void BasicStats_ExceptionTrue_In_IteratorLowerQuartile_test(std::vector<double>:
     std::cout << "Test passed: lower quartile threw exception for empty input\n";
 }
 
-void BasicStats_VectorUpperQuartile_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_UpperQuartile_tests()
+{
+    {
+        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double eps = nr::Moduls::DEFAULT_EPS;
+        double expected = 54.0;
+
+        BasicStats_VectorUpperQuartile_test(data, expected, eps);
+        BasicStats_NumericSampleUpperQuartile_test(dataSample, expected, eps);
+        BasicStats_IteratorUpperQuartile_test(data.begin(), data.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data{};
+        BasicStats_ExceptionTrue_In_VectorUpperQuartile_test(data);
+
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_NumericSampleUpperQuartile_test(dataSample);
+
+        std::vector<double> dataCopy(data);
+        BasicStats_ExceptionTrue_In_IteratorUpperQuartile_test(dataCopy.begin(), dataCopy.end());
+    }
+}
+
+void BasicStats_VectorUpperQuartile_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::upper_quartile(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -716,6 +539,7 @@ void BasicStats_IteratorUpperQuartile_test(std::vector<double>::iterator begin, 
 
 void BasicStats_ExceptionTrue_In_VectorUpperQuartile_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::upper_quartile(vec);
@@ -728,6 +552,7 @@ void BasicStats_ExceptionTrue_In_VectorUpperQuartile_test(const std::vector<doub
 
 void BasicStats_ExceptionTrue_In_IteratorUpperQuartile_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::upper_quartile(begin, end);
@@ -745,7 +570,31 @@ void BasicStats_NumericSampleArithmeticMean_test(const nr::NumericSample<double>
     std::cout << "Test passed: arithmetic mean is " << result << "\n";
 }
 
-void BasicStats_VectorArithmeticMean_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_ArithmeticMean_tests()
+{
+    {
+        std::vector<double> data1 = {1.0, 2.0, 3.0, 4.0};
+        nr::NumericSample<double> dataSample(data1.begin(), data1.end());
+        double eps = 1e-9;
+        double expected = 2.5;
+
+
+        BasicStats_VectorArithmeticMean_test(data1, expected, eps); // arithmetic mean should be 2.5
+        BasicStats_NumericSampleArithmeticMean_test(dataSample, expected, eps);
+        BasicStats_IteratorArithmeticMean_test(data1.begin(), data1.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data3;
+        nr::NumericSample<double> dataSample3(data3.begin(), data3.end());
+
+        BasicStats_ExceptionTrue_In_VectorArithmeticMean_test(data3);
+        BasicStats_ExceptionTrue_In_NumericArithmeticMean_test(dataSample3);
+        BasicStats_ExceptionTrue_In_IteratorArithmeticMean_test(data3.begin(), data3.end());
+    }
+}
+
+void BasicStats_VectorArithmeticMean_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::arithmetic_mean(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -771,7 +620,29 @@ void BasicStats_ExceptionTrue_In_IteratorArithmeticMean_test(std::vector<double>
     std::cout << "Test passed: arithmetic mean threw exception for empty input\n";
 }
 
-void BasicStats_VectorMedian_test(const std::vector<double>& vec, double expected, double eps)
+void BasicStats_Median_tests()
+{
+    {
+        std::vector<double> data1 = {3.0, 1.0, 4.0, 2.0, 5.0};
+        nr::NumericSample<double> dataSample(data1.begin(), data1.end());
+        double eps = 1e-9;
+        double expected = 3.0;
+
+        BasicStats_VectorMedian_test(data1, expected, eps); // median should be 3.0
+        BasicStats_NumericSampleMedian_test(dataSample, expected, eps);
+        BasicStats_IteratorMedian_test(data1.begin(), data1.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data4;
+        nr::NumericSample<double> dataSample4(data4.begin(), data4.end());
+        BasicStats_ExceptionTrue_In_VectorMedian_test(data4);
+        BasicStats_ExceptionTrue_In_NumericSampleMedian_test(dataSample4);
+        BasicStats_ExceptionTrue_In_IteratorMedian_test(data4.begin(), data4.end());
+    }
+}
+
+void BasicStats_VectorMedian_test(const std::vector<double> &vec, double expected, double eps)
 {
     auto result = nr::median(vec);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -794,6 +665,7 @@ void BasicStats_IteratorMedian_test(std::vector<double>::iterator begin, std::ve
 
 void BasicStats_ExceptionTrue_In_VectorMedian_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::median(vec);
@@ -806,6 +678,7 @@ void BasicStats_ExceptionTrue_In_VectorMedian_test(const std::vector<double>& ve
 
 void BasicStats_ExceptionTrue_In_IteratorMedian_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::median(begin, end);
@@ -816,7 +689,55 @@ void BasicStats_ExceptionTrue_In_IteratorMedian_test(std::vector<double>::iterat
     std::cout << "Test passed: median threw exception for empty input\n";
 }
 
-void BasicStats_VectorPercentile_test(const std::vector<double>& vec, double p, double expected, double eps)
+void BasicStats_Percentile_tests()
+{
+    {
+        std::vector<double> data{54, 63, 48, 29, 27, 32, 41};
+
+        // Sorted data:
+        // [27, 29, 32, 41, 48, 54, 63]
+        double expected = 30.5;
+        double perc = 25;
+        double eps = nr::Moduls::DEFAULT_EPS;
+        BasicStats_VectorPercentile_test(data, perc, expected, eps);
+        
+        perc = 50;
+        expected = 41.0;
+        BasicStats_VectorPercentile_test(data, perc, expected, eps);
+        
+        perc = 75;
+        expected = 51.0;
+        BasicStats_VectorPercentile_test(data, perc, expected, eps);
+    }
+
+    {
+        std::vector<double> data;
+        data.reserve(100);
+
+        for (int i = 100; i >= 1; --i)
+            data.push_back(i);
+
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double p = 50;
+        double expected = 50.5;
+        double eps = nr::Moduls::DEFAULT_EPS;
+        BasicStats_NumericSamplePercentile_test(dataSample, p, expected, eps);
+
+        BasicStats_IteratorPercentile_test(data.begin(), data.end(), p, expected, eps);
+    }
+
+    {
+        std::vector<double> data;
+        BasicStats_ExceptionTrue_In_VectorPercentile_test(data);
+        
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_NumericSamplePercentile_test(dataSample);
+    
+        BasicStats_ExceptionTrue_In_IteratorPercentile_test(data.begin(), data.end());
+    }
+}
+
+void BasicStats_VectorPercentile_test(const std::vector<double> &vec, double p, double expected, double eps)
 {
     auto result = nr::percentile(vec, p);
     assert(nr::Moduls::almostEqual(result, expected, eps));
@@ -839,6 +760,7 @@ void BasicStats_IteratorPercentile_test(std::vector<double>::iterator begin, std
 
 void BasicStats_ExceptionTrue_In_VectorPercentile_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::percentile(vec, 25);
@@ -851,6 +773,7 @@ void BasicStats_ExceptionTrue_In_VectorPercentile_test(const std::vector<double>
 
 void BasicStats_ExceptionTrue_In_NumericSamplePercentile_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.percentile(25);
@@ -863,6 +786,7 @@ void BasicStats_ExceptionTrue_In_NumericSamplePercentile_test(const nr::NumericS
 
 void BasicStats_ExceptionTrue_In_IteratorPercentile_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::percentile(begin, end, 25);
@@ -873,7 +797,27 @@ void BasicStats_ExceptionTrue_In_IteratorPercentile_test(std::vector<double>::it
     std::cout << "Test passed: percentile threw exception for empty input\n";
 }
 
-void BasicStats_VectorMode_test(const std::vector<double>& ns, double expected)
+void BasicStats_Mode_tests()
+{
+    {
+        std::vector<double> data{1, 2, 2, 3, 4};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double expected = 2;
+        BasicStats_VectorMode_test(data, expected);
+        BasicStats_NumericSampleMode_test(dataSample, expected);
+        BasicStats_IteratorMode_test(data.begin(), data.end(), expected);
+    }
+
+    {
+        std::vector<double> data{1, 2, 3, 4, 5};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_VectorModeHasValueFalse_test(data);
+        BasicStats_NumericSampleModeHasValueFalse_test(dataSample);
+        BasicStats_IteratorModeHasValueFalse_test(data.begin(), data.end());
+    }
+}
+
+void BasicStats_VectorMode_test(const std::vector<double> &ns, double expected)
 {
     auto result = *nr::mode(ns);
     assert(result == expected);
@@ -915,7 +859,38 @@ void BasicStats_IteratorModeHasValueFalse_test(std::vector<double>::iterator beg
     std::cout << "Test passed: mode is empty" << "\n";
 }
 
-void BasicStats_VectorModes_test(const std::vector<double>& vec, const std::vector<double>& expected)
+void BasicStats_Modes_tests()
+{
+    {
+        std::vector<double> data{1, 2, 2, 3, 4};
+        std::vector<double> expected{2};
+        BasicStats_VectorModes_test(data, expected);
+    }
+
+    {
+        std::vector<double> data{1, 2, 3, 4, 5};
+        std::vector<double> expected;
+        BasicStats_VectorModes_test(data, expected);
+    }
+
+    {
+        std::vector<double> data{1, 1, 2, 2, 3};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        std::vector<double> expected{1,2};
+
+        BasicStats_VectorModes_test(data, expected);
+        BasicStats_NumericSampleModes_test(dataSample, expected);
+        BasicStats_IteratorModes_test(data.begin(), data.end(), expected);
+    }
+
+    {
+        std::vector<double> data{1, 1, 2, 2, 3, 3};
+        std::vector<double> expected{1,2,3};
+        BasicStats_VectorModes_test(data, expected);
+    }
+}
+
+void BasicStats_VectorModes_test(const std::vector<double> &vec, const std::vector<double> &expected)
 {
     auto result = nr::modes(vec);
     for(size_t i = 0; i < result.size(); ++i)
@@ -945,7 +920,33 @@ void BasicStats_IteratorModes_test(std::vector<double>::iterator begin, std::vec
     std::cout << "Test passed: modes" << "\n";
 }
 
-void BasicStats_VectorScope_test(const std::vector<double>& vec, double expected)
+void BasicStats_Scope_tests()
+{
+    {
+        std::vector<double> data{1, 2, 3, 4, 5};
+        double expected = 4;
+        BasicStats_VectorScope_test(data, expected);
+    }
+
+    {
+        std::vector<double> data{10, 3, 7, 1, 9};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double expected = 9;
+        BasicStats_VectorScope_test(data, expected);
+        BasicStats_NumericSampleScope_test(dataSample, expected);
+        BasicStats_IteratorScope_test(data.begin(), data.end(), expected);
+    }
+
+    {
+        std::vector<double> data;
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_VectorScope_test(data);
+        BasicStats_ExceptionTrue_In_NumericSampleScope_test(dataSample);
+        BasicStats_ExceptionTrue_In_IteratorScope_test(data.begin(), data.end());
+    }
+}
+
+void BasicStats_VectorScope_test(const std::vector<double> &vec, double expected)
 {
     auto result = nr::Scope(vec);
     assert(result == expected);
@@ -968,6 +969,7 @@ void BasicStats_IteratorScope_test(std::vector<double>::iterator begin, std::vec
 
 void BasicStats_ExceptionTrue_In_VectorScope_test(const std::vector<double>& vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::Scope(vec);
@@ -980,6 +982,7 @@ void BasicStats_ExceptionTrue_In_VectorScope_test(const std::vector<double>& vec
 
 void BasicStats_ExceptionTrue_In_NumericSampleScope_test(const nr::NumericSample<double>& ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.Scope();
@@ -992,6 +995,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleScope_test(const nr::NumericSample
 
 void BasicStats_ExceptionTrue_In_IteratorScope_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::Scope(begin, end);
@@ -1000,6 +1004,27 @@ void BasicStats_ExceptionTrue_In_IteratorScope_test(std::vector<double>::iterato
     }
     assert(exception_thrown);
     std::cout << "Test passed: Scope threw exception for empty input\n";
+}
+
+void BasicStats_InterquartileRange_tests()
+{
+    {
+        std::vector<double> data = {9, 1, 8, 2, 7, 3, 6, 4, 5};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double expected = 5.0;
+        double eps = nr::Moduls::DEFAULT_EPS;
+        BasicStats_VectorInterquartileRange_test(data, expected, eps);
+        BasicStats_NumericSampleInterquartileRange_test(dataSample, expected, eps);
+        BasicStats_IteratorInterquartileRange_test(data.begin(), data.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data;
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_VectorInterquartileRange_test(data);
+        BasicStats_ExceptionTrue_In_NumericSampleInterquartileRange_test(dataSample);
+        BasicStats_ExceptionTrue_In_IteratorInterquartileRange_test(data.begin(), data.end());
+    }
 }
 
 void BasicStats_VectorInterquartileRange_test(const std::vector<double> &vec, double expected, double eps)
@@ -1025,6 +1050,7 @@ void BasicStats_IteratorInterquartileRange_test(std::vector<double>::iterator be
 
 void BasicStats_ExceptionTrue_In_VectorInterquartileRange_test(const std::vector<double> &vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::interquartile_range(vec);
@@ -1037,6 +1063,7 @@ void BasicStats_ExceptionTrue_In_VectorInterquartileRange_test(const std::vector
 
 void BasicStats_ExceptionTrue_In_NumericSampleInterquartileRange_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.interquartile_range();
@@ -1049,6 +1076,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleInterquartileRange_test(const nr::
 
 void BasicStats_ExceptionTrue_In_IteratorInterquartileRange_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::interquartile_range(begin, end);
@@ -1057,6 +1085,31 @@ void BasicStats_ExceptionTrue_In_IteratorInterquartileRange_test(std::vector<dou
     }
     assert(exception_thrown);
     std::cout << "Test passed: Interquartile Range threw exception for empty input\n";
+}
+
+void BasicStats_MeanAbsoluteDeviation_tests()
+{
+    {
+        // Test 1: Simple Dataset
+        // Data: {2, 2, 3, 4, 14}, Mean = 5
+        // Deviations: |2-5|=3, |2-5|=3, |3-5|=2, |4-5|=1, |14-5|=9
+        // Sum of deviations: 18. MAD = 18 / 5 = 3.6
+        std::vector<double> data = {2, 2, 3, 4, 14};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        double expected = 3.6;
+        double eps = nr::Moduls::DEFAULT_EPSILON;
+        BasicStats_VectorMeanAbsoluteDeviation_test(data, expected, eps);
+        BasicStats_NumericSampleMeanAbsoluteDeviation_test(dataSample, expected, eps);
+        BasicStats_IteratorMeanAbsoluteDeviation_test(data.begin(), data.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data;
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_VectorMeanAbsoluteDeviation_test(data);
+        BasicStats_ExceptionTrue_In_NumericSampleMeanAbsoluteDeviation_test(dataSample);
+        BasicStats_ExceptionTrue_In_IteratorMeanAbsoluteDeviation_test(data.begin(), data.end());
+    }
 }
 
 void BasicStats_VectorMeanAbsoluteDeviation_test(const std::vector<double> &vec, double expected, double eps)
@@ -1082,6 +1135,7 @@ void BasicStats_IteratorMeanAbsoluteDeviation_test(std::vector<double>::iterator
 
 void BasicStats_ExceptionTrue_In_VectorMeanAbsoluteDeviation_test(const std::vector<double> &vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::mean_absolute_deviation(vec);
@@ -1094,6 +1148,7 @@ void BasicStats_ExceptionTrue_In_VectorMeanAbsoluteDeviation_test(const std::vec
 
 void BasicStats_ExceptionTrue_In_NumericSampleMeanAbsoluteDeviation_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.mean_absolute_deviation();
@@ -1106,6 +1161,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleMeanAbsoluteDeviation_test(const n
 
 void BasicStats_ExceptionTrue_In_IteratorMeanAbsoluteDeviation_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin==end must be empty
     bool exception_thrown = false;
     try {
         nr::mean_absolute_deviation(begin, end);
@@ -1114,6 +1170,38 @@ void BasicStats_ExceptionTrue_In_IteratorMeanAbsoluteDeviation_test(std::vector<
     }
     assert(exception_thrown);
     std::cout << "Test passed: Mean Absolute Deviation threw exception for empty input\n";
+}
+
+void BasicStats_Dispersion_tests()
+{
+    {
+        // Tests for nr::dispersion (population variance)
+        std::vector<double> data = {1.0, 2.0, 3.0, 4.0, 5.0};
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        // mean = 3, variance = 2.0
+        double expected = 2.0;
+        double eps = nr::Moduls::DEFAULT_EPSILON;
+        BasicStats_VectorDispersion_test(data, expected, eps);
+        BasicStats_NumericSampleDispersion_test(dataSample, expected, eps);
+        BasicStats_IteratorDispersion_test(data.begin(), data.end(), expected, eps);
+
+        std::vector<double> data4 = {100.0, 107.0, 110.0, 113.0, 117.0, 121.0, 126.0, 129.0, 135.0, 138.0, 144.0, 148.0};
+        // mean = 124.0, variance = 213.5
+        expected = 213.5;
+        eps = 1.0;
+        nr::NumericSample<double> dataSample1(data4.begin(), data4.end());
+        BasicStats_VectorDispersion_test(data4, expected, eps);
+        BasicStats_NumericSampleDispersion_test(dataSample1, expected, eps);
+        BasicStats_IteratorDispersion_test(data4.begin(), data4.end(), expected, eps);
+    }
+
+    {
+        std::vector<double> data;
+        nr::NumericSample<double> dataSample(data.begin(), data.end());
+        BasicStats_ExceptionTrue_In_VectorDispersion_test(data);
+        BasicStats_ExceptionTrue_In_NumericSampleDispersion_test(dataSample);
+        BasicStats_ExceptionTrue_In_IteratorDispersion_test(data.begin(), data.end());
+    }
 }
 
 void BasicStats_VectorDispersion_test(const std::vector<double> &vec, double expected, double eps)
@@ -1139,6 +1227,7 @@ void BasicStats_IteratorDispersion_test(std::vector<double>::iterator begin, std
 
 void BasicStats_ExceptionTrue_In_VectorDispersion_test(const std::vector<double> &vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::dispersion(vec);
@@ -1151,6 +1240,7 @@ void BasicStats_ExceptionTrue_In_VectorDispersion_test(const std::vector<double>
 
 void BasicStats_ExceptionTrue_In_NumericSampleDispersion_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.dispersion();
@@ -1163,6 +1253,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleDispersion_test(const nr::NumericS
 
 void BasicStats_ExceptionTrue_In_IteratorDispersion_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::dispersion(begin, end);
@@ -1171,6 +1262,34 @@ void BasicStats_ExceptionTrue_In_IteratorDispersion_test(std::vector<double>::it
     }
     assert(exception_thrown);
     std::cout << "Test passed: Dispersion threw exception for empty input\n";    
+}
+
+void BasicStats_StandardDeviation_tests()
+{
+    {
+        // Tests for nr::standard_deviation (population standard deviation)
+        std::vector<double> s1 = {1.0, 2.0, 3.0, 4.0, 5.0};
+        nr::NumericSample<double> dataSample(s1.begin(), s1.end());
+        double expected = std::sqrt(2.0); // variance = 2.0 -> stddev = sqrt(2)
+        double eps = nr::Moduls::DEFAULT_EPSILON;
+        BasicStats_VectorStandardDeviation_test(s1, expected, eps);
+        BasicStats_NumericSampleStandardDeviation_test(dataSample, expected, eps);
+        BasicStats_IteratorStandardDeviation_test(s1.begin(), s1.end(), expected, eps);
+
+        // Tests for nr::standard_deviation (population standard deviation)
+        std::vector<double> s4 = {1.0, 2.0, 3.0, 4.0, 5.0, 13.0, 24.0, 10.0, 71.0};
+        expected = std::sqrt(441.73);
+        eps = nr::Moduls::DEFAULT_EPSILON;
+        BasicStats_VectorStandardDeviation_test(s4, expected, eps);
+        BasicStats_IteratorStandardDeviation_test(s4.begin(), s4.end(), expected, eps);
+
+        // empty data should throw
+        std::vector<double> empty_sd;
+        nr::NumericSample<double> emptyDataSample(empty_sd.begin(), empty_sd.end());
+        BasicStats_ExceptionTrue_In_VectorStandardDeviation_test(empty_sd);
+        BasicStats_ExceptionTrue_In_NumericSampleStandardDeviation_test(emptyDataSample);
+        BasicStats_ExceptionTrue_In_IteratorStandardDeviation_test(empty_sd.begin(), empty_sd.end());
+    }
 }
 
 void BasicStats_VectorStandardDeviation_test(const std::vector<double> &vec, double expected, double eps)
@@ -1196,6 +1315,7 @@ void BasicStats_IteratorStandardDeviation_test(std::vector<double>::iterator beg
 
 void BasicStats_ExceptionTrue_In_VectorStandardDeviation_test(const std::vector<double> &vec)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::standard_deviation(vec);
@@ -1208,6 +1328,7 @@ void BasicStats_ExceptionTrue_In_VectorStandardDeviation_test(const std::vector<
 
 void BasicStats_ExceptionTrue_In_NumericSampleStandardDeviation_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.standard_deviation();
@@ -1220,6 +1341,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleStandardDeviation_test(const nr::N
 
 void BasicStats_ExceptionTrue_In_IteratorStandardDeviation_test(std::vector<double>::iterator begin, std::vector<double>::iterator end)
 {
+    // begin == end must be empty
     bool exception_thrown = false;
     try {
         nr::standard_deviation(begin, end);
@@ -1232,6 +1354,7 @@ void BasicStats_ExceptionTrue_In_IteratorStandardDeviation_test(std::vector<doub
 
 void BasicStats_ExceptionTrue_In_NumericSampleMedian_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.median();
@@ -1244,6 +1367,7 @@ void BasicStats_ExceptionTrue_In_NumericSampleMedian_test(const nr::NumericSampl
 
 void BasicStats_ExceptionTrue_In_VectorArithmeticMean_test(const std::vector<double> &ns)
 {
+    // vec must be empty
     bool exception_thrown = false;
     try {
         nr::arithmetic_mean(ns.begin(), ns.end());
@@ -1256,6 +1380,7 @@ void BasicStats_ExceptionTrue_In_VectorArithmeticMean_test(const std::vector<dou
 
 void BasicStats_ExceptionTrue_In_NumericArithmeticMean_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.arithmetic_mean();
@@ -1268,6 +1393,7 @@ void BasicStats_ExceptionTrue_In_NumericArithmeticMean_test(const nr::NumericSam
 
 void BasicStats_ExceptionTrue_In_NumericSampleUpperQuartile_test(const nr::NumericSample<double> &ns)
 {
+    // ns must be empty
     bool exception_thrown = false;
     try {
         ns.upper_quartile();

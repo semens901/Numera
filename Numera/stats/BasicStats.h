@@ -290,7 +290,7 @@ namespace nr
         );
 
         if (data.empty()) {
-            throw std::invalid_argument("Data vector is empty");
+            throw std::invalid_argument("Data is empty");
         }
 
         T log_sum = std::accumulate(
@@ -321,7 +321,7 @@ namespace nr
         );
 
         if (begin == end) {
-            throw std::invalid_argument("Data vector is empty");
+            throw std::invalid_argument("Data begin equals end is empty");
         }
 
         T log_sum = std::accumulate(
@@ -352,7 +352,7 @@ namespace nr
         );
 
         if (data.empty()) {
-            throw std::invalid_argument("Data vector is empty");
+            throw std::invalid_argument("Data is empty");
         }
 
         T reciprocal_sum = std::accumulate(
@@ -383,7 +383,7 @@ namespace nr
         );
 
         if (begin == end) {
-            throw std::invalid_argument("Data vector is empty");
+            throw std::invalid_argument("Data begin equals end is empty");
         }
 
         T reciprocal_sum = std::accumulate(
@@ -720,7 +720,7 @@ namespace nr
             max_count = std::max(max_count, count);
 
         if (max_count <= 1)
-            return {}; // моды нет
+            return {};
 
         std::vector<T> result;
         for (const auto& [value, count] : freq)

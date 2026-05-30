@@ -18,46 +18,58 @@ namespace nr
     */
     class ProbabilitySampling {
     public:
-        template<typename T>
-        static std::vector<T> simple_random(
-            const std::vector<T>& data,
-            size_t sampleSize);
+        template<typename Container>
+        static auto simple_random(
+            const Container& data,
+            size_t sampleSize) 
+        -> std::vector<typename Container::value_type>;
 
-        template<typename T>
-        static std::vector<T> systematic(
-            const std::vector<T>& data,
-            size_t sample);
+        template<typename Container>
+        static auto systematic(
+            const Container& data,
+            size_t sample)
+        -> std::vector<typename Container::value_type>;
 
-        template<typename T>
-        static std::vector<T> stratified(
-            const std::vector<T>& data,
-            const std::vector<size_t>& strataLabels,
-            size_t sampleSize);
+        template<typename DataContainer, typename LabelContainer>
+        static auto stratified(
+            const DataContainer& data,
+            const LabelContainer& strataLabels,
+            size_t sampleSize)
+        -> std::vector<typename DataContainer::value_type>;
 
 ////////////////////////////////////////////////////
-        template<typename T>
-        static std::vector<T> simple_random(
-            const nr::NumericSample<T>& data,
-            size_t sampleSize);
+        template<typename Iterator>
+        static auto simple_random(
+            Iterator begin,
+            Iterator end,
+            size_t sampleSize) 
+        -> std::vector<typename std::iterator_traits<Iterator>::value_type>;
 
-        template<typename T>
-        static std::vector<T> systematic(
-            const nr::NumericSample<T>& data,
-            size_t sample);
+        template<typename Iterator>
+        static auto systematic(
+            Iterator begin,
+            Iterator end,
+            size_t sample)
+        -> std::vector<typename std::iterator_traits<Iterator>::value_type>;
 
-        template<typename T>
-        static std::vector<T> stratified(
-            const nr::NumericSample<T>& data,
+        template<typename Iterator>
+        static auto stratified(
+            Iterator data_begin,
+            Iterator data_end,
             const std::vector<size_t>& strataLabels,
-            size_t sampleSize);
+            size_t sampleSize) 
+        -> std::vector<typename std::iterator_traits<Iterator>::value_type>;
     };
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::simple_random(
-        const std::vector<T>& data,
-        size_t sampleSize)
+    template <typename Container>
+    inline auto ProbabilitySampling::simple_random(
+        const Container &data,
+        size_t sampleSize) 
+    -> std::vector<typename Container::value_type>
     {
         // Simple random sampling
+        using T = typename Container::value_type;
+
         if (sampleSize == 0 || data.empty()) return {};
 
         // Use a thread-local generator seeded once per thread with mixed entropy.
@@ -65,7 +77,7 @@ namespace nr
 
         size_t size = std::min(sampleSize, data.size());
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve(size);
 
         std::sample(data.begin(), data.end(), std::back_inserter(out),
@@ -76,12 +88,14 @@ namespace nr
         return out;
     }
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::systematic(
-        const std::vector<T>& data,
-        size_t sample)
+    template <typename Container>
+    inline auto ProbabilitySampling::systematic(
+        const Container &data, size_t sample) 
+    -> std::vector<typename Container::value_type>
     {
         //Systematic sampling
+
+        using T = typename Container::value_type;
 
         // requires a sorted population
         if (data.empty() || sample == 0) return {};
@@ -99,7 +113,7 @@ namespace nr
             start = dist(gen);
         }
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve((n + step - 1) / step);
 
         for (size_t i = start; i < n; i += step) {
@@ -109,13 +123,15 @@ namespace nr
         return out;
     }
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::stratified(
-        const std::vector<T>& data,
-        const std::vector<size_t>& strataLabels,
-        size_t sampleSize)
+    template <typename DataContainer, typename LabelContainer>
+    inline auto ProbabilitySampling::stratified(
+        const DataContainer &data, 
+        const LabelContainer &strataLabels, 
+        size_t sampleSize) 
+    -> std::vector<typename DataContainer::value_type>
     {
         // Stratified sampling
+        using T = typename DataContainer::value_type;
 
         if (data.empty() || strataLabels.size() != data.size() || sampleSize == 0) return {};
 
@@ -129,14 +145,14 @@ namespace nr
         }
 
         // A vector to store the target size k for each stratum and its fractional remainder
-        std::vector<std::pair<double, size_t>> fractional_targets; // {fractional remainder, stratum mark}
+        std::vector<std::pair<T, size_t>> fractional_targets; // {fractional remainder, stratum mark}
         std::unordered_map<size_t, size_t> final_k_values; // {stratum label, final size k}
         size_t total_picked_so_far = 0;
 
         for (auto const& [label, idxs] : groups) 
         {
             // Calculating the size of k using floating point
-            double target_k_double = (static_cast<double>(idxs.size()) * sampleSize) / dataSize;
+            T target_k_double = (static_cast<T>(idxs.size()) * sampleSize) / dataSize;
             
             // Base size k - round down (integer part)
             size_t base_k = static_cast<size_t>(std::floor(target_k_double));
@@ -148,7 +164,7 @@ namespace nr
             }
 
             // We calculate the fractional remainder for the distribution of missing elements
-            double fraction = target_k_double - base_k;
+            T fraction = target_k_double - base_k;
             
             // We write down the base value
             final_k_values[label] = base_k;
@@ -180,7 +196,7 @@ namespace nr
 
         // --- FORMATION OF THE FINAL SAMPLE ---
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve(sampleSize); 
         auto &gen = nr::RandomValueGenerator::get_thread_local_generator();
 
@@ -204,24 +220,28 @@ namespace nr
         return out;
     }
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::simple_random(
-        const nr::NumericSample<T>& data,
-        size_t sampleSize)
+    template <typename Iterator>
+    inline auto ProbabilitySampling::simple_random(
+        Iterator begin, 
+        Iterator end, 
+        size_t sampleSize) 
+    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
     {
         // Simple random sampling
 
-        if (sampleSize == 0 || data.empty()) return {};
+        using T = typename std::iterator_traits<Iterator>::value_type;
+
+        if (sampleSize == 0 || begin == end) return {};
 
         // Use a thread-local generator seeded once per thread with mixed entropy.
         auto &gen = nr::RandomValueGenerator::get_thread_local_generator();
 
-        size_t size = std::min(sampleSize, data.size());
+        size_t size = std::min(sampleSize, static_cast<size_t>(std::distance(begin, end)));
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve(size);
 
-        std::sample(data.cbegin(), data.cend(), std::back_inserter(out),
+        std::sample(begin, end, std::back_inserter(out),
                     size, gen);
         
         std::shuffle(out.begin(), out.end(), gen);
@@ -229,14 +249,18 @@ namespace nr
         return out;
     }
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::systematic(
-        const nr::NumericSample<T>& data,
-        size_t sample)
+    template <typename Iterator>
+    inline auto ProbabilitySampling::systematic(
+        Iterator begin, 
+        Iterator end, 
+        size_t sample) 
+    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
     {
         //Systematic sampling
-        if (data.empty() || sample == 0) return {};
-        auto population = std::vector<double>(data.cbegin(), data.cend());
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        if (begin == end || sample == 0) return {};
+        
+        auto population = std::vector<T>(begin, end);
         std::sort(population.begin(), population.end());
 
         size_t n = population.size();
@@ -250,7 +274,7 @@ namespace nr
             start = dist(gen);
         }
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve((n + step - 1) / step);
 
         for (size_t i = start; i < n; i += step) 
@@ -261,17 +285,20 @@ namespace nr
         return out;
     }
 
-    template<typename T>
-    std::vector<T> ProbabilitySampling::stratified(
-        const nr::NumericSample<T>& data,
-        const std::vector<size_t>& strataLabels,
-        size_t sampleSize)
+    template <typename Iterator>
+    inline auto ProbabilitySampling::stratified(
+        Iterator data_begin, 
+        Iterator data_end, 
+        const std::vector<size_t> &strataLabels, 
+        size_t sampleSize) 
+    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
     {
         // Stratified sampling
+        using T = typename std::iterator_traits<Iterator>::value_type;
 
-        if (data.empty() || strataLabels.size() != data.size() || sampleSize == 0) return {};
+        if (data_begin == data_end || strataLabels.size() != std::distance(data_begin, data_end) || sampleSize == 0) return {};
 
-        size_t dataSize = data.size();
+        size_t dataSize = std::distance(data_begin, data_end);
 
         // Grouping indices by strata
         std::unordered_map<size_t, std::vector<size_t>> groups;
@@ -281,14 +308,14 @@ namespace nr
         }
 
         // A vector to store the target size k for each stratum and its fractional remainder
-        std::vector<std::pair<double, size_t>> fractional_targets; // {fractional remainder, stratum mark}
+        std::vector<std::pair<T, size_t>> fractional_targets; // {fractional remainder, stratum mark}
         std::unordered_map<size_t, size_t> final_k_values; // {stratum label, final size k}
         size_t total_picked_so_far = 0;
 
         for (auto const& [label, idxs] : groups) 
         {
             // Calculating the size of k using floating point
-            double target_k_double = (static_cast<double>(idxs.size()) * sampleSize) / dataSize;
+            T target_k_double = (static_cast<T>(idxs.size()) * sampleSize) / dataSize;
             
             // Base size k - round down (integer part)
             size_t base_k = static_cast<size_t>(std::floor(target_k_double));
@@ -300,7 +327,7 @@ namespace nr
             }
 
             // We calculate the fractional remainder for the distribution of missing elements
-            double fraction = target_k_double - base_k;
+            T fraction = target_k_double - base_k;
             
             // We write down the base value
             final_k_values[label] = base_k;
@@ -332,7 +359,7 @@ namespace nr
 
         // --- FORMATION OF THE FINAL SAMPLE ---
 
-        std::vector<double> out;
+        std::vector<T> out;
         out.reserve(sampleSize); 
         auto &gen = nr::RandomValueGenerator::get_thread_local_generator();
 
@@ -348,7 +375,7 @@ namespace nr
             // We use std::sample
             std::sample(idxs.begin(), idxs.end(), std::back_inserter(picked), k, gen);
 
-            for (auto id : picked) out.push_back(data[id]);
+            for (auto id : picked) out.push_back(*(data_begin + id));
         }
 
         // Mixing

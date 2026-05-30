@@ -28,7 +28,7 @@ int main()
         nr::NumericSample<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
-        auto sampleResult = nr::ProbabilitySampling::systematic<double>(stats, sample);
+        auto sampleResult = nr::ProbabilitySampling::systematic(stats, sample);
 
         std::cout << "Systematic sample (" << sampleResult.size() << "):";
         for (double v : sampleResult) std::cout << ' ' << v;
@@ -42,7 +42,7 @@ int main()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        auto strat = nr::ProbabilitySampling::stratified<double>(stats, labels, sampleSize);
+        auto strat = nr::ProbabilitySampling::stratified(stats, labels, sampleSize);
 
         std::cout << "Stratified sample (" << strat.size() << "):";
         for (double v : strat) std::cout << ' ' << v;

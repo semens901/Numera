@@ -10,6 +10,7 @@
 #include<algorithm>
 #include<numeric>
 #include<cmath>
+#include <memory>
 
 /**
  * @brief A simple vector-based data container with basic statistical operations.
@@ -33,11 +34,12 @@ namespace nr
     {
     public:
         //Stores data in std::vector
-        using value_type = T;
-        using container_type = std::vector<T>;
-        using size_type = std::size_t;
-        using iterator = typename container_type::iterator;
-        using const_iterator =  typename container_type::const_iterator;
+        using value_type        = T;
+        using container_type    = std::vector<T>;
+        using size_type         = std::size_t;
+
+        class iterator;
+        class const_iterator;
 
         NumericSample() = default;
         ~NumericSample() = default;
@@ -110,7 +112,7 @@ namespace nr
         std::optional<value_type> mode() const;
 
         // Returns all modes of the sample. If there are no modes (all values unique), returns an empty vector. Throws if empty.
-        std::vector<value_type> modes() const;
+        container_type modes() const;
 
         // Returns the range (max - min) of the sample. Throws if empty.
         value_type Scope() const;
@@ -127,10 +129,69 @@ namespace nr
 
         iterator begin ();
         iterator end ();
-        const_iterator begin () const noexcept; 
-        const_iterator end () const noexcept; 
+        const_iterator begin () const noexcept;
+        const_iterator end () const noexcept;
         const_iterator cbegin () const noexcept; 
         const_iterator cend () const noexcept; 
+
+        class iterator
+        {
+        public:         
+            using iterator_category = std::bidirectional_iterator_tag;
+            using value_type        = T;
+            using difference_type   = std::ptrdiff_t;
+            using pointer           = T*;
+            using reference         = T&;
+
+            friend class const_iterator;
+        
+            iterator() = default;
+            iterator(typename container_type::iterator it) : current(it) {}
+            iterator(const const_iterator& other) : current(other.current) {}
+            iterator& operator++() { ++current; return *this; }
+            iterator operator++(int) { iterator tmp = *this; ++current; return tmp; }
+            iterator& operator--() { --current; return *this; }
+            iterator operator--(int) { iterator tmp = *this; --current; return tmp; }
+            iterator operator+(difference_type n) const { return iterator(current + n); }
+            iterator operator-(difference_type n) const { return iterator(current - n); }
+            bool operator==(const iterator& other) const { return current == other.current; }
+            bool operator!=(const iterator& other) const { return current != other.current; }
+            value_type& operator*() { return *current; }
+            const value_type& operator*() const { return *current; }
+            const value_type* operator->() const { return std::addressof(*current); }
+            value_type* operator->() { return std::addressof(*current); }
+        private:
+            typename container_type::iterator current;
+        };
+
+        class const_iterator
+        {
+        public:            
+            using iterator_category = std::bidirectional_iterator_tag;
+            using value_type        = const T;
+            using difference_type   = std::ptrdiff_t;
+            using pointer           = const T*;
+            using reference         = const T&;
+
+            friend class iterator;
+
+            const_iterator() = default;
+            const_iterator(typename container_type::const_iterator it) : current(it) {}
+            const_iterator& operator++() { ++current; return *this; }
+            const_iterator operator++(int) { const_iterator tmp = *this; ++current; return tmp; }
+            const_iterator& operator--() { --current; return *this; }
+            const_iterator operator--(int) { const_iterator tmp = *this; --current; return tmp; }
+            const_iterator operator+(difference_type n) const { return const_iterator(current + n); }
+            const_iterator operator-(difference_type n) const { return const_iterator(current - n); }
+            bool operator==(const const_iterator& other) const { return current == other.current; }
+            bool operator!=(const const_iterator& other) const { return current != other.current; }
+            const value_type& operator*() const { return *current; }
+            const value_type* operator->() const { return std::addressof(*current); }
+
+
+        private:
+            typename container_type::const_iterator current;
+        };
 
     private:
         container_type container;
@@ -265,39 +326,39 @@ namespace nr
     }
 
     template <typename T>
-    inline typename std::vector<T>::iterator NumericSample<T>::begin()
+    inline typename NumericSample<T>::iterator NumericSample<T>::begin()
     {
-        return this->container.begin();
+        return NumericSample<T>::iterator(this->container.begin());
     }
 
     template <typename T>
-    inline typename std::vector<T>::iterator NumericSample<T>::end()
+    inline typename NumericSample<T>::iterator NumericSample<T>::end()
     {
-        return this->container.end();
+        return NumericSample<T>::iterator(this->container.end());
     }
 
     template <typename T>
-    inline typename std::vector<T>::const_iterator NumericSample<T>::begin() const noexcept
+    inline typename NumericSample<T>::const_iterator NumericSample<T>::begin() const noexcept
     {
-        return this->container.cbegin();
+        return typename NumericSample<T>::const_iterator(this->container.begin());
     }
 
     template <typename T>
-    inline typename std::vector<T>::const_iterator NumericSample<T>::end() const noexcept
+    inline typename NumericSample<T>::const_iterator NumericSample<T>::end() const noexcept
     {
-        return this->container.cend();
+        return typename NumericSample<T>::const_iterator(this->container.end());
     }
 
     template <typename T>
-    inline typename std::vector<T>::const_iterator NumericSample<T>::cbegin() const noexcept
+    inline typename NumericSample<T>::const_iterator NumericSample<T>::cbegin() const noexcept
     {
-        return this->container.cbegin();
+        return typename NumericSample<T>::const_iterator(this->container.cbegin());
     }
 
     template <typename T>
-    inline typename std::vector<T>::const_iterator NumericSample<T>::cend() const noexcept
+    inline typename NumericSample<T>::const_iterator NumericSample<T>::cend() const noexcept
     {
-        return this->container.cend();
+        return typename NumericSample<T>::const_iterator(this->container.cend());
     }
 
     template <typename T>
@@ -352,7 +413,7 @@ namespace nr
         return nr::mode(container);
     }
     template <typename T>
-    inline std::vector<typename NumericSample<T>::value_type> NumericSample<T>::modes() const
+    inline typename NumericSample<T>::container_type NumericSample<T>::modes() const
     {
         return nr::modes(container);
     }

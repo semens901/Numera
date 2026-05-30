@@ -8,12 +8,12 @@ void probability_sampling_tests()
         nr::NumericSample<double> stats({10, 20, 30, 40, 50});
 
         size_t sampleSize = 3;
-        auto sample = nr::ProbabilitySampling::simple_random<double>(stats, sampleSize);
+        auto sample = nr::ProbabilitySampling::simple_random(stats, sampleSize);
 
         assert(sample.size() == sampleSize);
 
         nr::NumericSample<double> emptyStats;
-        std::vector<double> emptySample = nr::ProbabilitySampling::simple_random<double>(emptyStats, sampleSize);
+        std::vector<double> emptySample = nr::ProbabilitySampling::simple_random(emptyStats, sampleSize);
         assert(emptySample.size() == 0);
 
         std::cout << "[TEST] successfully!\n";
@@ -24,14 +24,14 @@ void probability_sampling_tests()
         nr::NumericSample<double> stats({10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 14, 11, 80, 15, 90});
 
         size_t sample = 4;
-        auto sampleResult = nr::ProbabilitySampling::systematic<double>(stats, sample);
+        auto sampleResult = nr::ProbabilitySampling::systematic(stats, sample);
 
         double statsSize = static_cast<double>(stats.size());
         double step = statsSize / static_cast<double>(sample);
         assert(sampleResult.size() == static_cast<double>(std::ceil(step)));
 
         nr::NumericSample<double> emptyStats;
-        auto emptySample = nr::ProbabilitySampling::systematic<double>(emptyStats, sample);
+        auto emptySample = nr::ProbabilitySampling::systematic(emptyStats, sample);
         assert(emptySample.size() == 0);
         std::cout << "[TEST] successfully!\n";
     }
@@ -43,14 +43,14 @@ void probability_sampling_tests()
         std::vector<size_t> labels = {1,1,1,1, 0,0,0,0,0, 2,2,2, 3,3,3,3,3,3};
         size_t sampleSize = 8;
 
-        std::vector<double> strat = nr::ProbabilitySampling::stratified<double>(stats, labels, sampleSize);
+        std::vector<double> strat = nr::ProbabilitySampling::stratified(stats, labels, sampleSize);
 
         assert(strat.size() == sampleSize);
 
         size_t sampleSize1 = 8;
         std::vector<double> emptyStats1;
         std::vector<size_t> emptyLabels1;
-        auto emptySample1 = nr::ProbabilitySampling::stratified<double>(emptyStats1, emptyLabels1, sampleSize);
+        auto emptySample1 = nr::ProbabilitySampling::stratified(emptyStats1, emptyLabels1, sampleSize);
         assert(emptySample1.size() == 0);
         std::cout << "[TEST] successfully!\n";
     }
