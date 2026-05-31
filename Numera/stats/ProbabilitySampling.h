@@ -52,11 +52,11 @@ namespace nr
             size_t sample)
         -> std::vector<typename std::iterator_traits<Iterator>::value_type>;
 
-        template<typename Iterator>
+        template<typename Iterator, typename LabelIterator>
         static auto stratified(
             Iterator data_begin,
             Iterator data_end,
-            const std::vector<size_t>& strataLabels,
+            LabelIterator labels_begin,
             size_t sampleSize) 
         -> std::vector<typename std::iterator_traits<Iterator>::value_type>;
     };
@@ -285,26 +285,21 @@ namespace nr
         return out;
     }
 
-    template <typename Iterator>
-    inline auto ProbabilitySampling::stratified(
-        Iterator data_begin, 
-        Iterator data_end, 
-        const std::vector<size_t> &strataLabels, 
-        size_t sampleSize) 
-    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
+    template <typename Iterator, typename LabelIterator>
+    inline auto ProbabilitySampling::stratified(Iterator data_begin, Iterator data_end, LabelIterator labels_begin, size_t sampleSize) -> std::vector<typename std::iterator_traits<Iterator>::value_type>
     {
         // Stratified sampling
         using T = typename std::iterator_traits<Iterator>::value_type;
 
-        if (data_begin == data_end || strataLabels.size() != std::distance(data_begin, data_end) || sampleSize == 0) return {};
+        if (data_begin == data_end || sampleSize == 0) return {};
 
         size_t dataSize = std::distance(data_begin, data_end);
 
         // Grouping indices by strata
         std::unordered_map<size_t, std::vector<size_t>> groups;
-        for (size_t i = 0; i < strataLabels.size(); ++i) 
+        for (size_t i = 0; i < dataSize; ++i) 
         {
-            groups[strataLabels[i]].push_back(i);
+            groups[*(labels_begin + i)].push_back(i);
         }
 
         // A vector to store the target size k for each stratum and its fractional remainder

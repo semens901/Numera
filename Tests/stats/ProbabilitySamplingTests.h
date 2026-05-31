@@ -13,4 +13,16 @@
 
 void probability_sampling_tests();
 
+void ProbabilitySampling_SimpleRandom_tests();
+void ProbabilitySampling_ContainerSimpleRandom_test();
+void ProbabilitySampling_IteratorSimpleRandom_test();
+
+void ProbabilitySampling_Systematic_tests();
+void ProbabilitySampling_ContainerSystematic_test();
+void ProbabilitySampling_IteratorSystematic_test();
+
+void ProbabilitySampling_Stratified_tests();
+void ProbabilitySampling_ContainerStratified_test();
+void ProbabilitySampling_IteratorStratified_test();
+
 #endif //PROBABILITYSAMPLING_H
