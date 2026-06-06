@@ -74,26 +74,12 @@ namespace nr
         return *std::max_element(data.begin(), data.end());
     }
 
-    template<typename Iterator>
-    auto arithmetic_mean(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
-    {
-        // Calculates the arithmetic arithmetic_mean
-        // Throws if the range is empty.
-        if (begin == end) 
-        {
-            throw std::invalid_argument("arithmetic_mean: empty container");
-        }
-
-        using T = typename std::iterator_traits<Iterator>::value_type;
-
-        T sum = std::accumulate(begin, end, 0.0);
-        return sum/std::distance(begin, end);
-    }
-
     template <typename Container>
     auto arithmetic_mean(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         // Calculates the arithmetic arithmetic_mean
         // Throws if the range is empty.
@@ -103,9 +89,31 @@ namespace nr
         }
 
         using T = typename std::decay_t<Container>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
-        T sum = std::accumulate(data.cbegin(), data.cend(), 0.0);
+        CalcType sum = std::accumulate(data.cbegin(), data.cend(), CalcType(0));
         return sum/data.size();
+    }
+
+    template<typename Iterator>
+    auto arithmetic_mean(Iterator begin, Iterator end) 
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        // Calculates the arithmetic arithmetic_mean
+        // Throws if the range is empty.
+        if (begin == end) 
+        {
+            throw std::invalid_argument("arithmetic_mean: empty container");
+        }
+
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
+        CalcType sum = std::accumulate(begin, end, CalcType(0));
+        return sum/std::distance(begin, end);
     }
 
     template<typename Iterator>
@@ -139,7 +147,7 @@ namespace nr
         // Finds the median
         // Throws if the range is empty.
         using mut_container = std::decay_t<Container>;
-        using value_type = typename mut_container::value_type;
+        using T = typename mut_container::value_type;
 
         if (std::begin(data) == std::end(data)) throw std::invalid_argument("median: empty container");
 
@@ -152,7 +160,7 @@ namespace nr
             return numbersCopy[n / 2];
         } else {
             // compute average of two middle elements, cast to value_type
-            return (numbersCopy[n / 2 - 1] + numbersCopy[n / 2]) / static_cast<value_type>(2);
+            return (numbersCopy[n / 2 - 1] + numbersCopy[n / 2]) / static_cast<T>(2);
         }
     }
 
@@ -160,12 +168,18 @@ namespace nr
     auto weighted_mean(
         const Container& values,
         const Weight& weights
-    ) -> typename std::decay_t<Container>::value_type
+    )
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         /*
             The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
         */
         using T = typename Container::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
         static_assert(
             std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
@@ -175,8 +189,8 @@ namespace nr
             throw std::invalid_argument("Values and weights must have the same size");
         }
 
-        T sum = 0.0;
-        T weight_sum = 0.0;
+        CalcType sum = 0.0;
+        CalcType weight_sum = 0.0;
 
         for (std::size_t i = 0; i < values.size(); ++i) {
             sum += values[i] * weights[i];
@@ -196,15 +210,21 @@ namespace nr
         IteratorData endData,
         IteratorWeight beginWeight,
         IteratorWeight endWeight
-    ) -> typename std::iterator_traits<IteratorData>::value_type
+    ) 
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<IteratorData>::value_type>,
+    typename std::iterator_traits<IteratorData>::value_type, double>
     {
-        using value_type = typename std::iterator_traits<IteratorData>::value_type;
         /*
             The function finds a weighted average value, the first parameter is the population (begin, end), the second is the "weight"(begin, end) of each population
         */
         
+        using T = typename std::iterator_traits<IteratorData>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
         static_assert(
-            std::is_arithmetic_v<value_type>,
+            std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
         );
         
@@ -216,8 +236,8 @@ namespace nr
             throw std::invalid_argument("Values and weights must have the same size");
         }
 
-        value_type sum = 0.0;
-        value_type weight_sum = 0.0;
+        CalcType sum = 0.0;
+        CalcType weight_sum = 0.0;
         
         for (std::pair<IteratorData, IteratorWeight> it_pair{beginData, beginWeight}; (it_pair.first != endData) && (it_pair.second != endWeight); ++it_pair.first, ++it_pair.second)
         {
@@ -237,9 +257,12 @@ namespace nr
         IteratorData beginData,
         IteratorData endData,
         IteratorWeight beginWeight
-    ) -> typename std::iterator_traits<IteratorData>::value_type
+    ) 
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<IteratorData>::value_type>,
+    typename std::iterator_traits<IteratorData>::value_type, double>
     {
-        using value_type = typename std::iterator_traits<IteratorData>::value_type;
         /*
             Computes the weighted mean for the data range [beginData, endData)
             using weights provided starting from `beginWeight`. The function
@@ -252,8 +275,11 @@ namespace nr
             to the data range before invoking this function.
         */
 
+        using T = typename std::iterator_traits<IteratorData>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
         static_assert(
-            std::is_arithmetic_v<value_type>,
+            std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
         );
         
@@ -262,8 +288,8 @@ namespace nr
             throw std::invalid_argument("Values ​​cannot be empty");
         }
 
-        value_type sum = 0.0;
-        value_type weight_sum = 0.0;
+        CalcType sum = 0.0;
+        CalcType weight_sum = 0.0;
         
         for (std::pair<IteratorData, IteratorWeight> it_pair{beginData, beginWeight}; it_pair.first != endData; ++it_pair.first, ++it_pair.second)
         {
@@ -280,10 +306,15 @@ namespace nr
 
     template <typename Container>
     auto geometric_mean(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         // finds the geometric arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+        
         static_assert(
             std::is_arithmetic_v<typename Container::value_type>,
             "geometric_mean requires arithmetic type"
@@ -293,16 +324,16 @@ namespace nr
             throw std::invalid_argument("Data is empty");
         }
 
-        T log_sum = std::accumulate(
+        CalcType log_sum = std::accumulate(
             data.begin(), data.end(),
             0.0,
-            [](T acc, T value) {
-                if (value <= static_cast<T>(0)) {
+            [](CalcType acc, CalcType value) {
+                if (value <= static_cast<CalcType>(0)) {
                     throw std::domain_error(
                         "Geometric arithmetic_mean requires positive values"
                     );
                 }
-                return acc + std::log(static_cast<T>(value));
+                return acc + std::log(static_cast<CalcType>(value));
             }
         );
 
@@ -311,10 +342,14 @@ namespace nr
 
     template<typename Iterator>
     auto geometric_mean(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         // finds the geometric arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         static_assert(
             std::is_arithmetic_v<T>,
             "geometric_mean requires arithmetic type"
@@ -324,16 +359,16 @@ namespace nr
             throw std::invalid_argument("Data begin equals end is empty");
         }
 
-        T log_sum = std::accumulate(
+        CalcType log_sum = std::accumulate(
             begin, end,
             0.0,
-            [](T acc, T value) {
-                if (value <= static_cast<T>(0)) {
+            [](CalcType acc, CalcType value) {
+                if (value <= static_cast<CalcType>(0)) {
                     throw std::domain_error(
                         "Geometric arithmetic_mean requires positive values"
                     );
                 }
-                return acc + std::log(static_cast<T>(value));
+                return acc + std::log(static_cast<CalcType>(value));
             }
         );
 
@@ -342,10 +377,15 @@ namespace nr
 
     template <typename Container>
     auto harmonic_mean(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
         static_assert(
             std::is_arithmetic_v<T>,
             "harmonic_mean requires arithmetic type"
@@ -355,28 +395,33 @@ namespace nr
             throw std::invalid_argument("Data is empty");
         }
 
-        T reciprocal_sum = std::accumulate(
+        CalcType reciprocal_sum = std::accumulate(
             data.begin(), data.end(),
             0.0,
-            [](T acc, T value) {
-                if (value <= static_cast<T>(0)) {
+            [](CalcType acc, CalcType value) {
+                if (value <= static_cast<CalcType>(0)) {
                     throw std::domain_error(
                         "Harmonic arithmetic_mean requires positive values"
                     );
                 }
-                return acc + 1.0 / static_cast<T>(value);
+                return acc + 1.0 / static_cast<CalcType>(value);
             }
         );
 
-        return static_cast<T>(data.size()) / reciprocal_sum;
+        return static_cast<CalcType>(data.size()) / reciprocal_sum;
     }
 
     template<typename Iterator>
     auto harmonic_mean(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
         static_assert(
             std::is_arithmetic_v<T>,
             "harmonic_mean requires arithmetic type"
@@ -386,20 +431,20 @@ namespace nr
             throw std::invalid_argument("Data begin equals end is empty");
         }
 
-        T reciprocal_sum = std::accumulate(
+        CalcType reciprocal_sum = std::accumulate(
             begin, end,
             0.0,
-            [](T acc, T value) {
-                if (value <= static_cast<T>(0)) {
+            [](CalcType acc, CalcType value) {
+                if (value <= static_cast<CalcType>(0)) {
                     throw std::domain_error(
                         "Harmonic arithmetic_mean requires positive values"
                     );
                 }
-                return acc + 1.0 / static_cast<T>(value);
+                return acc + 1.0 / static_cast<CalcType>(value);
             }
         );
 
-        return static_cast<T>(std::distance(begin, end)) / reciprocal_sum;
+        return static_cast<CalcType>(std::distance(begin, end)) / reciprocal_sum;
     }
 
     template <typename Container>
@@ -534,8 +579,8 @@ namespace nr
      * - Safety: Throws if data is empty or p is out of [0, 100] range.
      * - Precision: Returns double to handle fractional results between elements.
      */
-        using value_type = typename std::decay_t<Container>::value_type;
-        using returnType = std::common_type_t<value_type, double>;
+        using T = typename std::decay_t<Container>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty())
             throw std::invalid_argument("percentile: empty data");
@@ -543,14 +588,14 @@ namespace nr
         if (p < 0.0 || p > 100.0)
             throw std::out_of_range("percentile: p must be in [0, 100]");
 
-        std::vector<value_type> sorted(data.begin(), data.end());
+        std::vector<T> sorted(data.begin(), data.end());
         std::sort(sorted.begin(), sorted.end());
 
         const std::size_t n = sorted.size();
-        const returnType pos = (p / 100.0) * (n - 1);
+        const CalcType pos = (p / 100.0) * (n - 1);
 
         const std::size_t idx = static_cast<std::size_t>(std::floor(pos));
-        const returnType frac = pos - idx;
+        const CalcType frac = pos - idx;
 
         if (idx + 1 < n)
             return sorted[idx] * (1.0 - frac) + sorted[idx + 1] * frac;
@@ -570,8 +615,8 @@ namespace nr
          * - Safety: Throws if data is empty or p is out of [0, 100] range.
          * - Precision: Returns double to handle fractional results between elements.
          */
-        using value_type = typename std::iterator_traits<Iterator>::value_type;
-        using returnType = std::common_type_t<value_type, double>;
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
          if (begin == end)
              throw std::invalid_argument("percentile: empty data");
@@ -585,14 +630,14 @@ namespace nr
         if (p < 0.0 || p > 100.0)
             throw std::out_of_range("percentile: p must be in [0, 100]");
 
-        std::vector<value_type> sorted(begin, end);
+        std::vector<T> sorted(begin, end);
         std::sort(sorted.begin(), sorted.end());
 
         const std::size_t n = sorted.size();
-        const returnType pos = (p / 100.0) * (n - 1);
+        const CalcType pos = (p / 100.0) * (n - 1);
 
         const std::size_t idx = static_cast<std::size_t>(std::floor(pos));
-        const returnType frac = pos - idx;
+        const CalcType frac = pos - idx;
 
         if (idx + 1 < n)
             return sorted[idx] * (1.0 - frac) + sorted[idx + 1] * frac;
@@ -773,7 +818,10 @@ namespace nr
 
     template <typename Container>
     auto Scope(const Container& data)
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         /*
          * Calculates the scope (range) of a container.
@@ -790,7 +838,10 @@ namespace nr
 
     template <typename Iterator>
     auto Scope(Iterator begin, Iterator end)
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         /*
          * Calculates the scope (range) of a container.
@@ -808,7 +859,10 @@ namespace nr
 
     template <typename Container>
     auto interquartile_range(const Container& data)
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         /*
          * Calculates the interquartile range of a container.
@@ -826,7 +880,10 @@ namespace nr
 
     template <typename Iterator>
     auto interquartile_range(Iterator begin, Iterator end)
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         /*
          * Calculates the interquartile range of a container.
@@ -844,7 +901,10 @@ namespace nr
 
     template <typename Container>
     auto mean_absolute_deviation(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -855,19 +915,19 @@ namespace nr
          */
 
         using T = typename std::decay_t<Container>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty()) {
             throw std::invalid_argument("MAD: empty data");
         }
 
-        const returnType n = static_cast<returnType>(data.size());
+        const CalcType n = static_cast<CalcType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end());
+        CalcType sum = arithmetic_mean(data.begin(), data.end());
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for (const auto& value : data) {
-            total_deviation += std::abs(static_cast<double>(value) - sum);
+            total_deviation += std::abs(static_cast<CalcType>(value) - sum);
         }
 
         return total_deviation / n;
@@ -875,7 +935,10 @@ namespace nr
 
     template <typename Iterator>
     auto mean_absolute_deviation(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>, 
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -885,18 +948,18 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
         using T = typename std::iterator_traits<Iterator>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         if (begin == end) {
             throw std::invalid_argument("MAD: empty data");
         }
 
-        const returnType n = static_cast<returnType>(std::distance(begin, end));
+        const CalcType n = static_cast<CalcType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end);
+        CalcType sum = arithmetic_mean(begin, end);
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
-            total_deviation += std::abs(static_cast<returnType>(*it) - sum);
+            total_deviation += std::abs(static_cast<CalcType>(*it) - sum);
         }
 
         return total_deviation / n;
@@ -904,7 +967,10 @@ namespace nr
 
     template <typename Container>
     auto dispersion(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>, 
+    typename Container::value_type, double>
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -914,19 +980,19 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
         using T = typename std::decay_t<Container>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty()) {
             throw std::invalid_argument("Dispersion: empty data");
         }
 
-        const returnType n = static_cast<returnType>(data.size());
+        const CalcType n = static_cast<CalcType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end());
+        CalcType sum = arithmetic_mean(data.begin(), data.end());
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for (const auto& value : data) {
-            total_deviation += std::pow((static_cast<double>(value) - sum), 2);
+            total_deviation += std::pow((static_cast<CalcType>(value) - sum), 2);
         }
 
         return total_deviation / n;
@@ -934,7 +1000,10 @@ namespace nr
 
     template <typename Iterator>
     auto dispersion(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>, 
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -944,18 +1013,18 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
         using T = typename std::iterator_traits<Iterator>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         if (begin==end) {
             throw std::invalid_argument("Dispersion: empty data");
         }
 
-        const returnType n = static_cast<returnType>(std::distance(begin, end));
+        const CalcType n = static_cast<CalcType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end);
+        CalcType sum = arithmetic_mean(begin, end);
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
-            total_deviation += std::pow((static_cast<returnType>(*it) - sum), 2);
+            total_deviation += std::pow((static_cast<CalcType>(*it) - sum), 2);
         }
 
         return total_deviation / n;
@@ -963,7 +1032,10 @@ namespace nr
 
     template <typename Container>
     auto standard_deviation(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>, 
+    typename Container::value_type, double>
     {
         /**
          * Calculates the standard deviation of a container.
@@ -973,19 +1045,19 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
         using T = typename std::decay_t<Container>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty()) {
             throw std::invalid_argument("Standard Deviation: empty data");
         }
 
-        const returnType n = static_cast<returnType>(data.size());
+        const CalcType n = static_cast<CalcType>(data.size());
 
-        returnType sum = arithmetic_mean(data.begin(), data.end());
+        CalcType sum = arithmetic_mean(data.begin(), data.end());
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for (const auto& value : data) {
-            total_deviation += std::pow((static_cast<double>(value) - sum), 2);
+            total_deviation += std::pow((static_cast<CalcType>(value) - sum), 2);
         }
 
         return std::sqrt(total_deviation / n);
@@ -993,7 +1065,10 @@ namespace nr
     
     template <typename Iterator>
     auto standard_deviation(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
     {
         /**
          * Calculates the standard deviation of a container.
@@ -1003,21 +1078,163 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
         using T = typename std::iterator_traits<Iterator>::value_type;
-        using returnType = std::common_type_t<T, double>;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         if (begin==end) {
             throw std::invalid_argument("Standard Deviation: empty data");
         }
 
-        const returnType n = static_cast<returnType>(std::distance(begin, end));
+        const CalcType n = static_cast<CalcType>(std::distance(begin, end));
 
-        returnType sum = arithmetic_mean(begin, end);
+        CalcType sum = arithmetic_mean(begin, end);
 
-        returnType total_deviation = 0.0;
+        CalcType total_deviation = 0.0;
         for(auto it = begin; it != end; ++it) {
-            total_deviation += std::pow((static_cast<returnType>(*it) - sum), 2);
+            total_deviation += std::pow((static_cast<CalcType>(*it) - sum), 2);
         }
 
         return std::sqrt(total_deviation / n);
+    }
+
+    template<typename Container>
+    auto skewness_pearson_1(const Container& data)
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>, 
+    typename Container::value_type, double>
+    {
+        /*
+            * Calculates Pearson's first coefficient of skewness for a container.
+            * - Logic: Returns (mean - mode) / standard deviation.
+            * - Edge Cases: throw std::invalid_argument if data is empty or if standard deviation is zero, or if mode is not unique.
+            * - Complexity: O(N) time (one pass over the data).
+            * - Requirements: value_type must be comparable and arithmetic.
+        */
+
+        using T = typename Container::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+        
+
+        CalcType result = 0.0;
+
+        CalcType mean = arithmetic_mean(data);
+        CalcType stddev = standard_deviation(data);
+        auto modeOpt = mode(data);
+        if (!modeOpt.has_value()) {
+            throw std::invalid_argument("Pearson's first coefficient of skewness: mode is not unique or does not exist");
+        }
+        CalcType modeValue = modeOpt.value();
+        if (stddev != 0) {
+            result = (mean - modeValue) / stddev;
+        }
+        else
+        {
+            throw std::invalid_argument("Pearson's first coefficient of skewness: standard deviation is zero");
+        }
+        return result;
+    }
+
+    template<typename Iterator>
+    auto skewness_pearson_1(const Iterator& begin, const Iterator& end)
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>, 
+    typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        /*
+            * Calculates Pearson's first coefficient of skewness for a container.
+            * - Logic: Returns (mean - mode) / standard deviation.
+            * - Edge Cases: throw std::invalid_argument if data is empty or if standard deviation is zero, or if mode is not unique.
+            * - Complexity: O(N) time (one pass over the data).
+            * - Requirements: value_type must be comparable and arithmetic.
+        */
+
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
+        CalcType result = 0.0;
+
+        CalcType mean = arithmetic_mean(begin, end);
+        CalcType stddev = standard_deviation(begin, end);
+        auto modeOpt = mode(begin, end);
+        if (!modeOpt.has_value()) {
+            throw std::invalid_argument("Pearson's first coefficient of skewness: mode is not unique or does not exist");
+        }
+        CalcType modeValue = modeOpt.value();
+        if (stddev != 0) {
+            result = (mean - modeValue) / stddev;
+        }
+        else
+        {
+            throw std::invalid_argument("Pearson's first coefficient of skewness: standard deviation is zero");
+        }
+        return result;
+    }
+
+    
+
+    template <typename Container>
+    auto skewness_pearson_2(const Container& data)
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename Container::value_type>,
+    typename Container::value_type, double>
+    {
+        /*
+            * Calculates Pearson's second coefficient of skewness for a container.
+            * - Logic: Returns (mean - median) / standard deviation.
+            * - Edge Cases: throw std::invalid_argument if data is empty or if standard deviation is zero.
+            * - Complexity: O(N) time (one pass over the data).
+            * - Requirements: value_type must be comparable and arithmetic.
+        */
+
+        using T = typename std::decay_t<Container>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
+        CalcType result = 0.0;
+
+        CalcType mean = arithmetic_mean(data);
+        CalcType stddev = standard_deviation(data);
+        CalcType median = median(data);
+        if (stddev != 0) {
+            result = ((mean - median)*3) / stddev;
+        }
+        else
+        {
+            throw std::invalid_argument("Measure of asymmetry: standard deviation is zero");
+        }
+        return result;
+    }
+
+    template <typename Iterator>
+    auto skewness_pearson_2(Iterator begin, Iterator end)
+    -> typename std::conditional_t<
+    std::is_floating_point_v<
+    typename std::iterator_traits<Iterator>::value_type>,
+    typename std::iterator_traits<Iterator>::value_type, double>
+    {
+        /**
+         * Calculates Pearson's second coefficient of skewness for a container.
+         * - Logic: Returns (mean - median) / standard deviation.
+         * - Edge Cases: throw std::invalid_argument if data is empty or if standard deviation is zero.
+         * - Complexity: O(N) time (one pass over the data).
+         * - Requirements: value_type must be comparable and arithmetic.
+         */
+        using T = typename std::iterator_traits<Iterator>::value_type;
+        using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+
+        CalcType result = 0.0;
+
+        CalcType mean = arithmetic_mean(begin, end);
+        CalcType stddev = standard_deviation(begin, end);
+        CalcType median = median(begin, end);
+        if (stddev != 0) {
+            result = ((mean - median)*3) / stddev;
+        }
+        else
+        {
+            throw std::invalid_argument("Measure of asymmetry: standard deviation is zero");
+        }
+        return result;
     }
 
 }

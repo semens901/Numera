@@ -31,4 +31,4 @@ target_include_directories(Numera
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_compile_features(Numera PUBLIC cxx_std_17)
+target_compile_features(Numera PUBLIC cxx_std_20)

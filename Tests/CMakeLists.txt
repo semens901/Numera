@@ -23,6 +23,6 @@ add_executable(numera_tests
 )
 
 target_link_libraries(numera_tests PRIVATE Numera)
-target_compile_features(numera_tests PRIVATE cxx_std_17)
+target_compile_features(numera_tests PRIVATE cxx_std_20)
 
 add_test(NAME numera_tests COMMAND numera_tests)
