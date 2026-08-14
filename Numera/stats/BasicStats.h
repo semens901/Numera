@@ -12,6 +12,8 @@
 #include <optional>
 #include <unordered_map>
 
+#include "utils/type_traits.h"
+
 namespace nr
 {
     // Forward declaration of CSVTable to allow providing overloads
@@ -19,7 +21,7 @@ namespace nr
 
     template<typename Iterator>
     auto min(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         // Returns the minimum value in the range (begin, end). 
         // Throws if the range is empty.
@@ -31,7 +33,7 @@ namespace nr
 
     template <typename Container>
     auto min(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         // Returns the minimum value in the range [data.begin(), data.end()].
         // Throws std::invalid_argument if the container is empty.
@@ -50,7 +52,7 @@ namespace nr
 
     template<typename Iterator>
     auto max(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         // Returns the maximum value in the range (begin, end)
         // Throws if the range is empty.
@@ -62,7 +64,7 @@ namespace nr
 
     template <typename Container>
     auto max(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         // Returns the maximum value in the range (data.begin, data.end)
         // Throws if the range is empty.
@@ -76,10 +78,7 @@ namespace nr
 
     template <typename Container>
     auto arithmetic_mean(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         // Calculates the arithmetic arithmetic_mean
         // Throws if the range is empty.
@@ -97,10 +96,7 @@ namespace nr
 
     template<typename Iterator>
     auto arithmetic_mean(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         // Calculates the arithmetic arithmetic_mean
         // Throws if the range is empty.
@@ -118,7 +114,7 @@ namespace nr
 
     template<typename Iterator>
     auto median(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         // Finds the median
         // Throws if the range is empty.
@@ -142,7 +138,7 @@ namespace nr
 
     template <typename Container>
     auto median(const Container& data) 
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         // Finds the median
         // Throws if the range is empty.
@@ -169,10 +165,7 @@ namespace nr
         const Container& values,
         const Weight& weights
     )
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /*
             The function finds a weighted average value, the first parameter is the population, the second is the "weight" of each population
@@ -211,10 +204,7 @@ namespace nr
         IteratorWeight beginWeight,
         IteratorWeight endWeight
     ) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<IteratorData>::value_type>,
-    typename std::iterator_traits<IteratorData>::value_type, double>
+    -> iterator_conditional_type_f<IteratorData, double>
     {
         /*
             The function finds a weighted average value, the first parameter is the population (begin, end), the second is the "weight"(begin, end) of each population
@@ -258,10 +248,7 @@ namespace nr
         IteratorData endData,
         IteratorWeight beginWeight
     ) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<IteratorData>::value_type>,
-    typename std::iterator_traits<IteratorData>::value_type, double>
+    -> iterator_conditional_type_f<IteratorData, double>
     {
         /*
             Computes the weighted mean for the data range [beginData, endData)
@@ -306,10 +293,7 @@ namespace nr
 
     template <typename Container>
     auto geometric_mean(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         // finds the geometric arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
@@ -342,10 +326,7 @@ namespace nr
 
     template<typename Iterator>
     auto geometric_mean(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         // finds the geometric arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
@@ -377,10 +358,7 @@ namespace nr
 
     template <typename Container>
     auto harmonic_mean(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::decay_t<Container>::value_type;
@@ -413,10 +391,7 @@ namespace nr
 
     template<typename Iterator>
     auto harmonic_mean(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         // finds the harmonic arithmetic_mean
         using T = typename std::iterator_traits<Iterator>::value_type;
@@ -449,7 +424,7 @@ namespace nr
 
     template <typename Container>
     auto lower_quartile(const Container& data)
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         // Finds the lower quartile
         using mut_container = std::decay_t<Container>;
@@ -476,10 +451,10 @@ namespace nr
 
     template<typename Iterator>
     auto lower_quartile(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         // Finds the lower quartile
-        using mut_container = std::vector<typename std::iterator_traits<Iterator>::value_type>;
+        using mut_container = std::vector<iterator_value_type_t<Iterator>>;
         using value_type = typename mut_container::value_type;
 
         if (begin == end) {
@@ -503,7 +478,7 @@ namespace nr
 
     template <typename Container>
     auto upper_quartile(const Container& data)
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         // Finds the upper quartile
         using mut_container = std::decay_t<Container>;
@@ -536,10 +511,10 @@ namespace nr
 
     template<typename Iterator>
     auto upper_quartile(Iterator begin, Iterator end) 
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         // Finds the upper quartile
-        using mut_container = std::vector<typename std::iterator_traits<Iterator>::value_type>;
+        using mut_container = std::vector<iterator_value_type_t<Iterator>>;
 
         if (begin == end) {
             throw std::invalid_argument("upper_quartile: empty data");
@@ -569,7 +544,7 @@ namespace nr
 
     template <typename Container>
     auto percentile(const Container& data, double p)
-    -> typename std::decay_t<Container>::value_type
+    -> value_type_t<Container>
     {
         /**
      * Calculates the p-th percentile using linear interpolation (R7/Excel style).
@@ -579,7 +554,7 @@ namespace nr
      * - Safety: Throws if data is empty or p is out of [0, 100] range.
      * - Precision: Returns double to handle fractional results between elements.
      */
-        using T = typename std::decay_t<Container>::value_type;
+        using T = value_type_t<Container>;
         using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty())
@@ -605,7 +580,7 @@ namespace nr
 
     template<typename Iterator>
     auto percentile(const Iterator& begin, const Iterator& end, double p)
-    -> typename std::iterator_traits<Iterator>::value_type
+    -> iterator_value_type_t<Iterator>
     {
         /**
          * Calculates the p-th percentile using linear interpolation (R7/Excel style).
@@ -615,7 +590,7 @@ namespace nr
          * - Safety: Throws if data is empty or p is out of [0, 100] range.
          * - Precision: Returns double to handle fractional results between elements.
          */
-        using T = typename std::iterator_traits<Iterator>::value_type;
+        using T = iterator_value_type_t<Iterator>;
         using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
          if (begin == end)
@@ -647,7 +622,7 @@ namespace nr
 
     template <typename Container>
     auto mode(const Container& data)
-    -> std::optional<typename std::decay_t<Container>::value_type>
+    -> std::optional<value_type_t<Container>>
     {
         /**
          * Finds the unique mode of a container.
@@ -694,7 +669,7 @@ namespace nr
 
     template <typename Iterator>
     auto mode(Iterator begin, Iterator end)
-    -> std::optional<typename std::iterator_traits<Iterator>::value_type>
+    -> std::optional<iterator_value_type_t<Iterator>>
     {
         /**
          * Finds the unique mode of a container.
@@ -741,7 +716,7 @@ namespace nr
 
     template <typename Container>
     auto modes(const Container& data)
-    -> std::vector<typename std::decay_t<Container>::value_type>
+    -> std::vector<value_type_t<Container>>
     {
         /**
          * Finds all modes in a container (supports multi-modal distributions).
@@ -750,7 +725,7 @@ namespace nr
          * - Complexity: O(N) average time (two passes over the frequency map).
          * - Requirements: value_type must be hashable.
          */
-        using T = typename std::decay_t<Container>::value_type;
+        using T = value_type_t<Container>;
 
         if (data.empty())
             return {};
@@ -780,7 +755,7 @@ namespace nr
 
     template <typename Iterator>
     auto modes(Iterator begin, Iterator end)
-    -> std::vector<typename std::iterator_traits<Iterator>::value_type>
+    -> std::vector<iterator_value_type_t<Iterator>>
     {
         /**
          * Finds all modes in a container (supports multi-modal distributions).
@@ -789,7 +764,7 @@ namespace nr
          * - Complexity: O(N) average time (two passes over the frequency map).
          * - Requirements: value_type must be hashable.
          */
-        using T = typename std::iterator_traits<Iterator>::value_type;
+        using T = iterator_value_type_t<Iterator>;
 
         if (begin == end)
             return {};
@@ -838,10 +813,7 @@ namespace nr
 
     template <typename Iterator>
     auto Scope(Iterator begin, Iterator end)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /*
          * Calculates the scope (range) of a container.
@@ -859,10 +831,7 @@ namespace nr
 
     template <typename Container>
     auto interquartile_range(const Container& data)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /*
          * Calculates the interquartile range of a container.
@@ -880,10 +849,7 @@ namespace nr
 
     template <typename Iterator>
     auto interquartile_range(Iterator begin, Iterator end)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /*
          * Calculates the interquartile range of a container.
@@ -901,10 +867,7 @@ namespace nr
 
     template <typename Container>
     auto mean_absolute_deviation(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -914,7 +877,7 @@ namespace nr
          * - Requirements: value_type must be comparable.
          */
 
-        using T = typename std::decay_t<Container>::value_type;
+        using T = value_type_t<Container>;
         using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 
         if (data.empty()) {
@@ -935,10 +898,7 @@ namespace nr
 
     template <typename Iterator>
     auto mean_absolute_deviation(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>, 
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /**
          * Calculates the mean absolute deviation of a container.
@@ -947,7 +907,7 @@ namespace nr
          * - Complexity: O(N) time (one pass over the data).
          * - Requirements: value_type must be comparable.
          */
-        using T = typename std::iterator_traits<Iterator>::value_type;
+        using T = iterator_value_type_t<Iterator>;
         using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         if (begin == end) {
             throw std::invalid_argument("MAD: empty data");
@@ -967,10 +927,7 @@ namespace nr
 
     template <typename Container>
     auto dispersion(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>, 
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -1000,10 +957,7 @@ namespace nr
 
     template <typename Iterator>
     auto dispersion(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>, 
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /**
          * Calculates the dispersion (variance) of a container.
@@ -1012,7 +966,7 @@ namespace nr
          * - Complexity: O(N) time (one pass over the data).
          * - Requirements: value_type must be comparable.
          */
-        using T = typename std::iterator_traits<Iterator>::value_type;
+        using T = iterator_value_type_t<Iterator>;
         using CalcType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
         if (begin==end) {
             throw std::invalid_argument("Dispersion: empty data");
@@ -1032,10 +986,7 @@ namespace nr
 
     template <typename Container>
     auto standard_deviation(const Container& data) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>, 
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /**
          * Calculates the standard deviation of a container.
@@ -1065,10 +1016,7 @@ namespace nr
     
     template <typename Iterator>
     auto standard_deviation(Iterator begin, Iterator end) 
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /**
          * Calculates the standard deviation of a container.
@@ -1097,10 +1045,7 @@ namespace nr
 
     template<typename Container>
     auto skewness_pearson_1(const Container& data)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>, 
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /*
             * Calculates Pearson's first coefficient of skewness for a container.
@@ -1135,10 +1080,7 @@ namespace nr
 
     template<typename Iterator>
     auto skewness_pearson_1(const Iterator& begin, const Iterator& end)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>, 
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /*
             * Calculates Pearson's first coefficient of skewness for a container.
@@ -1174,10 +1116,7 @@ namespace nr
 
     template <typename Container>
     auto skewness_pearson_2(const Container& data)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename Container::value_type>,
-    typename Container::value_type, double>
+    -> conditional_type_f<Container, double>
     {
         /*
             * Calculates Pearson's second coefficient of skewness for a container.
@@ -1207,10 +1146,7 @@ namespace nr
 
     template <typename Iterator>
     auto skewness_pearson_2(Iterator begin, Iterator end)
-    -> typename std::conditional_t<
-    std::is_floating_point_v<
-    typename std::iterator_traits<Iterator>::value_type>,
-    typename std::iterator_traits<Iterator>::value_type, double>
+    -> iterator_conditional_type_f<Iterator, double>
     {
         /**
          * Calculates Pearson's second coefficient of skewness for a container.

@@ -25,6 +25,8 @@ add_library(Numera STATIC
 
     Moduls/Moduls.cpp
     Moduls/Moduls.h
+    
+    utils/type_traits.h
 )
 
 target_include_directories(Numera
